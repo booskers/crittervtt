@@ -1,0 +1,121 @@
+/* Critter design tokens: shared by Critter, Critter Sounds and Critter Notes.
+   The user picks up to two colours (--accent, --accent-2) and a background tone per scheme;
+   everything else is derived here, so an app only sets those inputs.
+
+   Usage:
+     <html data-theme="dark|light">     dark is the default; any element can switch scheme for its subtree
+     :root{ --accent:#8800ff; --accent-2:#4cc9f0; --tone-dark:#0b0a12; --tone-light:#f3f2f8 }   identity, or the user's picks
+   Optional: set --on-accent / --on-accent-2 from JS (a luminance test) for exact text-on-fill colours;
+   the CSS below picks black or white from the colour's lightness. */
+
+/* ---------- 1. inputs and scheme-independent constants ---------- */
+:root{
+  --accent:#10b39b;
+  --accent-2:#f5a524;
+  --tone-dark:#0c0d10;
+  --tone-light:#f1f1f5;
+
+  /* shape & space */
+  --r-xs:4px;--r-sm:6px;--r-md:8px;--r-lg:12px;--r-xl:16px;--r-2xl:22px;--r-pill:999px;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;
+  --h-sm:26px;--h-md:32px;--h-lg:40px;
+
+  /* type */
+  --font-ui:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,sans-serif;
+  --font-display:"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif;
+  --font-mono:"Cascadia Mono",Consolas,ui-monospace,monospace;
+  --fs-2xs:10.5px;--fs-xs:11.5px;--fs-sm:12.5px;--fs-md:13.5px;--fs-lg:15px;--fs-xl:18px;--fs-2xl:22px;--fs-3xl:28px;
+  --lh-tight:1.2;--lh:1.45;--lh-read:1.6;
+  --fw-regular:450;--fw-medium:560;--fw-bold:680;
+
+  /* motion */
+  --dur-fast:120ms;--dur:180ms;--dur-slow:280ms;
+  --ease-out:cubic-bezier(.2,.8,.2,1);--ease-in-out:cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- 2. dark (default) ---------- */
+:root,[data-theme=dark]{
+  --tone:var(--tone-dark);
+  /* surfaces: elevation by lightness, not by outlines.
+     0 = window/canvas, 1 = docked panels and sidebars, 2 = cards and items inside panels,
+     3 = floating things (menus, dialogs, popovers), 4 = strongest lift (hover on 3, toasts, active tab).
+     sunken = wells: inputs, tracks, segmented-control rails. */
+  --surface-0:var(--tone);
+  --surface-1:color-mix(in oklab,var(--tone),white 3.5%);
+  --surface-2:color-mix(in oklab,var(--tone),white 6.5%);
+  --surface-3:color-mix(in oklab,var(--tone),white 9.5%);
+  --surface-4:color-mix(in oklab,var(--tone),white 13%);
+  --sunken:rgb(0 0 0/.24);                              /* translucent: a well in whatever it sits on */
+  /* ink: three text levels, all AA (4.5:1) on every surface above */
+  --ink:color-mix(in oklab,white 93%,var(--tone));
+  --ink-2:color-mix(in oklab,white 76%,var(--tone));
+  --ink-3:color-mix(in oklab,white 63%,var(--tone));   /* the faintest TEXT */
+  --ink-4:color-mix(in oklab,white 42%,var(--tone));   /* icons and decoration only (3:1 non-text) */
+  /* accent as TEXT on surfaces: lightness clamped so any picked colour stays AA */
+  --accent-text:color-mix(in oklab,var(--accent) 50%,white);
+  --accent-text:oklch(from var(--accent) clamp(.78,l,.95) min(c,.19) h);
+  --accent-2-text:color-mix(in oklab,var(--accent-2) 50%,white);
+  --accent-2-text:oklch(from var(--accent-2) clamp(.78,l,.95) min(c,.19) h);
+  --accent-soft:color-mix(in oklab,var(--accent) 18%,transparent);
+  --ok:#4ade80;--warn:#fbbf24;--bad:#ff7b7b;
+  /* elevation: soft shadows + a 1px top sheen instead of borders */
+  --sheen:inset 0 1px 0 rgb(255 255 255/.05);
+  --shadow-1:0 1px 2px rgb(0 0 0/.35);
+  --shadow-2:0 8px 20px -8px rgb(0 0 0/.6),0 1px 3px rgb(0 0 0/.3);
+  --shadow-3:0 24px 60px -12px rgb(0 0 0/.72),0 2px 8px rgb(0 0 0/.35);
+  --scrim:rgb(0 0 0/.5);
+  color-scheme:dark;
+}
+
+/* ---------- 3. light: same names; lifted surfaces get lighter and shadows carry the edges ---------- */
+[data-theme=light]{
+  --tone:var(--tone-light);
+  --surface-0:var(--tone);
+  --surface-1:color-mix(in oklab,var(--tone),white 55%);
+  --surface-2:white;
+  --surface-3:white;
+  --surface-4:color-mix(in oklab,var(--tone),white 30%);
+  --sunken:rgb(20 20 50/.055);
+  --ink:color-mix(in oklab,black 88%,var(--tone));
+  --ink-2:color-mix(in oklab,black 68%,var(--tone));
+  --ink-3:color-mix(in oklab,black 54%,var(--tone));
+  --ink-4:color-mix(in oklab,black 36%,var(--tone));
+  --accent-text:color-mix(in oklab,var(--accent) 55%,black);
+  --accent-text:oklch(from var(--accent) clamp(.25,l,.46) c h);
+  --accent-2-text:color-mix(in oklab,var(--accent-2) 55%,black);
+  --accent-2-text:oklch(from var(--accent-2) clamp(.25,l,.46) c h);
+  --accent-soft:color-mix(in oklab,var(--accent) 14%,transparent);
+  --ok:#0e6630;--warn:#7f4a05;--bad:#ad1f22;
+  --sheen:0 0 0 1px rgb(20 20 40/.05);
+  --shadow-1:0 1px 2px rgb(20 20 40/.08),0 0 0 1px rgb(20 20 40/.05);
+  --shadow-2:0 8px 22px -10px rgb(20 20 40/.22),0 0 0 1px rgb(20 20 40/.05);
+  --shadow-3:0 24px 56px -14px rgb(20 20 40/.3),0 0 0 1px rgb(20 20 40/.06);
+  --scrim:rgb(20 20 30/.32);
+  color-scheme:light;
+}
+
+/* ---------- 4. derived from the scheme's ink and accents (recomputed in every scope) ---------- */
+:root,[data-theme]{
+  --hover:color-mix(in srgb,var(--ink) 6%,transparent);
+  --hover-2:color-mix(in srgb,var(--ink) 10%,transparent);
+  --press:color-mix(in srgb,var(--ink) 14%,transparent);
+  --line:color-mix(in srgb,var(--ink) 9%,transparent);        /* hairlines: only where space can't separate */
+  --line-strong:color-mix(in srgb,var(--ink) 16%,transparent);
+  --field-ring:color-mix(in srgb,var(--ink) 12%,transparent);  /* the one outline we keep: input wells */
+  --accent-softer:color-mix(in oklab,var(--accent) 10%,transparent);
+  --accent-2-soft:color-mix(in oklab,var(--accent-2) 16%,transparent);
+  /* text on a solid accent fill: black on light accents, white on dark ones */
+  --on-accent:oklch(from var(--accent) clamp(0,(.57 - l) * 1000,1) 0 0);
+  --on-accent-2:oklch(from var(--accent-2) clamp(0,(.57 - l) * 1000,1) 0 0);
+  --focus:var(--accent-text);
+  --ok-soft:color-mix(in srgb,var(--ok) 14%,transparent);
+  --warn-soft:color-mix(in srgb,var(--warn) 14%,transparent);
+  --bad-soft:color-mix(in srgb,var(--bad) 14%,transparent);
+  --danger:#c42b38;--on-danger:#fff;
+}
+
+/* ---------- motion: everything still works, nothing slides ---------- */
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-fast:1ms;--dur:1ms;--dur-slow:1ms}
+  *,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}
+}

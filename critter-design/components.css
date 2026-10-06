@@ -1,0 +1,126 @@
+/* Critter design system: reference components. Each app maps these rules onto its own class names;
+   the specimen page (index.html) uses them as written. Needs tokens.css first. */
+
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--surface-0);color:var(--ink);font:var(--fw-regular) var(--fs-md)/var(--lh) var(--font-ui);-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+::selection{background:color-mix(in oklab,var(--accent) 35%,transparent)}
+*{scrollbar-width:thin;scrollbar-color:var(--hover-2) transparent}
+
+/* ---------- type ---------- */
+.cap{font-size:var(--fs-2xs);font-weight:var(--fw-bold);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.t-2{color:var(--ink-2)}.t-3{color:var(--ink-3)}.t-accent{color:var(--accent-text)}.t-accent-2{color:var(--accent-2-text)}
+h1,h2,h3{font-family:var(--font-display);line-height:var(--lh-tight);margin:0}
+h1{font-size:var(--fs-3xl);font-weight:700}h2{font-size:var(--fs-2xl);font-weight:680}h3{font-size:var(--fs-xl);font-weight:650}
+
+/* ---------- surfaces ---------- */
+.panel{background:var(--surface-1);border-radius:var(--r-xl)}
+.card{background:var(--surface-2);border-radius:var(--r-lg);box-shadow:var(--sheen)}
+.float{background:var(--surface-3);border-radius:var(--r-xl);box-shadow:var(--shadow-3),var(--sheen)}
+
+/* ---------- buttons: tonal by default, solid accent for the one main action ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:var(--h-md);padding:0 14px;border:0;border-radius:var(--r-md);
+  background:var(--hover-2);color:var(--ink);font:var(--fw-medium) var(--fs-md)/1 var(--font-ui);cursor:pointer;white-space:nowrap;
+  transition:background var(--dur-fast),color var(--dur-fast),box-shadow var(--dur-fast),transform var(--dur-fast) var(--ease-out)}
+.btn:hover{background:var(--press)}
+.btn:active{transform:translateY(1px)}
+.btn:disabled{opacity:.45;cursor:default;transform:none}
+.btn.primary{background:var(--accent);color:var(--on-accent);box-shadow:0 6px 16px -8px var(--accent)}
+.btn.primary:hover{background:color-mix(in oklab,var(--accent),white 10%)}
+.btn.secondary{background:var(--accent-soft);color:var(--accent-text)}
+.btn.secondary:hover{background:color-mix(in oklab,var(--accent) 26%,transparent)}
+.btn.ghost{background:transparent;color:var(--ink-2)}.btn.ghost:hover{background:var(--hover);color:var(--ink)}
+.btn.danger{background:var(--danger);color:var(--on-danger)}
+.btn.sm{height:var(--h-sm);padding:0 10px;font-size:var(--fs-sm);border-radius:var(--r-sm)}
+.btn.lg{height:var(--h-lg);padding:0 18px;font-size:var(--fs-lg);border-radius:var(--r-lg)}
+.btn.on{background:var(--accent-soft);color:var(--accent-text)}
+.iconbtn{display:inline-grid;place-items:center;width:var(--h-md);height:var(--h-md);border:0;border-radius:var(--r-md);background:transparent;color:var(--ink-2);cursor:pointer;transition:background var(--dur-fast),color var(--dur-fast)}
+.iconbtn:hover{background:var(--hover-2);color:var(--ink)}.iconbtn.on{background:var(--accent-soft);color:var(--accent-text)}
+
+/* ---------- inputs: a sunken well with a faint ring; the accent ring on focus ---------- */
+.field{height:var(--h-md);padding:0 11px;border:0;border-radius:var(--r-md);background:var(--sunken);color:var(--ink);font:inherit;
+  box-shadow:inset 0 0 0 1px var(--field-ring);transition:box-shadow var(--dur-fast)}
+textarea.field{height:auto;padding:8px 11px;line-height:var(--lh)}
+.field::placeholder{color:var(--ink-3)}
+.field:hover{box-shadow:inset 0 0 0 1px var(--line-strong)}
+.field:focus{outline:0;box-shadow:inset 0 0 0 1px var(--accent),0 0 0 3px var(--accent-soft)}
+
+/* selects: same well, our chevron; the open list is themed where the engine allows (base-select) */
+select.field{appearance:none;padding-right:30px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--ink-3) 50%),linear-gradient(135deg,var(--ink-3) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;background-size:5px 5px;background-repeat:no-repeat}
+@supports (appearance:base-select){
+  select.field{appearance:base-select;background-image:none}
+  select.field::picker-icon{color:var(--ink-3);transition:rotate var(--dur)}
+  select.field:open::picker-icon{rotate:180deg}
+  select.field::picker(select){appearance:base-select;border:0;border-radius:var(--r-lg);padding:4px;background:var(--surface-3);color:var(--ink);box-shadow:var(--shadow-3)}
+  select.field option{border-radius:var(--r-sm);padding:6px 10px}
+  select.field option:hover,select.field option:focus-visible{background:var(--hover-2)}
+  select.field option:checked{background:var(--accent-soft);color:var(--accent-text)}
+  select.field option::checkmark{color:var(--accent-text)}
+}
+select.field option{background:var(--surface-3);color:var(--ink)}
+
+/* checkbox, radio, switch: drawn by us */
+.check,.radio{appearance:none;flex:none;width:16px;height:16px;margin:0;display:inline-grid;place-content:center;cursor:pointer;
+  background:var(--sunken);box-shadow:inset 0 0 0 1.5px var(--ink-4);transition:background var(--dur-fast),box-shadow var(--dur-fast)}
+.check{border-radius:5px}.radio{border-radius:50%}
+.check::before{content:"";width:10px;height:10px;background:var(--on-accent);transform:scale(0);transition:transform var(--dur-fast) var(--ease-out);
+  clip-path:polygon(14% 44%,0 65%,50% 100%,100% 16%,80% 0,43% 62%)}
+.radio::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-accent);transform:scale(0);transition:transform var(--dur-fast) var(--ease-out)}
+.check:checked,.radio:checked{background:var(--accent);box-shadow:none}
+.check:checked::before,.radio:checked::before{transform:scale(1)}
+.check:hover:not(:checked),.radio:hover:not(:checked){box-shadow:inset 0 0 0 1.5px var(--ink-3)}
+.switch{appearance:none;flex:none;width:32px;height:18px;margin:0;border-radius:99px;background:var(--press);position:relative;cursor:pointer;transition:background var(--dur)}
+.switch::before{content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--ink);box-shadow:var(--shadow-1);transition:transform var(--dur) var(--ease-out)}
+.switch:checked{background:var(--accent)}.switch:checked::before{transform:translateX(14px);background:var(--on-accent)}
+.grow{flex:1;min-width:0}
+.optlabel{display:inline-flex;align-items:center;gap:8px;cursor:pointer;color:var(--ink-2)}
+
+/* range: thin track filled to the handle (set --p from JS) */
+.range{appearance:none;background:transparent;height:18px;--p:50%;cursor:pointer}
+.range::-webkit-slider-runnable-track{height:4px;border-radius:99px;background:linear-gradient(90deg,var(--accent) 0 var(--p),var(--press) var(--p))}
+.range::-webkit-slider-thumb{appearance:none;width:14px;height:14px;margin-top:-5px;border-radius:50%;background:#fff;box-shadow:0 0 0 3px var(--accent),var(--shadow-1)}
+
+/* ---------- segmented tabs: a sunken rail, the active tab lifted ---------- */
+.seg{display:inline-flex;gap:2px;padding:3px;border-radius:var(--r-md);background:var(--sunken)}
+.seg>button{height:calc(var(--h-md) - 6px);padding:0 12px;border:0;border-radius:var(--r-sm);background:transparent;color:var(--ink-2);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer;transition:background var(--dur-fast),color var(--dur-fast)}
+.seg>button:hover{color:var(--ink)}
+.seg>button.on,.seg>button[aria-selected=true]{background:var(--surface-4);color:var(--ink);box-shadow:var(--shadow-1)}
+/* underline tabs for panel headers: no rule under the row, just the indicator */
+.tabs{display:flex;gap:2px}
+.tabs>button{position:relative;padding:8px 10px;border:0;background:none;color:var(--ink-3);font:var(--fw-medium) var(--fs-sm)/1 var(--font-ui);cursor:pointer;border-radius:var(--r-sm)}
+.tabs>button:hover{color:var(--ink);background:var(--hover)}
+.tabs>button.on{color:var(--ink)}
+.tabs>button.on::after{content:"";position:absolute;left:10px;right:10px;bottom:0;height:2px;border-radius:2px;background:var(--accent)}
+
+/* ---------- chips ---------- */
+.chip{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 10px;border:0;border-radius:var(--r-pill);background:var(--hover-2);color:var(--ink-2);font:var(--fw-medium) var(--fs-xs)/1 var(--font-ui)}
+.chip.on{background:var(--accent-soft);color:var(--accent-text)}
+
+/* ---------- menus ---------- */
+.menu{min-width:200px;padding:4px;display:grid;gap:1px;align-content:start}
+.menu>button{display:flex;align-items:center;gap:10px;height:var(--h-md);padding:0 10px;border:0;border-radius:var(--r-sm);background:transparent;color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.menu>button:hover,.menu>button:focus-visible{background:var(--hover-2);outline:0}
+.menu>button .kbd{margin-left:auto;color:var(--ink-3);font-size:var(--fs-xs)}
+.menu>hr{border:0;height:1px;margin:4px 8px;background:var(--line)}
+
+/* ---------- dialogs ---------- */
+.scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(6px);display:grid;place-items:center;padding:var(--sp-6)}
+.dialog{width:min(480px,100%);padding:var(--sp-5);display:grid;gap:var(--sp-4)}
+.dialog .foot{display:flex;justify-content:flex-end;gap:var(--sp-2);padding-top:var(--sp-1)}
+
+/* ---------- toasts ---------- */
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:var(--r-lg);background:var(--surface-4);color:var(--ink);box-shadow:var(--shadow-3)}
+.toast::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none}
+
+/* ---------- window headers that run out of room: buttons fold into one overflow (burger) button ---------- */
+.whead{display:flex;align-items:center;gap:6px;padding:8px 8px 8px 12px;container-type:inline-size}
+.whead .wtitle{flex:1;min-width:0;font-weight:var(--fw-bold);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.whead .wacts{display:flex;gap:2px}
+.whead .wmore{display:none}
+@container (max-width:300px){.whead .wacts{display:none}.whead .wmore{display:inline-grid}}
+
+/* ---------- motion ---------- */
+@keyframes cd-pop{from{opacity:0;transform:translateY(4px) scale(.98)}}
+.float.pop{animation:cd-pop var(--dur) var(--ease-out)}
