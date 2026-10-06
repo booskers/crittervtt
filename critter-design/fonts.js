@@ -3,9 +3,9 @@
    All from Google Fonts (free, OFL) except "System", which uses Windows' Segoe UI / Sitka. */
 const FONTS = {
   ui: [
+    ['Atkinson Hyperlegible Next', 'Atkinson+Hyperlegible+Next:wght@200..800', 'sans'],
     ['Zalando Sans', 'Zalando+Sans:ital,wght@0,200..900;1,200..900', 'sans'],
     ['Alegreya Sans', 'Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400', 'sans'],
-    ['Atkinson Hyperlegible Next', 'Atkinson+Hyperlegible+Next:wght@200..800', 'sans'],
     ['Bricolage Grotesque', 'Bricolage+Grotesque:opsz,wght@12..96,300..800', 'sans'],
     ['Figtree', 'Figtree:wght@300..900', 'sans'],
     ['Lexend', 'Lexend:wght@300..800', 'sans'],
@@ -16,6 +16,7 @@ const FONTS = {
     ['System', '', 'sys']
   ],
   display: [
+    ['Atkinson Hyperlegible Next', 'Atkinson+Hyperlegible+Next:wght@200..800', 'sans', 750],
     ['Zalando Sans Expanded', 'Zalando+Sans+Expanded:wght@200..900', 'sans', 700],
     ['Zalando Sans SemiExpanded', 'Zalando+Sans+SemiExpanded:wght@200..900', 'sans', 700],
     ['Zalando Sans', 'Zalando+Sans:ital,wght@0,200..900;1,200..900', 'sans', 750],
@@ -33,18 +34,19 @@ const FONTS = {
     ['System', '', 'sys', 700]
   ],
   read: [
+    ['Atkinson Hyperlegible Next', 'Atkinson+Hyperlegible+Next:wght@200..800', 'sans'],
     ['Literata', 'Literata:opsz,wght@7..72,200..900', 'serif'],
     ['Newsreader', 'Newsreader:opsz,wght@6..72,200..800', 'serif'],
     ['Spectral', 'Spectral:wght@400;500;600;700', 'serif'],
     ['Alegreya', 'Alegreya:wght@400..900', 'serif'],
     ['Fraunces', 'Fraunces:opsz,wght@9..144,300..900', 'serif'],
     ['Zalando Sans', 'Zalando+Sans:ital,wght@0,200..900;1,200..900', 'sans'],
-    ['Atkinson Hyperlegible Next', 'Atkinson+Hyperlegible+Next:wght@200..800', 'sans'],
     ['System', '', 'sys']
   ]
 };
-// ready-made pairings: [name, display, ui, read]
+// ready-made pairings: [name, display, ui, read]; "Easy reading" is the base for all three apps
 const FONT_SETS = [
+  ['Easy reading', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible Next'],
   ['Zalando', 'Zalando Sans Expanded', 'Zalando Sans', 'Literata'],
   ['Critter classic', 'Grenze', 'Alegreya Sans', 'Spectral'],
   ['Storybook', 'Fraunces', 'Nunito', 'Literata'],
@@ -53,8 +55,7 @@ const FONT_SETS = [
   ['Pulp', 'Texturina', 'Rubik', 'Spectral'],
   ['Neon', 'Unbounded', 'Onest', 'Atkinson Hyperlegible Next'],
   ['Jolly Roger', 'Pirata One', 'Outfit', 'Alegreya'],
-  ['Studio', 'Syne', 'Bricolage Grotesque', 'Newsreader'],
-  ['Easy reading', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible Next']
+  ['Studio', 'Syne', 'Bricolage Grotesque', 'Newsreader']
 ];
 const SYS_STACK = { ui: '"Segoe UI Variable Text","Segoe UI",system-ui,sans-serif', display: '"Segoe UI Variable Display","Segoe UI",system-ui,sans-serif', read: '"Sitka Text",Georgia,serif' };
 const fontDef = (role, name) => FONTS[role].find(f => f[0] === name) || (role === 'display' && FONTS.ui.find(f => f[0] === name) && [name, FONTS.ui.find(f => f[0] === name)[1], 'sans', 700]);

@@ -27,10 +27,11 @@ const items = await ev(`(() => {
     const rg = document.createRange(), rects = [];
     for (const n of e.childNodes) if (n.nodeType === 3 && n.textContent.trim()) { rg.selectNodeContents(n); rects.push(...rg.getClientRects()); }
     e.setAttribute('data-chk', 1);
-    for (const r of rects) { if (r.width < 2 || r.height < 2) continue;
+    const shaped = !!e.closest('.die');   // clip-path dice: the digit sits in the middle of its line box
+    for (let r of rects) { if (r.width < 2 || r.height < 2) continue; if (shaped) r = { left: r.left + r.width * .3, top: r.top + r.height * .3, width: r.width * .4, height: r.height * .4 };
       out.push({ sel: (e.className || e.tagName) + ' "' + e.textContent.trim().slice(0, 24) + '"', x: r.left + scrollX, y: r.top + scrollY, w: r.width, h: r.height, c: rgb(cs.color), size: parseFloat(cs.fontSize), wt: +cs.fontWeight }); }
   }
-  const st = document.createElement('style'); st.id = 'chkst'; st.textContent = '[data-chk]{color:transparent!important;text-shadow:none!important;-webkit-text-fill-color:transparent!important}[data-chk] svg,[data-chk] .art{visibility:hidden!important}'; document.head.append(st);
+  const st = document.createElement('style'); st.id = 'chkst'; st.textContent = '[data-chk]{color:transparent!important;text-shadow:none!important;-webkit-text-fill-color:transparent!important}[data-chk] svg,[data-chk] .art{visibility:hidden!important}*{text-decoration-color:transparent!important}'; document.head.append(st);
   return out;
 })()`);
 await new Promise(r => setTimeout(r, 900));

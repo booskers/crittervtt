@@ -25,9 +25,10 @@
   --h-sm:26px;--h-md:32px;--h-lg:40px;
 
   /* type: three user-pickable faces (see README for the choices) plus mono */
-  --font-ui:"Zalando Sans","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;          /* controls, lists, labels */
-  --font-display:"Zalando Sans Expanded","Segoe UI Variable Display","Segoe UI",sans-serif;  /* titles, numbers, the logo line */
-  --font-read:Literata,"Sitka Text",Georgia,serif;                                         /* long text: notes, rules, sheets */
+  /* the base set for all three apps is "Easy reading": Atkinson Hyperlegible Next in every role */
+  --font-ui:"Atkinson Hyperlegible Next","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;   /* controls, lists, labels */
+  --font-display:"Atkinson Hyperlegible Next","Segoe UI Variable Display","Segoe UI",sans-serif;    /* titles, numbers */
+  --font-read:"Atkinson Hyperlegible Next","Segoe UI",system-ui,sans-serif;                         /* long text: notes, rules, sheets */
   --font-mono:"Cascadia Mono",Consolas,ui-monospace,monospace;
   --fw-display:700;
   --track-display:-.01em;
@@ -65,6 +66,7 @@
   --accent-2-text:oklch(from var(--accent-2) clamp(.81,l,.95) min(c,.18) h);
   --accent-soft:color-mix(in oklab,var(--accent) 18%,transparent);
   --ok:#4ade80;--warn:#fbbf24;--bad:#ff7b7b;
+  --crit:#f0c45a;--crit-text:#f0c45a;--fumble:#ff6f63;--fumble-text:#ff8a80;
   /* elevation: soft shadows + a 1px top sheen instead of borders */
   --sheen:inset 0 1px 0 rgb(255 255 255/.05);
   --shadow-1:0 1px 2px rgb(0 0 0/.35);
@@ -98,6 +100,7 @@
   --accent-2-text:oklch(from var(--accent-2) clamp(.25,l,.4) c h);
   --accent-soft:color-mix(in oklab,var(--accent) 14%,transparent);
   --ok:#094f25;--warn:#653a03;--bad:#8d1619;
+  --crit:#f0c45a;--crit-text:#7a5300;--fumble:#ff6f63;--fumble-text:#a3241c;
   --sheen:0 0 0 1px rgb(20 20 40/.05);
   --shadow-1:0 1px 2px rgb(20 20 40/.08),0 0 0 1px rgb(20 20 40/.05);
   --shadow-2:0 8px 22px -10px rgb(20 20 40/.22),0 0 0 1px rgb(20 20 40/.05);
@@ -128,13 +131,16 @@
   --warn-soft:color-mix(in srgb,var(--warn) 14%,transparent);
   --bad-soft:color-mix(in srgb,var(--bad) 14%,transparent);
   --danger:#c42b38;--on-danger:#fff;
+  --crit-soft:color-mix(in srgb,var(--crit) 16%,transparent);--fumble-soft:color-mix(in srgb,var(--fumble) 16%,transparent);
   /* atmosphere for the window background: two soft lights from the accents, and grain */
   --ambient:radial-gradient(1100px 520px at 88% -12%,color-mix(in oklab,var(--accent) var(--ambient-amt),transparent),transparent 62%),
             radial-gradient(900px 420px at -8% 112%,color-mix(in oklab,var(--accent-2) calc(var(--ambient-amt) * .7),transparent),transparent 62%);
   --grain-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
-  /* the primary fill: the accent, lit from above, glowing a little */
+  /* the primary fill: the accent, lit from above. Glows appear only on hover (--accent-glow, --art-glow). */
   --accent-fill:linear-gradient(180deg,color-mix(in oklab,var(--accent),white 14%),var(--accent) 60%,color-mix(in oklab,var(--accent),black 8%));
-  --accent-glow:0 8px 22px -10px var(--accent),inset 0 1px 0 rgb(255 255 255/.22);
+  --accent-lift:inset 0 1px 0 rgb(255 255 255/.22);
+  --accent-glow:0 8px 22px -8px var(--accent);
+  --art-glow:.85;
 }
 
 /* ---------- motion: everything still works, nothing slides ---------- */

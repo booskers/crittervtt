@@ -1,5 +1,5 @@
 /* Demo artwork for the specimen: small painted scenes and token portraits, made from SVG so they ship with the page.
-   ART.scene(name) and ART.portrait(gameIcon, colourA, colourB) return a CSS url() for --art. */
+   ART.scene(name) and ART.portrait(gameIcon, colour) return a CSS url() for --art. */
 const ART = (() => {
   const url = svg => `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
   const wrap = (defs, body) => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice"><defs>${defs}<filter id="s"><feGaussianBlur stdDeviation="6"/></filter><filter id="b"><feGaussianBlur stdDeviation="18"/></filter></defs>${body}</svg>`;
@@ -34,9 +34,9 @@ const ART = (() => {
   };
   return {
     scene: n => url(S[n] || S.arcane),
-    portrait: (gi, a, b) => {
+    portrait: (gi, a) => {
       const g = (typeof GAME_ICONS !== 'undefined' && GAME_ICONS[gi]) || ['0 0 512 512', ''];
-      return url(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><radialGradient id="r" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></radialGradient></defs><rect width="120" height="120" fill="url(#r)"/><svg x="22" y="20" width="76" height="76" viewBox="${g[0]}" fill="#fff" fill-opacity=".92">${g[1]}</svg></svg>`);
+      return url(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" fill="${a}"/><svg x="22" y="20" width="76" height="76" viewBox="${g[0]}" fill="#fff" fill-opacity=".92">${g[1]}</svg></svg>`);
     }
   };
 })();
