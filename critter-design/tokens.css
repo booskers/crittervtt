@@ -1,0 +1,150 @@
+/* Critter design tokens: shared by Critter, Critter Sounds and Critter Notes.
+   The user picks up to two colours (--accent, --accent-2) and a background tone per scheme;
+   everything else is derived here, so an app only sets those inputs.
+
+   Usage:
+     <html data-theme="dark|light">     dark is the default; any element can switch scheme for its subtree
+     :root{ --accent:#8800ff; --accent-2:#4cc9f0; --tone-dark:#0b0a12; --tone-light:#f3f2f8 }   identity, or the user's picks
+   More user knobs: --hue (how much the accent tints the surfaces), the three fonts, --grain and --bleed (art glow).
+   Optional: set --on-accent / --on-accent-2 from JS (a luminance test) for exact text-on-fill colours;
+   the CSS below picks black or white from the colour's lightness. */
+
+/* ---------- 1. inputs and scheme-independent constants ---------- */
+:root{
+  --accent:#10b39b;
+  --accent-2:#f5a524;
+  --tone-dark:#0c0d10;
+  --tone-light:#f1f1f5;
+  --hue:4%;          /* the accent mixed into every surface: 0% = neutral grey, 14% = strongly tinted */
+  --grain:1;         /* paper/film grain on the window background: 0 = off, 1 = on */
+  --bleed:1;         /* how strongly artwork glows into the surfaces around it: 0 = off, .6 = soft, 1 = full */
+
+  /* shape & space: soft, a little rounder than a business app */
+  --r-xs:5px;--r-sm:7px;--r-md:10px;--r-lg:14px;--r-xl:18px;--r-2xl:26px;--r-pill:999px;
+  --sp-1:4px;--sp-2:8px;--sp-3:12px;--sp-4:16px;--sp-5:20px;--sp-6:24px;--sp-8:32px;--sp-10:40px;
+  --h-sm:26px;--h-md:32px;--h-lg:40px;
+
+  /* type: three user-pickable faces (see README for the choices) plus mono */
+  /* the base set for all three apps is "Easy reading": Atkinson Hyperlegible Next in every role */
+  --font-ui:"Atkinson Hyperlegible Next","Segoe UI Variable Text","Segoe UI",system-ui,sans-serif;   /* controls, lists, labels */
+  --font-display:"Atkinson Hyperlegible Next","Segoe UI Variable Display","Segoe UI",sans-serif;    /* titles, numbers */
+  --font-read:"Atkinson Hyperlegible Next","Segoe UI",system-ui,sans-serif;                         /* long text: notes, rules, sheets */
+  --font-mono:"Cascadia Mono",Consolas,ui-monospace,monospace;
+  --fw-display:700;
+  --track-display:-.01em;
+  --fs-2xs:10.5px;--fs-xs:11.5px;--fs-sm:12.5px;--fs-md:13.5px;--fs-lg:15px;--fs-xl:18px;--fs-2xl:22px;--fs-3xl:28px;
+  --lh-tight:1.2;--lh:1.45;--lh-read:1.6;
+  --fw-regular:450;--fw-medium:560;--fw-bold:680;
+
+  /* motion */
+  --dur-fast:120ms;--dur:180ms;--dur-slow:280ms;
+  --ease-out:cubic-bezier(.2,.8,.2,1);--ease-in-out:cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- 2. dark (default) ---------- */
+:root,[data-theme=dark]{
+  --tone:color-mix(in oklab,var(--tone-dark),var(--accent) var(--hue));
+  /* surfaces: elevation by lightness, not by outlines.
+     0 = window/canvas, 1 = docked panels and sidebars, 2 = cards and items inside panels,
+     3 = floating things (menus, dialogs, popovers), 4 = strongest lift (hover on 3, toasts, active tab).
+     sunken = wells: inputs, tracks, segmented-control rails. */
+  --surface-0:var(--tone);
+  --surface-1:color-mix(in oklab,var(--tone),white 3.5%);
+  --surface-2:color-mix(in oklab,var(--tone),white 6.5%);
+  --surface-3:color-mix(in oklab,var(--tone),white 9.5%);
+  --surface-4:color-mix(in oklab,var(--tone),white 13%);
+  --sunken:rgb(0 0 0/.24);                              /* translucent: a well in whatever it sits on */
+  /* ink: three text levels, all AA (4.5:1) on every surface above */
+  --ink:color-mix(in oklab,white 93%,var(--tone));
+  --ink-2:color-mix(in oklab,white 76%,var(--tone));
+  --ink-3:color-mix(in oklab,white 66%,var(--tone));   /* the faintest TEXT */
+  --ink-4:color-mix(in oklab,white 42%,var(--tone));   /* icons and decoration only (3:1 non-text) */
+  /* accent as TEXT on surfaces: lightness clamped so any picked colour stays AA */
+  --accent-text:color-mix(in oklab,var(--accent) 50%,white);
+  --accent-text:oklch(from var(--accent) clamp(.81,l,.95) min(c,.18) h);
+  --accent-2-text:color-mix(in oklab,var(--accent-2) 50%,white);
+  --accent-2-text:oklch(from var(--accent-2) clamp(.81,l,.95) min(c,.18) h);
+  --accent-soft:color-mix(in oklab,var(--accent) 18%,transparent);
+  --ok:#4ade80;--warn:#fbbf24;--bad:#ff7b7b;
+  --crit:#f0c45a;--crit-text:#f0c45a;--fumble:#ff6f63;--fumble-text:#ff8a80;
+  /* elevation: soft shadows + a 1px top sheen instead of borders */
+  --sheen:inset 0 1px 0 rgb(255 255 255/.05);
+  --shadow-1:0 1px 2px rgb(0 0 0/.35);
+  --shadow-2:0 8px 20px -8px rgb(0 0 0/.6),0 1px 3px rgb(0 0 0/.3);
+  --shadow-3:0 24px 60px -12px rgb(0 0 0/.72),0 2px 8px rgb(0 0 0/.35);
+  --scrim:rgb(0 0 0/.5);
+  /* art bleed: artwork blurred, saturated and dimmed so --ink stays AA over it, even over a pure white picture */
+  --bleed-filter:blur(44px) saturate(2.8) brightness(.44);
+  --bleed-opacity:calc(.72 * var(--bleed));
+  --grain-opacity:calc(.07 * var(--grain));
+  --ambient-amt:13%;
+  color-scheme:dark;
+}
+
+/* ---------- 3. light: same names; lifted surfaces get lighter and shadows carry the edges ---------- */
+[data-theme=light]{
+  --tone:color-mix(in oklab,var(--tone-light),var(--accent) calc(var(--hue) * .9));
+  --surface-0:var(--tone);
+  --surface-1:color-mix(in oklab,var(--tone),white 55%);
+  --surface-2:white;
+  --surface-3:white;
+  --surface-4:color-mix(in oklab,var(--tone),white 30%);
+  --sunken:rgb(20 20 50/.055);
+  --ink:color-mix(in oklab,black 88%,var(--tone));
+  --ink-2:color-mix(in oklab,black 68%,var(--tone));
+  --ink-3:color-mix(in oklab,black 56%,var(--tone));
+  --ink-4:color-mix(in oklab,black 36%,var(--tone));
+  --accent-text:color-mix(in oklab,var(--accent) 55%,black);
+  --accent-text:oklch(from var(--accent) clamp(.25,l,.4) c h);
+  --accent-2-text:color-mix(in oklab,var(--accent-2) 55%,black);
+  --accent-2-text:oklch(from var(--accent-2) clamp(.25,l,.4) c h);
+  --accent-soft:color-mix(in oklab,var(--accent) 14%,transparent);
+  --ok:#094f25;--warn:#653a03;--bad:#8d1619;
+  --crit:#f0c45a;--crit-text:#7a5300;--fumble:#ff6f63;--fumble-text:#a3241c;
+  --sheen:0 0 0 1px rgb(20 20 40/.05);
+  --shadow-1:0 1px 2px rgb(20 20 40/.08),0 0 0 1px rgb(20 20 40/.05);
+  --shadow-2:0 8px 22px -10px rgb(20 20 40/.22),0 0 0 1px rgb(20 20 40/.05);
+  --shadow-3:0 24px 56px -14px rgb(20 20 40/.3),0 0 0 1px rgb(20 20 40/.06);
+  --scrim:rgb(20 20 30/.32);
+  --bleed-filter:blur(44px) saturate(2) contrast(.5) brightness(1.55);
+  --bleed-opacity:calc(.7 * var(--bleed));
+  --grain-opacity:calc(.05 * var(--grain));
+  --ambient-amt:16%;
+  color-scheme:light;
+}
+
+/* ---------- 4. derived from the scheme's ink and accents (recomputed in every scope) ---------- */
+:root,[data-theme]{
+  --hover:color-mix(in srgb,var(--ink) 6%,transparent);
+  --hover-2:color-mix(in srgb,var(--ink) 10%,transparent);
+  --press:color-mix(in srgb,var(--ink) 14%,transparent);
+  --line:color-mix(in srgb,var(--ink) 9%,transparent);        /* hairlines: only where space can't separate */
+  --line-strong:color-mix(in srgb,var(--ink) 16%,transparent);
+  --field-ring:color-mix(in srgb,var(--ink) 12%,transparent);  /* the one outline we keep: input wells */
+  --accent-softer:color-mix(in oklab,var(--accent) 10%,transparent);
+  --accent-2-soft:color-mix(in oklab,var(--accent-2) 16%,transparent);
+  /* text on a solid accent fill: black on light accents, white on dark ones */
+  --on-accent:oklch(from var(--accent) clamp(0,(.57 - l) * 1000,1) 0 0);
+  --on-accent-2:oklch(from var(--accent-2) clamp(0,(.57 - l) * 1000,1) 0 0);
+  --focus:var(--accent-text);
+  --ok-soft:color-mix(in srgb,var(--ok) 14%,transparent);
+  --warn-soft:color-mix(in srgb,var(--warn) 14%,transparent);
+  --bad-soft:color-mix(in srgb,var(--bad) 14%,transparent);
+  --danger:#c42b38;--on-danger:#fff;
+  --crit-soft:color-mix(in srgb,var(--crit) 16%,transparent);--fumble-soft:color-mix(in srgb,var(--fumble) 16%,transparent);
+  /* atmosphere for the window background: two soft lights from the accents, and grain */
+  --ambient:radial-gradient(1100px 520px at 88% -12%,color-mix(in oklab,var(--accent) var(--ambient-amt),transparent),transparent 62%),
+            radial-gradient(900px 420px at -8% 112%,color-mix(in oklab,var(--accent-2) calc(var(--ambient-amt) * .7),transparent),transparent 62%);
+  --grain-img:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  /* the primary fill: the accent, lit from above. Glows appear only on hover (--accent-glow, --art-glow). */
+  --accent-fill:linear-gradient(180deg,color-mix(in oklab,var(--accent),white 14%),var(--accent) 60%,color-mix(in oklab,var(--accent),black 8%));
+  --accent-lift:inset 0 1px 0 rgb(255 255 255/.22);
+  --accent-glow:0 8px 22px -8px var(--accent);
+  --art-glow:.85;
+}
+
+/* ---------- motion: everything still works, nothing slides ---------- */
+@media (prefers-reduced-motion:reduce){
+  :root{--dur-fast:1ms;--dur:1ms;--dur-slow:1ms}
+  *,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}
+}
