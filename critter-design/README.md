@@ -203,7 +203,7 @@ This covers all three mock-ups, the component sheets, and 27 accent colours as t
 Add `tokens.css` first, set the inputs, then alias the old names so existing rules keep working while they're migrated.
 
 **Critter Sounds** (`src/style.css`, `applyTheme()`/`appearance()` in `src/app.js`)
-- `applyTheme()` sets `--accent`, `--accent-2` (keep `--accent2` as an alias), `--tone-dark` from `TONES[t.tone].bg`, plus `--hue`, `--bleed`, `--grain` and the fonts. `appearance()` gains Dark/Light, fonts, surface tint and art glow, with German strings.
+- `applyTheme()` sets `--accent`, `--accent-2` (keep `--accent2` as an alias), `--tone-dark` from `TONES[t.tone].bg`, plus `--hue`, `--bleed`, `--grain` and the fonts. `appearance()` gains Dark/Light, the font pairing, surface tint and picture colour, with German strings.
 - Map: `--bg` → `--surface-0`, `--panel` → `--surface-1`, `--panel2` → `--surface-2`, `--muted` → `--ink-2`, `--faint` → `--ink-3` (today's `#6d6b7e` is 3.6:1, which fails AA), `--accent-hi` → `--accent-text`, `--accent-ink` → `--on-accent`.
 - The play bar's existing `#barGlow` becomes `.bleed` with the graded filter (today it uses `brightness(1)`, which can put white text on a bright cover). `.nowart` becomes `.art` (glow on hover).
 - The title bar becomes see-through like Critter's: the page runs under it, `#titlebar` gets the `.titlebar` fade instead of its solid background and gradient line.
