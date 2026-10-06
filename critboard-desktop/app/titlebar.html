@@ -6,7 +6,7 @@
 <title>Critter title bar</title>
 <style>
 /* Critter's own title bar. Its colours follow the page's theme (sent by the page), these are the starting ones. */
-:root { --bg: #0f1114; --ink: #ece8e0; --muted: #8b909a; --line: #23262e; --accent: #d97200; --hover: #1b1e25; }
+:root { --bg: #0f1114; --ink: #ece8e0; --muted: #8b909a; --line: #23262e; --accent: #ff5c00; --hover: #1b1e25; }
 * { box-sizing: border-box; margin: 0; }
 html, body { height: 100%; overflow: hidden; background: transparent; }
 /* see-through: the board shows through, under a soft darkening that fades out downwards so the buttons stay readable */
@@ -42,9 +42,8 @@ body.max .ctl .max .restore { display: block; }
 </style>
 </head>
 <body>
-<button class="brand" id="menu" type="button" title="Critter menu" aria-haspopup="menu" aria-expanded="false">
+<button class="brand" id="menu" type="button" title="Critter VTT menu" aria-label="Critter VTT menu" aria-haspopup="menu" aria-expanded="false">
   <img class="logo" src="assets/icon.png" alt="">
-  <span class="name">Critter</span>
   <svg class="caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
 </button>
 <div class="title" id="title"></div>
@@ -67,9 +66,9 @@ bar.onState(s => {
   document.body.classList.toggle('max', !!s.max);
   document.body.classList.toggle('blur', !s.focus);
   $('.max').title = $('.max').ariaLabel = s.max ? 'Restore' : 'Maximize';
-  const t = String(s.title || '').replace(/^Critter\s*[·:-]?\s*/, '');
-  $('#title').textContent = t && t !== 'Critter' ? t : '';
-  document.title = s.title || 'Critter';
+  const t = String(s.title || '').replace(/^Critter(?: VTT)?\s*[·:-]?\s*/, '').replace(/\s*[·:-]\s*Critter(?: VTT)?$/, '');
+  $('#title').textContent = t && t !== 'Critter' && t !== 'Critter VTT' ? t : '';
+  document.title = s.title || 'Critter VTT';
 });
 bar.onTheme(t => { for (const [k, v] of Object.entries(t)) if (v) document.documentElement.style.setProperty('--' + k, v); });
 </script>

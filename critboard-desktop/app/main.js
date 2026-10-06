@@ -22,7 +22,7 @@ function serveFiles(ses) {
     return net.fetch(pathToFileURL(file).toString());
   });
   // a file the page offers to save gets a proper save dialog
-  ses.on('will-download', (e, item) => { item.setSaveDialogOptions({ title: 'Save from Critter', defaultPath: item.getFilename() }); });
+  ses.on('will-download', (e, item) => { item.setSaveDialogOptions({ title: 'Save from Critter VTT', defaultPath: item.getFilename() }); });
 }
 
 // the page tells the title bar its theme's colours, so the bar always matches it
@@ -45,7 +45,7 @@ function openWindow(partition, page) {
   const music = page === 'music.html';
   const win = new BaseWindow({
     width: music ? 560 : 1440, height: music ? 820 : 900, minWidth: music ? 360 : 900, minHeight: 600,
-    backgroundColor: '#0c0d10', title: music ? 'Critter Music Link' : 'Critter', icon: ICON, frame: false, show: false
+    backgroundColor: '#0c0d10', title: music ? 'Critter Music Link' : 'Critter VTT', icon: ICON, frame: false, show: false
   });
   const bar = new WebContentsView({ webPreferences: { contextIsolation: true, sandbox: true, preload: path.join(__dirname, 'titlebar-preload.js') } });
   // the table's music starts when the lobby owner presses play, without each player clicking first
@@ -120,7 +120,7 @@ function critterMenu(win) {
     ] },
     { label: 'Cloudflare dashboard', click: () => shell.openExternal('https://dash.cloudflare.com/') },
     { type: 'separator' },
-    { label: 'Quit Critter', click: () => app.quit() }
+    { label: 'Quit Critter VTT', click: () => app.quit() }
   ]);
 }
 ipcMain.on('bar:cmd', (e, cmd, arg) => {
@@ -146,7 +146,7 @@ ipcMain.handle('saves:info', async () => { const r = await savesRoot(); return r
 ipcMain.handle('saves:pick', async (e, useDefault) => {
   let dir = null;
   if (useDefault) dir = defaultSavesDir();
-  else { const w = winOf(e.sender); const r = await dialog.showOpenDialog(w || undefined, { title: 'Where should Critter keep its saves?', defaultPath: (await savesRoot()) || defaultSavesDir(), properties: ['openDirectory', 'createDirectory', 'promptToCreate'] }); if (r.canceled || !r.filePaths[0]) return null; dir = r.filePaths[0]; }
+  else { const w = winOf(e.sender); const r = await dialog.showOpenDialog(w || undefined, { title: 'Where should Critter VTT keep its saves?', defaultPath: (await savesRoot()) || defaultSavesDir(), properties: ['openDirectory', 'createDirectory', 'promptToCreate'] }); if (r.canceled || !r.filePaths[0]) return null; dir = r.filePaths[0]; }
   await fsp.mkdir(dir, { recursive: true }); await saveSettings({ savesDir: dir });
   return { path: dir, name: path.basename(dir) };
 });
