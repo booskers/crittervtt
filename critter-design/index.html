@@ -12,7 +12,7 @@
 <script src="art.js"></script>
 <style>
   /* page chrome only; everything inside the mock-ups uses tokens.css + components.css */
-  :root{--accent:#e8584c;--accent-2:#3cc4c4;--tone-dark:#0b0c0f;--tone-light:#f2f1ee}
+  :root{--accent:#ff5c00;--accent-2:#3cc4c4;--tone-dark:#0b0c0f;--tone-light:#f2f1ee}
   body{padding:28px 16px 80px;min-height:100vh;background:var(--ambient),var(--surface-0);background-attachment:fixed}
   .wrap{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
   .wrap>*{min-width:0}
@@ -182,7 +182,7 @@
   <header class="hero">
     <div>
       <span class="cap orn"><i data-g="dice-twenty-faces-twenty"></i>Critter design system · draft 3</span>
-      <h1 class="display">One look for Critter, Sounds and Notes</h1>
+      <h1 class="display">One look for Critter VTT, Sounds and Notes</h1>
       <p>Surfaces lift by light and shadow, not 1px outlines. Pictures spill their colour into the space around them, and things glow only when you point at them. Each app keeps its own colours; all three share one set of fonts, and every choice below is yours to change.</p>
     </div>
     <section class="float look" aria-label="Your look">
@@ -190,7 +190,7 @@
       <div class="lrow"><span>Scheme</span><div class="seg" role="group" aria-label="Scheme"><button type="button" class="on" data-scheme="dark"><i data-i="moon"></i>Dark</button><button type="button" data-scheme="light"><i data-i="sun"></i>Light</button></div></div>
       <div class="lrow"><span>Fonts, all apps</span><select class="field" id="fontSet" aria-label="Font pairing for all apps"></select></div>
       <div class="lrow"><span>Titles · UI · Reading</span><div class="fontrow"><select class="field" id="fDisplay" aria-label="Title font"></select><select class="field" id="fUi" aria-label="Interface font"></select><select class="field" id="fRead" aria-label="Reading font"></select></div></div>
-      <div class="lrow"><span>Surface tint</span><input type="range" class="range" id="hue" min="0" max="14" value="6" aria-label="How much the colour tints the surfaces"></div>
+      <div class="lrow"><span>Surface tint</span><input type="range" class="range" id="hue" min="0" max="14" value="4" aria-label="How much the colour tints the surfaces"></div>
       <div class="lrow"><span>Picture colour</span><div class="seg" role="group" aria-label="How far pictures spill their colour"><button type="button" data-bleed="0"><i data-i="eye-off"></i>Off</button><button type="button" data-bleed=".6"><i data-i="eye"></i>Soft</button><button type="button" class="on" data-bleed="1"><i data-i="sparkle"></i>Full</button></div></div>
       <div class="lrow"><span>Grain</span><label class="optlabel"><input type="checkbox" class="switch" id="grain" checked> Film grain on backgrounds</label></div>
       <div class="row" style="justify-content:flex-end"><button class="btn sm ghost" type="button" id="resetAll"><i data-i="refresh"></i>Reset everything</button></div>
@@ -199,9 +199,9 @@
 
   <!-- ===================== Critter ===================== -->
   <section class="appsec" data-app="critter">
-    <div class="sechead"><h2 class="display"><span class="logo"><i data-g="dice-twenty-faces-twenty"></i></span>Critter</h2><span class="note">The table, in the logo's coral. The chat shows every die that was rolled; the sheet header takes the colour of its portrait.</span><div class="picks"><select class="field fontpick" aria-label="Fonts for this app"></select></div></div>
+    <div class="sechead"><h2 class="display"><span class="logo"><i data-g="dice-twenty-faces-twenty"></i></span>Critter VTT</h2><span class="note">The table, in Critter VTT orange. The chat shows every die that was rolled; the sheet header takes the colour of its portrait.</span><div class="picks"><select class="field fontpick" aria-label="Fonts for this app"></select></div></div>
     <div class="mock">
-      <div class="titlebar"><span class="tb-brand"><span class="logo"><i data-g="dice-twenty-faces-twenty"></i></span><span class="tb-name">Critter</span></span><span class="tb-title">The Gilded Goose</span><span class="tb-ctl"><span><i data-i="minus"></i></span><span><i data-i="square"></i></span><span><i data-i="x"></i></span></span></div>
+      <div class="titlebar"><span class="tb-brand"><span class="logo"><i data-g="dice-twenty-faces-twenty"></i></span><span class="tb-name">Critter VTT</span></span><span class="tb-title">The Gilded Goose</span><span class="tb-ctl"><span><i data-i="minus"></i></span><span><i data-i="square"></i></span><span><i data-i="x"></i></span></span></div>
       <div class="board">
         <nav class="rail" aria-label="Tools">
           <button class="iconbtn on" type="button" title="Select" aria-label="Select"><i data-g="arrow-cursor"></i></button>
@@ -309,7 +309,7 @@
 
   <!-- ===================== Critter Notes ===================== -->
   <section class="appsec" data-app="notes">
-    <div class="sechead"><h2 class="display"><span class="logo"><i data-i="n-note"></i></span>Critter Notes</h2><span class="note">A page's picture becomes its banner and washes its colours down the page. New colours: pick a suggestion.</span><div class="presets" id="notesThemes" style="order:3;flex-basis:100%"></div><div class="picks"><select class="field fontpick" aria-label="Fonts for this app"></select></div></div>
+    <div class="sechead"><h2 class="display"><span class="logo"><i data-i="n-note"></i></span>Critter Notes</h2><span class="note">A page's picture becomes its banner and washes its colours down the page. Saffron & ink, or another theme.</span><div class="presets" id="notesThemes" style="order:3;flex-basis:100%"></div><div class="picks"><select class="field fontpick" aria-label="Fonts for this app"></select></div></div>
     <div class="mock">
       <div class="titlebar"><span class="tb-brand"><span class="logo"><i data-i="n-note"></i></span><span class="tb-name">Critter Notes</span></span><span class="tb-title">Saltmarsh harbour</span><span class="tb-ctl"><span><i data-i="minus"></i></span><span><i data-i="square"></i></span><span><i data-i="x"></i></span></span></div>
       <div class="nlay">
@@ -409,17 +409,17 @@
 <script>
 // each app's identity: its colours and background tones. All three share the base fonts ("Easy reading").
 const APPS = {
-  critter: { nm: 'Critter', a: '#e8584c', b: '#3cc4c4', td: '#0b0c0f', tl: '#f2f1ee' },
+  critter: { nm: 'Critter VTT', a: '#ff5c00', b: '#3cc4c4', td: '#0b0c0f', tl: '#f2f1ee' },
   sounds: { nm: 'Critter Sounds', a: '#8800ff', b: '#4cc9f0', td: '#0b0a12', tl: '#f3f2f8' },
-  notes: { nm: 'Critter Notes', a: '#4f7dff', b: '#f5a524', td: '#0b0d14', tl: '#f2f3f8' }
+  notes: { nm: 'Critter Notes', a: '#ffbd00', b: '#7a8cff', td: '#0b0d14', tl: '#f2f3f8' }
 };
-// suggested colour themes for Notes (instead of the old teal); the first is the new default
-const NOTES_THEMES = [['Lapis & amber', '#4f7dff', '#f5a524'], ['Ember & ice', '#ff7a3d', '#5ac8fa'], ['Rose & gold', '#e0568f', '#f2c14e'], ['Cerulean & coral', '#2ea8ff', '#ff8a6b'], ['Saffron & ink', '#f0a020', '#7a8cff']];
+// colour themes for Notes; Saffron & ink is the chosen default
+const NOTES_THEMES = [['Saffron & ink', '#f0a020', '#7a8cff'], ['Lapis & amber', '#4f7dff', '#f5a524'], ['Ember & ice', '#ff7a3d', '#5ac8fa'], ['Rose & gold', '#e0568f', '#f2c14e'], ['Cerulean & coral', '#2ea8ff', '#ff8a6b']];
 const BASE_SET = 'Easy reading';
 const setFonts = name => { const f = FONT_SETS.find(x => x[0] === name) || FONT_SETS.find(x => x[0] === BASE_SET); return { display: f[1], ui: f[2], read: f[3] }; };
 const state = { pick: {}, appFonts: {} };
 const reset = () => {
-  Object.assign(state, { scheme: 'dark', custom: null, hue: 6, bleed: 1, grain: 1, art: 'tavern' });
+  Object.assign(state, { scheme: 'dark', custom: null, hue: 4, bleed: 1, grain: 1, art: 'tavern' });
   for (const k in APPS) { state.pick[k] = { a: APPS[k].a, b: APPS[k].b }; state.appFonts[k] = BASE_SET; }
 };
 reset();
@@ -464,7 +464,7 @@ function paint() {
     sheet.append(n);
   }
   const st = document.getElementById('stress'); st.textContent = '';
-  for (const c of ['#e8584c', '#8800ff', '#4f7dff', '#b07cff', '#d4a64a', '#ff7a1a', '#e5484d', '#ec4899', '#22c55e', '#14b8a6', '#3b82f6', '#4cc9f0', '#c9a45c', '#10b39b', '#f5a524', '#ff7a3d', '#e0568f', '#2ea8ff', '#f0a020', '#4fd18b', '#3cc4c4', '#5aa2ff', '#a37cff', '#ff6fb1', '#3d2f7a', '#1a1a1a', '#ffffff']) {
+  for (const c of ['#ff5c00', '#e8584c', '#8800ff', '#4f7dff', '#b07cff', '#d4a64a', '#ff7a1a', '#e5484d', '#ec4899', '#22c55e', '#14b8a6', '#3b82f6', '#4cc9f0', '#c9a45c', '#10b39b', '#f5a524', '#ff7a3d', '#e0568f', '#2ea8ff', '#f0a020', '#4fd18b', '#3cc4c4', '#5aa2ff', '#a37cff', '#ff6fb1', '#3d2f7a', '#1a1a1a', '#ffffff']) {
     const d = document.createElement('div'); d.dataset.theme = state.scheme; d.style.cssText = `--accent:${c};--accent-2:${c}`;
     d.innerHTML = `<span class="t-accent">${c} as text</span><button class="btn primary sm" type="button">On fill</button><span class="chip on">Soft chip</span>`;
     st.append(d);

@@ -15,7 +15,7 @@
   --accent-2:#f5a524;
   --tone-dark:#0c0d10;
   --tone-light:#f1f1f5;
-  --hue:6%;          /* the accent mixed into every surface: 0% = neutral grey, 12% = strongly tinted */
+  --hue:4%;          /* the accent mixed into every surface: 0% = neutral grey, 14% = strongly tinted */
   --grain:1;         /* paper/film grain on the window background: 0 = off, 1 = on */
   --bleed:1;         /* how strongly artwork glows into the surfaces around it: 0 = off, .6 = soft, 1 = full */
 

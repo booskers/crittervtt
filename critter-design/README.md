@@ -1,6 +1,6 @@
 # Critter design system (draft 3)
 
-One look for **Critter**, **Critter Sounds** and **Critter Notes**. This folder holds only the look, so it stays easy to change before any app adopts it.
+One look for **Critter VTT**, **Critter Sounds** and **Critter Notes**. This folder holds only the look, so it stays easy to change before any app adopts it.
 
 | File | What it is |
 |---|---|
@@ -34,7 +34,7 @@ Open `index.html` through a local server (there's no build step). Change a value
 | Second colour | `--accent-2` | any colour |
 | Background tone | `--tone-dark`, `--tone-light` | any near-black / near-white |
 | Dark or light | `data-theme` on `<html>` (or any element) | `dark`, `light` |
-| Surface tint | `--hue` | `0%` (neutral grey) to `14%` (strongly tinted); default 6% |
+| Surface tint | `--hue` | `0%` (neutral grey) to `14%` (strongly tinted); default 4% |
 | Picture colour (bleed) | `--bleed` | `0` off, `.6` soft, `1` full |
 | Film grain | `--grain` | `0` or `1` |
 | Fonts (per app, in its settings) | `--font-display`, `--font-ui`, `--font-read` (+ `--fw-display`) | a pairing from the list below, or custom; default "Easy reading" |
@@ -43,21 +43,21 @@ Each app's identity (its defaults). Fonts are the same for all three: Easy readi
 
 | App | `--accent` | `--accent-2` | `--tone-dark` | `--tone-light` |
 |---|---|---|---|---|
-| Critter | `#e8584c` coral, the logo's colour (and still follows the player's colour) | `#3cc4c4` teal | `#0b0c0f` | `#f2f1ee` |
+| Critter VTT | `#ff5c00` orange (and still follows the player's colour) | `#3cc4c4` teal | `#0b0c0f` | `#f2f1ee` |
 | Critter Sounds | `#8800ff` purple | `#4cc9f0` ice | `#0b0a12` | `#f3f2f8` |
-| Critter Notes | `#4f7dff` lapis | `#f5a524` amber | `#0b0d14` | `#f2f3f8` |
+| Critter Notes | `#ffbd00` logo yellow | `#7a8cff` ink | `#0b0d14` | `#f2f3f8` |
 
-**Critter Notes: new colours.** The teal is gone. Suggested themes (they're buttons in the specimen's Notes section):
+**Critter Notes colours.** Notes matches its logo's yellow (`#ffbd00`) with ink as the second colour; these themes stay available:
 
 | Theme | `--accent` | `--accent-2` | Feel |
 |---|---|---|---|
-| **Lapis & amber** (proposed default) | `#4f7dff` | `#f5a524` | ink and lamplight; calm for long reading, clearly apart from Critter's coral and Sounds' purple |
+| **Saffron & ink** (default) | `#f0a020` | `#7a8cff` | old parchment and ink |
+| Lapis & amber | `#4f7dff` | `#f5a524` | ink and lamplight; calm for long reading |
 | Ember & ice | `#ff7a3d` | `#5ac8fa` | warm and lively; closer to Critter's coral |
 | Rose & gold | `#e0568f` | `#f2c14e` | storybook |
 | Cerulean & coral | `#2ea8ff` | `#ff8a6b` | bright sky; a nod to Critter |
-| Saffron & ink | `#f0a020` | `#7a8cff` | old parchment |
 
-Critter's game-system themes keep their own tones on top of this.
+Critter VTT's game systems no longer bring their own palettes, borders or fonts: every system uses this one look (each keeps its emblem).
 
 ## Fonts
 
@@ -212,7 +212,7 @@ Add `tokens.css` first, set the inputs, then alias the old names so existing rul
 
 **Critter** (`critboard/critboard.html`)
 - Game-system THEMES set `--bg/--panel/--panel-2/--ink/--muted/--line/--hover` and fonts per system. Keep that: either map `--tone-dark` from the system's `--bg` and let surfaces derive, or alias `--surface-1` → `--panel`. Systems' decorative borders and frames are identity and stay.
-- The default accent becomes the logo's coral `#e8584c` (today `#c9a45c` gold). `applyAccent()` keeps setting `--accent` from the player's colour; add `--accent-2` and a "Look" section in the Critter menu (Esc), the app's settings area, with colours, scheme, the font pairing and picture colour.
+- The app is renamed **Critter VTT** in visible text. The default accent becomes `#ff5c00` (today `#c9a45c` gold). `applyAccent()` keeps setting `--accent` from the player's colour; add `--accent-2` and a "Look" section in the Critter menu (Esc), the app's settings area, with colours, scheme, the font pairing and picture colour.
 - Keep the chat exactly as structured today (`renderEntryCore`: `.entry`, `.rres`, `.total`, `.rline`, `.dice`, `.die.d4…d20`); restyle it with the tokens as in `components.css`. Avatars stay flat (`.av`). Dropped dice change from faded (`opacity:.35`) to grey and struck through, which keeps the number readable.
 - Pictures: the sheet window header gets `.bleed` from its portrait; scene thumbnails (the scenes strip) and scene cards get `.art` / `.banner`.
 - Leave alone: paper sheets (`.entwin.paper`, their own `--pp-*` light palette), the loader (`.crload`), the system-switch screen (`.sysveil`).
@@ -222,7 +222,7 @@ Add `tokens.css` first, set the inputs, then alias the old names so existing rul
 
 **Critter Notes** (`src/style.css`; already token-based with `:root[data-theme=light]`)
 - Rename `--panel/--panel2/--panel3` → `--surface-1/2/3`, `--muted` → `--ink-2`, `--faint` → `--ink-3`, `--accent2` → `--accent-2`, `--accent-hi` → `--accent-text`, `--accent-ink` → `--on-accent`; `--read` → `--font-read`.
-- New colours: Lapis & amber (`#4f7dff` / `#f5a524`) unless the user picks another suggested theme.
+- New colours: Saffron & ink (`#f0a020` / `#7a8cff`).
 - Pages with a picture get `.banner` + `.bleed.down`; the campaign button gets `.art`, linked people get `.av`.
 - The title bar becomes see-through (the sidebar, page banner and side panel run under it), and window headers fold everything but ✕ into ⋯ when narrow.
 - Remove `border-right`/`border-left` on `#side`/`#right` and the rule under `.rtabs`; remove borders on `.btn`, `.chip`, `.campbtn`, `.findbtn`, `.linkbox`, `.tstat`, `.blink`. Replace `accent-color` checkboxes and native selects with the drawn controls.
@@ -235,3 +235,12 @@ Add `tokens.css` first, set the inputs, then alias the old names so existing rul
 - How strongly surfaces separate: the white percentages in `--surface-1…4` (dark) or the shadows (light).
 - How loud artwork is: `--bleed` per user; the grading in `--bleed-filter` (re-run the bleed check after brightening it).
 - Roundness: the `--r-*` scale. Density: `--h-*` and `--sp-*`.
+
+## Logos
+
+Each app has a logo (mark, "Critter" wordmark, coloured pill) drawn for dark backgrounds. In the apps:
+
+- **Title bar (top left): the mark only**, in the app's colour; the app's name stays in the tooltip, the window title and the screen-reader label.
+- **Large logos** (Critter VTT's chat panel, splash and menu; Critter Sounds' header) use the full logo inline: the wordmark follows the text colour (`currentColor`), so it turns dark in light mode; the mark and pill keep the brand colour.
+- **Light mode:** Critter Notes' yellow deepens from `#ffbd00` to `#b27f00` for the mark (`icon-light.svg`) so it stays visible on white; orange and purple stay as they are.
+- Icons (`.ico`, PNGs, favicons) are cut from the mark; `make-icons.cjs` in Sounds and Notes now draws them from `src/icon.svg`.
