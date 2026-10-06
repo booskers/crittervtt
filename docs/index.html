@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Critter</title>
+<meta name="description" content="Critter is a free virtual tabletop: a battle map, dice, character sheets and rulebooks, shared live with your group in a browser or on Windows.">
+<meta property="og:title" content="Critter">
+<meta property="og:description" content="A free virtual tabletop for your group, in the browser or on Windows.">
+<meta property="og:image" content="img/critter-table.png">
+<link rel="icon" href="img/critter-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Grenze:wght@600;700&display=swap">
+<link rel="stylesheet" href="style.css">
+<style>
+.hero::before{background:radial-gradient(closest-side at 50% 50%,rgba(232,88,76,.24),transparent)}
+.logos img{height:88px}
+</style>
+</head>
+<body class="critter">
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Critter home"><img src="img/critter-logo.svg" alt="Critter"></a>
+    <div class="links">
+      <a href="#features" class="hide-s">Features</a>
+      <a href="#homebase" class="hide-s">Host it</a>
+      <a href="#download">Download</a>
+      <a href="https://github.com/booskers/critter">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="logos"><img src="img/critter-logo.svg" alt="Critter"></div>
+    <h1>A game table everyone<br>can sit at, <span class="r">online</span>.</h1>
+    <p class="lede">Critter is a free virtual tabletop. Share a lobby code and your group is in, with the same battle map, dice, character sheets and rulebooks, and every roll as it happens.</p>
+    <div class="ctas">
+      <a class="btn red" href="https://critter.poly-chrome.cc">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l14 8-14 8z"/></svg>
+        Play in your browser</a>
+      <a class="btn ghost" href="https://github.com/booskers/critter/releases/latest/download/Critter-Setup.exe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
+        Download for Windows</a>
+    </div>
+    <p class="note">Free and open source. Nothing to install to play in a browser.</p>
+    <div class="shot">
+      <img src="img/critter-table.png" alt="Critter: the battle map, the dice panel and the Take a seat dialog for choosing a name, token and colour" width="1440" height="900">
+    </div>
+  </div>
+</header>
+
+<section id="features">
+  <div class="wrap">
+    <span class="eyebrow red-t"><img src="img/critter-icon.png" alt="">Features</span>
+    <h2>Everything the table needs.</h2>
+    <p class="sub">Everyone at the table sees the same thing at the same moment: maps, rolls, sheets and music.</p>
+    <div class="split">
+      <div>
+        <ul class="ticks">
+          <li><b>A battle map</b> with tokens, drawing tools and each player's live cursor.</li>
+          <li><b>Dice</b> from d4 to d100, with modifiers, hidden GM rolls and typed rolls like <span class="code">2d6+3</span>.</li>
+          <li><b>Character sheets and items</b>, with D&amp;D Beyond import for the owner of a lobby.</li>
+          <li><b>Built-in rules compendium</b> for D&amp;D 5e, Pathfinder 2e, Daggerheart, Blades in the Dark and Fate.</li>
+          <li><b>Autosaves and Rewind</b> on the server, plus the GM's own saves folder on their computer.</li>
+          <li><b>Works on phones</b>, in any modern browser, or as a Windows app.</li>
+        </ul>
+      </div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:0">
+        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M10 10a4 4 0 100-8 4 4 0 000 8zM21 20v-2a4 4 0 00-3-3.87M16 2.13a4 4 0 010 7.75"/></svg></div>
+          <h3>Players and seats</h3><p>The owner sets up the players; each person claims theirs with a name, token and colour.</p></div>
+        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5zM4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg></div>
+          <h3>Library and creators</h3><p>Spells, monsters, items and classes, plus importers and creature builders.</p></div>
+        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8M3 3v5h5"/></svg></div>
+          <h3>Rewind the table</h3><p>Saves every ten minutes while you play. Rewind a lost evening, and undo the rewind too.</p></div>
+        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
+          <h3>Browser or desktop</h3><p>The same table in a browser, or in the Windows app with its own window.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="sounds" class="sounds">
+  <div class="wrap">
+    <div class="split rev">
+      <div class="media"><img src="img/sounds-game.png" alt="Critter Sounds: playlists, sound pads, soundscapes, scenes and effects side by side" loading="lazy" width="1280" height="820"></div>
+      <div>
+        <span class="eyebrow purple-t"><img src="img/sounds-icon.png" alt="">Pairs with Critter Sounds</span>
+        <h2>Music, played live to the table.</h2>
+        <p class="sub">Critter Sounds is the companion app for whoever runs the music. In Critter, the owner opens <b>Music</b>, copies the table's music code and pastes it into Critter Sounds. Everyone hears the music, and each player sets their own volume.</p>
+        <a class="btn purple" href="https://booskers.github.io/critter-sounds/">Meet Critter Sounds</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="homebase">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--gold)">Host it yourself</span>
+    <h2>Your group, your server.</h2>
+    <p class="sub">Critter connects through Homebase, a small server that keeps your tables and pushes every change live. Run your own in one of two ways.</p>
+    <div class="flow">
+      <div class="step"><h3>On Cloudflare</h3><p>A Worker on your own free Cloudflare account. One double-click on <span class="code">setup-homebase.cmd</span> puts it online and builds an installer that connects to it.</p></div>
+      <div class="step"><h3>On your computer</h3><p>A Node server: <span class="code">node server.mjs --port 8787</span>. Players open its address in a browser, or point the app at it.</p></div>
+      <div class="step"><h3>Your data</h3><p>Tables, autosaves and uploaded music stay on your server, in a folder you can back up.</p></div>
+    </div>
+    <p class="small" style="margin-top:20px">The full guide is in the <a href="https://github.com/booskers/critter/blob/main/critboard-desktop/README.md">project README</a>.</p>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <span class="eyebrow" style="color:var(--muted)">Download</span>
+    <h2>Get Critter.</h2>
+    <div class="dl">
+      <div class="dlcard c">
+        <img class="lg" src="img/critter-logo.svg" alt="Critter">
+        <p>The Windows app, with its own window and a saves folder on your computer.</p>
+        <div class="row">
+          <a class="btn red" href="https://github.com/booskers/critter/releases/latest/download/Critter-Setup.exe">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
+            Critter for Windows</a>
+        </div>
+      </div>
+      <div class="dlcard">
+        <h3 style="margin:0;font:700 30px var(--display)">In your browser</h3>
+        <p>Nothing to install. Works on computers, tablets and phones.</p>
+        <div class="row">
+          <a class="btn ghost" href="https://critter.poly-chrome.cc">Open critter.poly-chrome.cc</a>
+        </div>
+      </div>
+    </div>
+    <p class="small" style="margin-top:20px">The installer isn't code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>. Every version is on the <a href="https://github.com/booskers/critter/releases">Releases page</a>.</p>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>Critter · <a href="https://github.com/booskers/critter">Source on GitHub</a> · MIT License</div>
+    <div>Icons from <a href="https://game-icons.net">game-icons.net</a> (CC BY 3.0).</div>
+  </div>
+</footer>
+
+</body>
+</html>

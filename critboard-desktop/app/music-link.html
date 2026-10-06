@@ -1,0 +1,220 @@
+<title>Critter Music Link</title>
+<style>
+:root{--bg:#f4f1ea;--panel:#fffdf8;--panel-2:#efe9dd;--ink:#1d1b18;--muted:#6b645a;--line:#ddd5c6;--accent:#9a6b1f;--accent-ink:#fff;--bad:#b3261e;--ok:#2e7d32}
+@media (prefers-color-scheme:dark){:root{--bg:#0e0f12;--panel:#16181d;--panel-2:#1d2026;--ink:#ece6da;--muted:#a39d92;--line:#2b2e36;--accent:#d2ab62;--accent-ink:#17150f;--bad:#f2766b;--ok:#7cc882}}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:520px;margin:0 auto;padding:24px 16px 40px;display:grid;gap:16px}
+h1{font-size:22px;margin:0}h2{font-size:14px;margin:6px 0 0;color:var(--muted)}
+p{margin:0}.hint{color:var(--muted);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;display:grid;gap:12px}
+label.f{display:grid;gap:4px;font-size:13px;color:var(--muted)}
+input[type=text]{font:inherit;font-size:17px;letter-spacing:.08em;text-transform:uppercase;padding:9px 11px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);width:100%}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel-2);color:var(--ink);padding:8px 14px}
+button:disabled{opacity:.45;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+button[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
+.err{color:var(--bad);min-height:1.4em;font-size:14px}
+.title{font-size:19px;font-weight:700;overflow-wrap:anywhere}
+.bar{display:flex;gap:10px;align-items:center}.bar input{flex:1;min-width:0}
+.time{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.ctl{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctl .big{width:52px;height:52px;border-radius:50%;padding:0;font-size:20px}
+.row{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center}
+ol{margin:0;padding:0;list-style:none;display:grid;gap:2px}
+li{display:flex;gap:8px;align-items:center;padding:6px 8px;border-radius:8px}
+li.cur{background:var(--panel-2)}li .n{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+li button{padding:0;border:0;background:none;text-align:left;color:inherit;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+li button:hover{color:var(--accent)}
+.msg{font-size:13px;min-height:1.4em}.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}
+</style>
+<main>
+  <header><h1>Critter Music Link</h1><p class="hint">Hear a table's music on another device, or control it from here. It connects through Homebase with the lobby code.</p></header>
+
+  <form class="card" id="conn">
+    <label class="f">Lobby code<input type="text" id="code" maxlength="12" autocomplete="off" spellcheck="false" required></label>
+    <label class="f">Remote key (only needed to control the music)<input type="text" id="key" maxlength="14" autocomplete="off" spellcheck="false" placeholder="ABCDE-FGHJK"></label>
+    <p class="hint">The lobby owner finds the key in Critter under Music › Remote link.</p>
+    <p class="err" id="err" role="alert"></p>
+    <div><button class="primary" type="submit" id="go">Connect</button></div>
+  </form>
+
+  <section class="card" id="player" hidden>
+    <div class="top"><span class="hint" id="where"></span><button type="button" id="leave">Disconnect</button></div>
+    <div><div class="title" id="title">Nothing playing</div><p class="hint" id="state"></p></div>
+    <div class="bar"><input type="range" id="seek" min="0" max="1" step="1" value="0" aria-label="Position in the track"><span class="time" id="time"></span></div>
+    <div class="ctl" id="ctl">
+      <button type="button" id="prev" aria-label="Previous track">⏮</button>
+      <button type="button" class="big primary" id="play" aria-label="Play">▶</button>
+      <button type="button" id="next" aria-label="Next track">⏭</button>
+      <button type="button" id="loop"></button>
+      <button type="button" id="shuffle">Shuffle</button>
+    </div>
+    <div class="row" id="tvRow"><span class="hint">Table volume</span><input type="range" id="tv" min="0" max="100" aria-label="Music volume for the whole table"></div>
+    <p class="msg" id="msg" role="status"></p>
+    <label class="row"><input type="checkbox" id="here"><span>Play the music on this device</span></label>
+    <div class="row"><span class="hint">Volume here</span><input type="range" id="vol" min="0" max="100" aria-label="Volume on this device"></div>
+    <h2>Playlist</h2>
+    <ol id="list"></ol>
+  </section>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const LS = { get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } }, set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} } };
+  const norm = s => String(s || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const fmt = s => { s = Math.max(0, Math.floor(s || 0)); const h = Math.floor(s / 3600), m = Math.floor(s / 60) % 60, x = String(s % 60).padStart(2, '0'); return h ? `${h}:${String(m).padStart(2, '0')}:${x}` : `${m}:${x}`; };
+  let db = null, room = null, code = '', key = '', M = null, offs = [], here = LS.get('ml.here', true), vol = LS.get('ml.vol', 0.8);
+  const au = new Audio(); au.preload = 'auto';
+  let want = '', loading = false, failed = '', blocked = false, sig = '';
+  const urls = new Map(), pending = new Map();
+
+  $('#code').value = LS.get('ml.code', ''); $('#key').value = LS.get('ml.key', '');
+  $('#here').checked = here; $('#vol').value = String(Math.round(vol * 100));
+
+  /* ---------- the table's music state, as the Critter page writes it ---------- */
+  function clean(o) {
+    o = o && typeof o === 'object' ? o : {};
+    const list = (Array.isArray(o.list) ? o.list : []).filter(t => t && typeof t === 'object' && t.id).map(t => ({ id: String(t.id).replace(/\W/g, ''), title: String(t.title || 'Track').slice(0, 80), kind: t.kind === 'url' ? 'url' : 'file', src: String(t.src || ''), n: Math.max(0, Math.trunc(+t.n) || 0), mime: String(t.mime || ''), dur: +t.dur || 0 }));
+    const cur = list.some(t => t.id === o.cur) ? o.cur : '';
+    return { list, cur, playing: !!o.playing && !!cur, at: +o.at || 0, t0: +o.t0 || 0, loop: ['all', 'one', 'off'].includes(o.loop) ? o.loop : 'all', shuffle: !!o.shuffle, tv: o.tv === undefined ? 1 : Math.min(1, Math.max(0, +o.tv || 0)), lk: !!o.lk };
+  }
+  const track = () => M && M.list.find(t => t.id === M.cur);
+  const pos = () => M.at + (M.playing ? Math.max(0, (Date.now() - M.t0) / 1000) : 0);
+  const tkey = t => code + '-' + t.id;
+
+  /* ---------- playing it here: the same tracks, cached the same way as in Critter ---------- */
+  let idbP = null;
+  const idb = () => idbP || (idbP = new Promise((res, rej) => { try { const r = indexedDB.open('critboard-music', 1); r.onupgradeneeded = () => r.result.createObjectStore('t'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); } catch (e) { rej(e); } }));
+  const idbGet = k => idb().then(d => new Promise(r => { try { const q = d.transaction('t').objectStore('t').get(k); q.onsuccess = () => r(q.result || null); q.onerror = () => r(null); } catch { r(null); } }), () => null);
+  const idbPut = (k, v) => idb().then(d => { try { d.transaction('t', 'readwrite').objectStore('t').put(v, k); } catch {} }, () => {});
+  async function source(t) {
+    if (t.kind === 'url') return t.src;
+    const k = tkey(t); if (urls.has(k)) return urls.get(k);
+    let blob = await idbGet(k);
+    if (!blob) {
+      const parts = new Array(t.n);
+      for (let i = 0; i < t.n; i += 6) await Promise.all(Array.from({ length: Math.min(6, t.n - i) }, async (_, j) => { const s = await db.doc(`audio/${k}-${i + j}`).get(); if (!s.exists) throw new Error('missing'); parts[i + j] = String((s.data() || {}).d || ''); }));
+      const bin = atob(parts.join('')), u = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+      blob = new Blob([u], { type: t.mime || 'audio/mpeg' }); idbPut(k, blob);
+    }
+    const u = URL.createObjectURL(blob); urls.set(k, u); return u;
+  }
+  function apply() {
+    au.loop = !!M && M.loop === 'one'; au.volume = M ? vol * M.tv : vol;
+    const t = track();
+    if (!t || !here) { want = ''; if (au.getAttribute('src')) { au.pause(); au.removeAttribute('src'); au.dataset.k = ''; } render(); return; }
+    const k = tkey(t) + (t.kind === 'url' ? '|' + t.src : '');
+    const s = [M.cur, M.playing, M.at, M.t0].join('|'), moved = s !== sig; sig = s;
+    if (au.dataset.k === k) { sync(moved); return; }
+    if (want === k) return;
+    want = k; loading = true; failed = ''; render();
+    source(t).then(src => {
+      if (want !== k) return;
+      loading = false; au.pause(); au.dataset.k = k; au.src = src;
+      au.addEventListener('loadedmetadata', () => sync(true), { once: true }); render();
+    }, () => { if (want !== k) return; want = ''; loading = false; failed = t.id; render(); });
+  }
+  function sync(force) {
+    const t = track(); if (!t || !here || !au.dataset.k || !au.dataset.k.startsWith(tkey(t)) || au.readyState < 1) return;
+    au.volume = vol * M.tv;
+    const d = isFinite(au.duration) ? au.duration : t.dur;
+    let p = pos();
+    if (d) { if (M.loop === 'one') p %= d; else if (p >= d) { au.pause(); return; } }
+    if (force || Math.abs(au.currentTime - p) > (M.playing ? 1.5 : 0.3)) try { au.currentTime = p; } catch {}
+    if (!M.playing) { au.pause(); return; }
+    if (au.paused) au.play().then(() => { if (blocked) { blocked = false; render(); } }, e => { if (e && e.name === 'NotAllowedError') { blocked = true; render(); } });
+  }
+  au.addEventListener('error', () => { const t = track(); if (t && au.dataset.k) { failed = t.id; render(); } });
+  addEventListener('pointerdown', () => { if (blocked) sync(true); }, true);
+
+  /* ---------- controlling it: commands go to the GM's Critter page, which checks the key ---------- */
+  function send(op, extra) {
+    if (!room || !key) return;
+    const rid = Math.random().toString(36).slice(2, 12);
+    say('Sending…', '');
+    const t = setTimeout(() => { if (pending.delete(rid)) say('No GM answered. The lobby owner (or a co-owner) needs to have the table open.', 'bad'); }, 5000);
+    pending.set(rid, t);
+    room.emit('music', { op, key, rid, ...(extra || {}) }).catch(() => { clearTimeout(t); pending.delete(rid); say('Could not reach Homebase.', 'bad'); });
+  }
+  function onAck(msg) {
+    const d = msg && msg.data; if (!d || !pending.has(d.rid)) return;
+    clearTimeout(pending.get(d.rid)); pending.delete(d.rid);
+    if (d.ok) say('Done.', 'ok'); else say(d.err === 'wrong key' ? 'The key is wrong, or the owner made a new one.' : 'The table did not accept that.', 'bad');
+  }
+  function say(text, cls) { const m = $('#msg'); m.textContent = text; m.className = 'msg ' + (cls || ''); }
+
+  /* ---------- the screen ---------- */
+  function render() {
+    if (!M) return;
+    const t = track(), ctl = !!key;
+    $('#title').textContent = t ? t.title : 'Nothing playing';
+    $('#state').textContent = !t ? 'The lobby owner hasn\'t put on any music.'
+      : failed === t.id ? (t.kind === 'url' ? 'This link can\'t be played here.' : 'This track could not be loaded.')
+      : !M.playing ? 'Paused' : !here ? 'Playing at the table' : loading ? 'Loading the track…' : blocked ? 'Click anywhere to hear it.' : 'Playing here and at the table';
+    $('#play').textContent = M.playing ? '⏸' : '▶'; $('#play').setAttribute('aria-label', M.playing ? 'Pause' : 'Play');
+    $('#loop').textContent = { all: 'Repeat all', one: 'Repeat one', off: 'No repeat' }[M.loop];
+    $('#shuffle').setAttribute('aria-pressed', String(M.shuffle));
+    $('#ctl').hidden = $('#tvRow').hidden = !ctl;
+    $('#tv').value = String(Math.round(M.tv * 100));
+    const sk = $('#seek'); sk.max = String(Math.max(1, Math.floor((t && t.dur) || 0))); sk.disabled = !ctl || !t || !t.dur;
+    $('#where').textContent = `Lobby ${code}` + (ctl ? (M.lk ? ' · remote control' : ' · the owner has no remote link on') : ' · listening');
+    const ol = $('#list'); ol.textContent = '';
+    if (!M.list.length) { const li = document.createElement('li'); li.className = 'hint'; li.textContent = 'Empty.'; ol.append(li); }
+    for (const x of M.list) {
+      const li = document.createElement('li'); if (x.id === M.cur) li.className = 'cur';
+      const n = document.createElement(ctl ? 'button' : 'span'); n.className = 'n'; n.textContent = (x.id === M.cur && M.playing ? '♪ ' : '') + x.title;
+      if (ctl) { n.type = 'button'; n.title = 'Play this for everyone'; n.onclick = () => send('play', { track: x.id }); }
+      const d = document.createElement('span'); d.className = 'hint'; d.textContent = x.dur ? fmt(x.dur) : '';
+      li.append(n, d); ol.append(li);
+    }
+    tick();
+  }
+  function tick() {
+    const t = track(); if (!M || !t) { $('#time').textContent = ''; $('#seek').value = '0'; return; }
+    const d = t.dur || (isFinite(au.duration) ? au.duration : 0), p = d ? Math.min(d, M.loop === 'one' ? pos() % d : pos()) : pos();
+    if (document.activeElement !== $('#seek')) $('#seek').value = String(Math.floor(p));
+    $('#time').textContent = fmt(p) + (d ? ' / ' + fmt(d) : '');
+  }
+  setInterval(() => { if (M) { sync(false); tick(); } }, 1000);
+
+  $('#prev').onclick = () => send('prev');
+  $('#next').onclick = () => send('next');
+  $('#play').onclick = () => send(M && M.playing ? 'pause' : 'play');
+  $('#loop').onclick = () => send('loop', { value: { all: 'one', one: 'off', off: 'all' }[M.loop] });
+  $('#shuffle').onclick = () => send('shuffle', { value: !M.shuffle });
+  $('#tv').onchange = e => send('volume', { value: +e.target.value / 100 });
+  $('#seek').onchange = e => send('seek', { to: +e.target.value });
+  $('#here').onchange = e => { here = e.target.checked; LS.set('ml.here', here); apply(); };
+  $('#vol').oninput = e => { vol = +e.target.value / 100; LS.set('ml.vol', vol); if (M) au.volume = vol * M.tv; };
+
+  async function connect(ev) {
+    if (ev) ev.preventDefault();
+    const err = $('#err'); err.textContent = '';
+    code = norm($('#code').value); key = norm($('#key').value);
+    if (!code) { $('#code').focus(); return; }
+    if (!window.claude) { err.textContent = 'Choose where you play first (Homebase, or your own Homebase server).'; if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); return; }
+    $('#go').disabled = true; $('#go').textContent = 'Connecting…';
+    try {
+      db = await window.claude.use('db'); const rm = await window.claude.use('room');
+      if (!db) throw new Error('no db');
+      const lob = await db.doc('lobbies/' + code).get();
+      if (!lob.exists) { err.textContent = `No lobby uses the code ${code}.`; return; }
+      LS.set('ml.code', code); LS.set('ml.key', key);
+      offs.push(db.doc(`lobbies/${code}/state/music`).onSnapshot(s => { M = clean(s.exists ? s.data() : {}); apply(); render(); }, () => say('Lost the connection to the table.', 'bad')));
+      if (rm) { room = await rm.join('lobby-' + code.toLowerCase()); room.presence({ app: 'music-link' }).catch(() => {}); room.on('music-ack', onAck); }
+      $('#conn').hidden = true; $('#player').hidden = false; say(key ? '' : 'Listening only. Add the remote key to control the music.', '');
+    } catch (e) { err.textContent = 'Could not reach Homebase. Check the connection and try again.'; }
+    finally { $('#go').disabled = false; $('#go').textContent = 'Connect'; }
+  }
+  $('#conn').addEventListener('submit', connect);
+  $('#leave').onclick = () => {
+    offs.forEach(o => o()); offs = []; if (room) room.leave().catch(() => {}); room = null; M = null; want = ''; au.pause(); au.removeAttribute('src'); au.dataset.k = '';
+    $('#player').hidden = true; $('#conn').hidden = false;
+  };
+  // a link like music.html#ABC123 or #ABC123/KEY fills the form in
+  const h = location.hash.slice(1).split('/'); if (h[0]) { $('#code').value = norm(h[0]); if (h[1]) $('#key').value = norm(h[1]); }
+  if (norm($('#code').value) && location.hash) connect();
+})();
+</script>

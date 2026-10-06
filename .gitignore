@@ -1,0 +1,22 @@
+# local tooling
+.claude/
+
+# dependencies and build output
+node_modules/
+dist/
+.wrangler/
+critboard-desktop/app/www/
+
+# server data (tables, saves, uploaded audio)
+homebase-data/
+
+# Critter Sounds is its own repository (github.com/booskers/critter-sounds)
+critboard-desktop/music/
+
+# Critter Notes is its own (private) repository
+critter-notes/
+critboard-desktop/notes/
+
+*.log
+.env
+.env.*

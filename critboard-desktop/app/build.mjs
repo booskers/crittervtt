@@ -1,0 +1,51 @@
+// Puts the Critter page, its SRD data and Homebase into ./www for the desktop app (and for the Homebase server).
+// The page is the same file that is published as the claude.ai artifact.
+//   homebase.config.json  { "server": "https://critter.poly-chrome.cc" } (or a workers.dev address), written by homebase-cloudflare/setup-homebase.cmd;
+//                         without it the app asks where to connect
+//   HOMEBASE_SERVER=<url> use another built-in Homebase for this build (for testing, e.g. http://localhost:8787 from "wrangler dev")
+import { readFile, writeFile, mkdir, cp, rm, readdir } from 'node:fs/promises';
+import { existsSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { build } from 'esbuild';
+
+const here = dirname(fileURLToPath(import.meta.url));
+const src = join(here, '..', '..', 'critboard');
+const out = join(here, 'www');
+
+// empty www rather than delete it, so a running "wrangler dev" watching it doesn't block the build
+await mkdir(out, { recursive: true });
+for (const f of await readdir(out)) await rm(join(out, f), { recursive: true, force: true });
+
+const cfgFile = join(here, 'homebase.config.json');
+const cfg = existsSync(cfgFile) ? JSON.parse(await readFile(cfgFile, 'utf8')) : {};
+if (process.env.HOMEBASE_SERVER !== undefined) cfg.server = process.env.HOMEBASE_SERVER;
+if (!cfg.server) delete cfg.server;
+delete cfg.firebase;
+
+await build({ entryPoints: [join(here, 'shim', 'homebase-client.js')], bundle: true, format: 'iife', minify: true, target: 'chrome120', outfile: join(out, 'homebase.js'), logLevel: 'warning' });
+
+const wrap = body => `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)};</script>
+<script src="homebase.js"></script>
+</head>
+<body>
+${body}
+</body>
+</html>
+`;
+const html = wrap(await readFile(join(src, 'critboard.html'), 'utf8'));
+await writeFile(join(out, 'index.html'), html);
+// Critter Music Link: hears and controls a table's music from outside, with the lobby code
+await writeFile(join(out, 'music.html'), wrap(await readFile(join(here, 'music-link.html'), 'utf8')));
+await cp(join(src, 'srd'), join(out, 'srd'), { recursive: true });
+// the Critter icon for browser tabs and home screens
+for (const f of ['favicon.ico', 'favicon.png', 'apple-touch-icon.png']) await cp(join(here, 'assets', f), join(out, f));
+console.log(`www ready: page ${(html.length / 1024).toFixed(0)} KB, Homebase ${cfg.server ? 'at ' + cfg.server : 'not configured (the app will ask)'}`);

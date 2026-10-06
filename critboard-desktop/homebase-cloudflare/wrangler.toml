@@ -1,0 +1,25 @@
+# Homebase on Cloudflare. Deploy with setup-homebase.cmd, or: npx wrangler deploy
+name = "critboard-homebase"
+main = "src/worker.js"
+compatibility_date = "2025-11-01"
+
+# the public address; Cloudflare makes the DNS record and certificate (poly-chrome.cc's DNS is on Cloudflare)
+routes = [
+  { pattern = "critter.poly-chrome.cc", custom_domain = true }
+]
+# keep the old workers.dev address working for copies installed before the custom domain
+workers_dev = true
+
+# the built Critter app, so people can also play in a browser at this Worker's address
+[assets]
+directory = "../app/www"
+binding = "ASSETS"
+
+[[durable_objects.bindings]]
+name = "HUB"
+class_name = "Hub"
+
+# SQLite-backed Durable Objects are the kind the free Workers plan includes
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["Hub"]

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' file:; style-src 'unsafe-inline'; script-src 'unsafe-inline'">
+<title>Critter title bar</title>
+<style>
+/* Critter's own title bar. Its colours follow the page's theme (sent by the page), these are the starting ones. */
+:root { --bg: #0f1114; --ink: #ece8e0; --muted: #8b909a; --line: #23262e; --accent: #d97200; --hover: #1b1e25; }
+* { box-sizing: border-box; margin: 0; }
+html, body { height: 100%; overflow: hidden; background: transparent; }
+/* see-through: the board shows through, under a soft darkening that fades out downwards so the buttons stay readable */
+body {
+  display: flex; align-items: stretch; height: 34px; user-select: none; cursor: default;
+  background: linear-gradient(180deg, rgba(0,0,0,.62) 0%, rgba(0,0,0,.34) 55%, rgba(0,0,0,0) 100%);
+  color: var(--ink); text-shadow: 0 1px 2px rgba(0,0,0,.7);
+  font: 600 12.5px/1 "Segoe UI Variable Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-app-region: drag; transition: color .15s;
+}
+body.blur { color: var(--muted); }
+body.blur .logo { filter: saturate(.35) brightness(.8); }
+.logo { filter: drop-shadow(0 1px 2px rgba(0,0,0,.6)); }
+.ctl svg { filter: drop-shadow(0 1px 1px rgba(0,0,0,.7)); }
+button { -webkit-app-region: no-drag; font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.brand { display: flex; align-items: center; gap: 8px; padding: 0 6px 0 8px; border-radius: 6px; margin: 3px 0 3px 4px; }
+.brand:hover, .brand[aria-expanded="true"] { background: var(--hover); }
+.logo { width: 20px; height: 20px; display: block; }
+.name { font-weight: 700; letter-spacing: .14em; text-transform: uppercase; font-size: 11.5px; }
+.caret { width: 9px; height: 9px; opacity: .55; }
+.title { flex: 1; min-width: 0; display: flex; align-items: center; justify-content: center; color: var(--muted); font-weight: 500; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; padding: 0 12px; }
+.ctl { display: flex; }
+.ctl button { width: 46px; display: grid; place-items: center; color: var(--ink); opacity: .82; transition: background .12s, opacity .12s; }
+.ctl button:hover { background: rgba(255,255,255,.12); opacity: 1; }
+.brand:hover, .brand[aria-expanded="true"] { background: rgba(255,255,255,.12); }
+.ctl button:active { filter: brightness(1.25); }
+.ctl .close:hover { background: #c42b1c; color: #fff; }
+.ctl svg { width: 10px; height: 10px; stroke: currentColor; fill: none; stroke-width: 1; shape-rendering: crispEdges; }
+.ctl .close svg { shape-rendering: geometricPrecision; }
+.ctl .max .restore { display: none; }
+body.max .ctl .max .square { display: none; }
+body.max .ctl .max .restore { display: block; }
+</style>
+</head>
+<body>
+<button class="brand" id="menu" type="button" title="Critter menu" aria-haspopup="menu" aria-expanded="false">
+  <img class="logo" src="assets/icon.png" alt="">
+  <span class="name">Critter</span>
+  <svg class="caret" viewBox="0 0 10 10" aria-hidden="true"><path d="M2 3.5 5 6.5 8 3.5" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+</button>
+<div class="title" id="title"></div>
+<div class="ctl">
+  <button class="min" type="button" title="Minimize" aria-label="Minimize"><svg viewBox="0 0 10 10"><path d="M0 5.5h10"/></svg></button>
+  <button class="max" type="button" title="Maximize" aria-label="Maximize">
+    <svg class="square" viewBox="0 0 10 10"><rect x=".5" y=".5" width="9" height="9"/></svg>
+    <svg class="restore" viewBox="0 0 10 10"><rect x=".5" y="2.5" width="7" height="7"/><path d="M2.5 2.5V.5h7v7h-2"/></svg>
+  </button>
+  <button class="close" type="button" title="Close" aria-label="Close"><svg viewBox="0 0 10 10"><path d="M.5.5l9 9M9.5.5l-9 9"/></svg></button>
+</div>
+<script>
+const $ = s => document.querySelector(s), menu = $('#menu');
+$('.min').onclick = () => bar.cmd('min');
+$('.max').onclick = () => bar.cmd('max');
+$('.close').onclick = () => bar.cmd('close');
+menu.onclick = () => { const r = menu.getBoundingClientRect(); menu.setAttribute('aria-expanded', 'true'); bar.cmd('menu', { x: r.left }); setTimeout(() => menu.setAttribute('aria-expanded', 'false'), 300); };
+// double-clicking the empty bar maximizes, as on any Windows title bar (Windows does this for the drag region itself)
+bar.onState(s => {
+  document.body.classList.toggle('max', !!s.max);
+  document.body.classList.toggle('blur', !s.focus);
+  $('.max').title = $('.max').ariaLabel = s.max ? 'Restore' : 'Maximize';
+  const t = String(s.title || '').replace(/^Critter\s*[·:-]?\s*/, '');
+  $('#title').textContent = t && t !== 'Critter' ? t : '';
+  document.title = s.title || 'Critter';
+});
+bar.onTheme(t => { for (const [k, v] of Object.entries(t)) if (v) document.documentElement.style.setProperty('--' + k, v); });
+</script>
+</body>
+</html>

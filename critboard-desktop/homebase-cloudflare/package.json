@@ -1,0 +1,14 @@
+{
+  "name": "critboard-homebase-cloudflare",
+  "private": true,
+  "type": "module",
+  "description": "Homebase for Critboard on Cloudflare Workers and Durable Objects.",
+  "scripts": {
+    "dev": "wrangler dev",
+    "site": "node ../app/build.mjs",
+    "deploy": "node ../app/build.mjs && wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

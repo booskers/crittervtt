@@ -1,0 +1,44 @@
+{
+  "name": "critboard",
+  "productName": "Critter",
+  "version": "1.0.0",
+  "description": "Critter: a tabletop dice roller and battle map, as a desktop app.",
+  "main": "main.js",
+  "private": true,
+  "scripts": {
+    "build-www": "node build.mjs",
+    "start": "node build.mjs && electron .",
+    "dist": "node build.mjs && electron-builder --win nsis"
+  },
+  "build": {
+    "appId": "app.critboard.desktop",
+    "productName": "Critter",
+    "files": [
+      "main.js",
+      "titlebar.html",
+      "titlebar-preload.js",
+      "page-preload.js",
+      "assets/**/*",
+      "www/**/*"
+    ],
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "shortcutName": "Critter",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    }
+  },
+  "devDependencies": {
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.2"
+  }
+}
