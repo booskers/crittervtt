@@ -1796,10 +1796,10 @@ input[type=range]{accent-color:var(--accent)}
       <p id="sysHint" class="syshint"></p>
     </section>
     <section class="rsec">
-      <div class="rhead" style="margin-top:4px"><h3>Table colour</h3><span class="hint">The plain surface under the board, with a light grain.</span></div>
+      <div class="rhead" style="margin-top:4px"><h3>Table colour</h3><span class="hint">The surface under the board. Without grid lines, a fine dot marks every square's corner.</span></div>
       <div class="sysrow">
         <label class="chk">Colour <input type="color" id="clothColor" aria-label="Table colour"></label>
-        <button type="button" id="clothReset" class="btn small ghost">Use the system's colour</button>
+        <button type="button" id="clothReset" class="btn small ghost">Use the default colour</button>
         <label class="chk"><input type="checkbox" id="clothGrid"> Grid lines</label>
       </div>      <div class="rhead"><h3>Table background</h3><span class="hint">Everyone at the table sees it behind the board.</span></div>
       <div class="bgrow">
@@ -4095,7 +4095,7 @@ const cssHex = (() => { let x = null; return v => { if (!x) { const c = document
 function readTheme() {
   let p = readTheme.probe;
   if (!p) { p = readTheme.probe = document.createElement('i'); p.setAttribute('aria-hidden', 'true'); p.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none'; document.body.append(p); }
-  for (const k of ['bg', 'grid', 'grid-major', 'ink', 'accent', 'muted']) { p.style.color = `var(--${k})`; T[k] = cssHex(getComputedStyle(p).color); }
+  for (const k of ['bg', 'grid', 'grid-major', 'ink', 'accent', 'accent-2', 'muted']) { p.style.color = `var(--${k})`; T[k] = cssHex(getComputedStyle(p).color); }
   requestDraw();
 }
 function resize() {
@@ -4387,34 +4387,31 @@ function translated(s, dx, dy) {
 
 /* ---------------- board: render ---------------- */
 let act = null, eraserAt = null;
-/* table colour: a light noise drawn under the board instead of graph paper */
-const CLOTH_N = 192;
-let clothCache = { key: '', tile: null, pat: null };
+/* the table (the Critter design): the plain surface, soft light from the two colours and a fine dot on every grid corner.
+   A lobby's own table colour (rules › Table) replaces the surface; its grid lines replace the dots. */
 const viewRules = () => (rulesDraft && !$('#rulesBox').hidden) ? rulesDraft : S.rules;
 function clothColor() {
   const c = viewRules().cloth && viewRules().cloth.color;
   if (isHex(c)) return c;
-  const bg = isHex(T.bg) ? T.bg : '#08090b', [r, g, b] = hexRgb(bg);
-  return '#' + [r, g, b].map(v => Math.min(255, v + 12).toString(16).padStart(2, '0')).join('');
+  return isHex(T.bg) ? T.bg : '#0b0c0f';
 }
-function clothTile(color) {
-  // plain, light grain: no weave, just a little per-pixel variation
-  const N = CLOTH_N, c = document.createElement('canvas'); c.width = c.height = N;
-  const g = c.getContext('2d'), img = g.createImageData(N, N), d = img.data, [r0, g0, b0] = hexRgb(color);
-  let seed = 1234567; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-  const lum = 0.299 * r0 + 0.587 * g0 + 0.114 * b0, amp = lum < 60 ? 9 : lum < 150 ? 12 : 14;
-  for (let i = 0; i < N * N * 4; i += 4) {
-    const v = (rnd() - 0.5) * amp;
-    d[i] = Math.max(0, Math.min(255, r0 + v)); d[i + 1] = Math.max(0, Math.min(255, g0 + v)); d[i + 2] = Math.max(0, Math.min(255, b0 + v)); d[i + 3] = 255;
+const clothA = (hex, a) => { const [r, g, b] = hexRgb(isHex(hex) ? hex : '#ff5c00'); return `rgba(${r},${g},${b},${a})`; };
+function drawCloth(W, H) {
+  const light = document.documentElement.dataset.theme === 'light', amt = light ? 0.16 : 0.13, big = Math.max(W, H);
+  ctx.fillStyle = clothColor(); ctx.fillRect(0, 0, W, H);
+  // the light stays with the window, like the panels': the highlight from the top right, the second colour from the bottom left
+  for (const [cx, cy, rad, col, a] of [[W * 0.88, -H * 0.12, big * 0.8, T.accent, amt], [-W * 0.08, H * 1.12, big * 0.65, T['accent-2'], amt * 0.7]]) {
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+    g.addColorStop(0, clothA(col, a)); g.addColorStop(1, clothA(col, 0));
+    ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
   }
-  g.putImageData(img, 0, 0);
-  return c;
-}function drawCloth(W, H) {
-  const color = clothColor();
-  if (clothCache.key !== color || !clothCache.pat) { clothCache = { key: color, tile: clothTile(color), pat: null }; clothCache.pat = ctx.createPattern(clothCache.tile, 'repeat'); }
-  const pat = clothCache.pat, ox = ((-V.x * V.z) % CLOTH_N + CLOTH_N) % CLOTH_N, oy = ((-V.y * V.z) % CLOTH_N + CLOTH_N) % CLOTH_N;
-  if (pat.setTransform) pat.setTransform(new DOMMatrix().translate(ox, oy));
-  ctx.fillStyle = pat; ctx.fillRect(0, 0, W, H);
+  // the dots move with the board, on the same squares as the grid lines (sparser when zoomed far out)
+  if (viewRules().cloth && viewRules().cloth.grid) return;
+  let step = SQ; while (step * V.z < 18) step *= 5;
+  const s = step * V.z, ox = ((-V.x * V.z) % s + s) % s, oy = ((-V.y * V.z) % s + s) % s, r = Math.max(0.8, Math.min(1.5, 1.1 * Math.sqrt(V.z)));
+  ctx.fillStyle = clothA(T.ink, light ? 0.14 : 0.11); ctx.beginPath();
+  for (let y = oy; y < H + s; y += s) for (let x = ox; x < W + s; x += s) { ctx.moveTo(x + r, y); ctx.arc(x, y, r, 0, Math.PI * 2); }
+  ctx.fill();
 }
 function drawGrid(W, H) {
   // one grid square is one token wide; a heavier line every five squares
