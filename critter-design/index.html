@@ -355,7 +355,7 @@
   <section>
     <div class="sechead"><h2 class="display">Artwork effects</h2><span class="note">Pick a picture: the Sounds play bar and the Notes page follow it.</span><div class="picks"><div class="artpick" id="artpick"></div></div></div>
     <div class="fx">
-      <div class="fxbox bleed" id="fxBleed" data-art="tavern"><span class="cap"><i data-i="sparkle"></i>Bleed</span><b class="display" style="font-size:var(--fs-xl)">Colour spills out of the art</b><p>Blurred, saturated and graded into a safe band, then masked away from the picture. Text on it uses <b>ink</b> or <b>ink-2</b> only. For the play bar, sheet headers, roll cards and page washes.</p></div>
+      <div class="fxbox bleed" id="fxBleed" data-art="tavern"><span class="cap"><i data-i="sparkle"></i>Bleed</span><div class="row" style="gap:14px;flex-wrap:nowrap"><span class="art" id="fxArt" data-art="tavern" style="width:64px;height:64px"></span><b class="display" style="font-size:var(--fs-xl)">Colour spills out of the art</b></div><p>Blurred, saturated and graded into a safe band, then masked away from the picture. All text on it is <b>ink</b>. For the play bar, sheet headers, roll cards and page washes.</p></div>
       <div class="fxbox"><span class="cap"><i data-i="image"></i>Glow</span><div class="row" style="gap:16px;padding:8px 4px"><span class="art" data-art="forest" style="width:72px;height:72px"></span><span class="art round" data-portrait="dragon-head,#e5484d,#3a0a10" style="width:64px;height:64px"></span><span class="art" data-art="arcane" style="width:72px;height:72px"></span></div><p>A blurred copy of the picture sits under it as its shadow, so covers, tokens and portraits glow in their own colours.</p></div>
       <div class="fxbox" style="padding:0;overflow:hidden"><div class="banner" data-art="desert" style="height:110px"></div><div style="padding:0 14px 14px;margin-top:-26px;display:grid;gap:8px;position:relative"><span class="cap"><i data-i="n-note"></i>Banner</span><p>A wide picture that fades into the surface below it. For page headers in Notes and scene cards in Critter.</p></div></div>
     </div>
@@ -437,7 +437,7 @@ function paint() {
     sec.querySelectorAll('.sechead .logo').forEach(l => { l.style.cssText = vars(k); });
     sec.querySelectorAll('.swatch').forEach(s => s.style.setProperty('--c', state.pick[k][s.dataset.key]));
   }
-  for (const id of ['bar', 'fxBleed']) document.getElementById(id).dataset.art = state.art;
+  for (const id of ['bar', 'fxBleed', 'fxArt']) document.getElementById(id).dataset.art = state.art;
   document.querySelector('.page.bleed').dataset.art = state.art; document.querySelector('.page .banner').dataset.art = state.art;
   document.querySelector('#bar .now .art').dataset.art = state.art;
   document.querySelectorAll('#artpick button').forEach(b => b.classList.toggle('on', b.dataset.n === state.art));
