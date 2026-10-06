@@ -8,6 +8,7 @@
    every accent. Critter VTT's own colour is #ff5c00; the Look dialog (Critter VTT menu) changes it, light or dark, the tint and the fonts. */
 :root{
   --accent:#ff5c00; --accent-2:#3cc4c4; --accent-ink:#141006;
+  --logo-c:var(--accent); /* the logo's mark and badge take the highlight colour too */
   --tone-dark:#0b0c0f; --tone-light:#f2f1ee; --hue:4%; --bleed:1; --grain:1;
   --tone:color-mix(in oklab,var(--tone-dark),var(--accent) var(--hue));
   --bg:var(--tone); --panel:color-mix(in oklab,var(--tone),white 3.5%); --panel-2:color-mix(in oklab,var(--tone),white 6.5%);
@@ -451,7 +452,7 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .nhelp{width:min(620px,100%);max-height:calc(100vh - 60px);overflow:auto}
 .nhelp .nmd h6,.nhelp .nmd h5{margin:14px 0 4px}
 /* the splash while Critter VTT starts (it also goes by itself, in case anything goes wrong while loading) */
-#splash{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 42%,#1d1408,#0b0c0f 70%);transition:opacity .5s ease,visibility 0s .5s;animation:splashAuto 0s 12s forwards;--sp-ink:#ece8e0;--sp-acc:#ff5c00;--sp-muted:#8b909a}
+#splash{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;background:radial-gradient(ellipse at 50% 42%,#1d1408,#0b0c0f 70%);transition:opacity .5s ease,visibility 0s .5s;animation:splashAuto 0s 12s forwards;--sp-ink:#ece8e0;--sp-acc:var(--accent);--sp-muted:#8b909a}
 #splash.out{opacity:0;visibility:hidden;pointer-events:none}
 /* the safety net clips it away rather than fading it, so it never fights the fade */
 @keyframes splashAuto{to{clip-path:inset(50%);pointer-events:none}}
@@ -459,7 +460,7 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 @keyframes splashIn{from{opacity:0;transform:translateY(10px) scale(.97)}}
 .splashmark{position:relative;display:flex;align-items:flex-start;gap:10px}
 .splashlogo{width:min(440px,72vw);height:auto;color:var(--sp-ink)}
-.splashlogo .logo-mark{color:var(--sp-acc)}
+.splashlogo{--logo-c:var(--sp-acc)}.splashlogo .logo-mark{color:var(--sp-acc)}
 #splash .alpha{border-color:var(--sp-acc);color:var(--sp-acc);background:rgba(217,114,0,.12);font-family:system-ui,'Segoe UI',sans-serif}
 .alpha{display:inline-block;padding:3px 8px;border:1px solid var(--accent);border-radius:999px;color:var(--accent-text);font:700 10.5px/1 var(--f-body,system-ui);letter-spacing:.14em;text-transform:uppercase;background:color-mix(in srgb,var(--accent) 12%,transparent);white-space:nowrap}
 .splashmark .alpha{margin-top:4px}
@@ -1493,18 +1494,18 @@ body.mob .fwin .fwhead :is(.xbtn,[data-x],[data-act=close])::before{content:'';w
 .crload{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:16px;background:rgba(10,11,14,.72);-webkit-backdrop-filter:grayscale(1) blur(3px);backdrop-filter:grayscale(1) blur(3px);animation:crlIn .25s ease both}
 .crload[hidden]{display:none}
 @keyframes crlIn{from{opacity:0}}
-.crlbox{width:min(560px,100%);display:grid;justify-items:center;gap:14px;padding:30px 28px 22px;border-radius:18px;background:radial-gradient(ellipse at 50% 0%,#1d1408,#0e0f12 75%);border:1px solid rgba(217,114,0,.35);box-shadow:0 30px 80px rgba(0,0,0,.6);color:#ece8e0;text-align:center}
+.crlbox{width:min(560px,100%);display:grid;justify-items:center;gap:14px;padding:30px 28px 22px;border-radius:18px;background:radial-gradient(ellipse at 50% 0%,#1d1408,#0e0f12 75%);border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);box-shadow:0 30px 80px rgba(0,0,0,.6);color:#ece8e0;text-align:center}
 .crlmark{width:min(300px,70vw)}
 .crllogo{width:100%;height:auto;color:#ece8e0}
-.crllogo .logo-mark{color:#ff5c00;animation:crlBob 2.4s ease-in-out infinite;transform-origin:50% 60%;transform-box:fill-box}
+.crllogo{--logo-c:var(--accent)}.crllogo .logo-mark{color:var(--accent);animation:crlBob 2.4s ease-in-out infinite;transform-origin:50% 60%;transform-box:fill-box}
 @keyframes crlBob{50%{transform:translateY(-3px) rotate(-4deg)}}
 .crltitle{font:600 16px/1.35 var(--f-body,system-ui);min-height:1.35em}
 .crlbar{width:100%;height:10px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden;position:relative}
-.crlbar>span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,#b35e00,#f09a2a);transition:width .3s ease}
+.crlbar>span{display:block;height:100%;width:0;border-radius:inherit;background:linear-gradient(90deg,color-mix(in oklab,var(--accent) 70%,black),var(--accent));transition:width .3s ease}
 .crlbar.indet>span{width:32%!important;position:absolute;animation:cipSlide 1.3s ease-in-out infinite}
 .crlline{width:100%;min-height:1.3em;font:12.5px/1.3 var(--f-mono,monospace);color:#a7a39a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.crltip{width:100%;display:grid;gap:6px;padding:14px 16px;border-radius:12px;background:rgba(217,114,0,.08);border:1px solid rgba(217,114,0,.22);text-align:left}
-.crltiph{font:700 11px/1 var(--f-body,system-ui);letter-spacing:.14em;text-transform:uppercase;color:#ff5c00}
+.crltip{width:100%;display:grid;gap:6px;padding:14px 16px;border-radius:12px;background:color-mix(in srgb,var(--accent) 8%,transparent);border:1px solid color-mix(in srgb,var(--accent) 22%,transparent);text-align:left}
+.crltiph{font:700 11px/1 var(--f-body,system-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--accent-text,var(--accent))}
 .crltipt{font-size:14.5px;line-height:1.45;min-height:2.9em}
 .crltipt.in{animation:crlTip .5s ease both}
 @keyframes crlTip{from{opacity:0;transform:translateY(4px)}}
@@ -1522,7 +1523,7 @@ body.mob .fwin .fwhead :is(.xbtn,[data-x],[data-act=close])::before{content:'';w
 .svin{display:grid;justify-items:center;gap:12px;padding:24px;text-align:center}
 .svmark{width:min(360px,64vw)}
 .svlogo{width:100%;height:auto;color:var(--sv-ink)}
-.svlogo .logo-mark{color:var(--sv-acc)}
+.svlogo{--logo-c:var(--sv-acc)}.svlogo .logo-mark{color:var(--sv-acc)}
 .svwhat{font:500 13px/1.4 system-ui,'Segoe UI',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:color-mix(in srgb,var(--sv-ink) 60%,transparent);margin-top:4px}
 .svname{display:flex;align-items:center;gap:12px;font-size:clamp(26px,5vw,40px);line-height:1.1;color:var(--sv-ink)}
 .svname .gi{width:1.1em;height:1.1em;color:var(--sv-acc);flex:none}
