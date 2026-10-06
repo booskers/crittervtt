@@ -4,90 +4,171 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Critter Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="components.css">
+<script src="icons.js"></script>
+<script src="fonts.js"></script>
+<script src="art.js"></script>
 <style>
-  /* page chrome only; everything inside the mockups uses tokens.css + components.css */
-  body{padding:28px 16px 80px}
-  .wrap{max-width:1240px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+  /* page chrome only; everything inside the mock-ups uses tokens.css + components.css */
+  :root{--accent:#c9a45c;--accent-2:#3cc4c4;--tone-dark:#0b0c0f;--tone-light:#f2f1ee}
+  body{padding:28px 16px 80px;min-height:100vh;background:var(--ambient),var(--surface-0);background-attachment:fixed}
+  .wrap{max-width:1260px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:34px}
   .wrap>*{min-width:0}
-  .top{display:flex;flex-wrap:wrap;gap:16px 24px;align-items:flex-end;justify-content:space-between}
-  .top p{margin:6px 0 0;color:var(--ink-2);max-width:66ch}
-  .sechead{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
-  .sechead h2{font-size:var(--fs-xl)}
+  .hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:24px;align-items:start}
+  .hero h1{font-size:clamp(30px,4.4vw,48px);line-height:1.05;margin:6px 0 10px}
+  .hero p{margin:0;color:var(--ink-2);max-width:60ch;font-size:var(--fs-lg)}
+  .look{padding:16px;display:grid;gap:12px}
+  .look .lrow{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center}
+  .look .lrow>span{color:var(--ink-2);font-size:var(--fs-sm)}
+  .look select.field{width:100%}
+  .fontrow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .sechead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-bottom:12px}
+  .sechead h2{font-size:var(--fs-2xl);display:flex;align-items:center;gap:10px}
   .picks{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-left:auto}
-  .swatch{position:relative;width:28px;height:28px;border-radius:50%;background:var(--c);box-shadow:var(--shadow-1);cursor:pointer;flex:none}
+  .swatch{position:relative;width:30px;height:30px;border-radius:50%;background:var(--c);box-shadow:0 4px 14px -4px var(--c),inset 0 1px 0 rgb(255 255 255/.25);cursor:pointer;flex:none}
   .swatch input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
   .swatch:focus-within{outline:2px solid var(--focus);outline-offset:2px}
   .note{color:var(--ink-3);font-size:var(--fs-sm)}
-  .gi{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
 
   /* ---------- the app frames ---------- */
-  .mock{position:relative;height:460px;border-radius:var(--r-2xl);overflow:hidden;background:var(--surface-0);color:var(--ink);box-shadow:var(--shadow-3);display:flex;flex-direction:column;font-size:var(--fs-md)}
-  .tbar{flex:none;height:34px;display:flex;align-items:center;gap:8px;padding:0 6px 0 12px;background:color-mix(in oklab,var(--surface-0),black 25%);position:relative;font-size:var(--fs-sm);font-weight:var(--fw-bold)}
+  .mock{position:relative;isolation:isolate;height:540px;border-radius:var(--r-2xl);overflow:hidden;background:var(--ambient),var(--surface-0);color:var(--ink);box-shadow:var(--shadow-3);display:flex;flex-direction:column;font:var(--fw-regular) var(--fs-md)/var(--lh) var(--font-ui)}
+  .mock::after{content:"";position:absolute;inset:0;pointer-events:none;background:var(--grain-img);opacity:var(--grain-opacity);mix-blend-mode:overlay;z-index:50}
+  .tbar{flex:none;height:36px;display:flex;align-items:center;gap:9px;padding:0 6px 0 12px;background:color-mix(in oklab,var(--surface-0),black 28%);position:relative;font-size:var(--fs-sm)}
   [data-theme=light] .tbar{background:var(--surface-1)}
-  .tbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--accent-2) 80%,transparent);opacity:.5}
-  .tbar .brand{letter-spacing:.14em;text-transform:uppercase;font-size:var(--fs-xs)}
-  .tbar .ctl{margin-left:auto;display:flex;gap:2px;color:var(--ink-3)}.tbar .ctl span{width:36px;text-align:center}
-  .logo{width:18px;height:18px;border-radius:6px;background:linear-gradient(135deg,var(--accent),var(--accent-2))}
+  .tbar::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,transparent,var(--accent) 20%,var(--accent-2) 80%,transparent);opacity:.6}
+  .tbar .brand{font-family:var(--font-display);font-weight:var(--fw-display);letter-spacing:.06em;text-transform:uppercase;font-size:var(--fs-xs)}
+  .tbar .ctl{margin-left:auto;display:flex;color:var(--ink-3)}.tbar .ctl span{width:40px;display:grid;place-items:center}
+  .logo{width:20px;height:20px;border-radius:7px;display:grid;place-items:center;color:var(--on-accent);background:linear-gradient(135deg,var(--accent),var(--accent-2));box-shadow:0 0 12px -2px var(--accent)}
+  .logo .ic{width:13px;height:13px}
+  .sechead .logo{width:30px;height:30px;border-radius:10px}.sechead .logo .ic{width:18px;height:18px}
 
-  /* Critter: the board, a floating tool rail, the docked chat panel, a floating window, the bottom dock */
-  .board{flex:1;position:relative;background:radial-gradient(circle,var(--hover-2) 1px,transparent 1.4px) 0 0/28px 28px,var(--surface-0)}
-  .rail{position:absolute;left:12px;top:50%;translate:0 -50%;display:grid;gap:2px;padding:5px;border-radius:var(--r-lg);background:var(--surface-2);box-shadow:var(--shadow-2),var(--sheen)}
-  .rail .iconbtn.on{background:var(--accent);color:var(--on-accent)}
-  .chatp{position:absolute;right:10px;top:10px;bottom:10px;width:300px;border-radius:var(--r-xl);background:var(--surface-1);box-shadow:var(--shadow-2),var(--sheen);display:flex;flex-direction:column;padding:12px;gap:10px}
-  .chatp .head{display:flex;align-items:center;gap:8px;font:700 var(--fs-xl)/1 var(--font-display)}
-  .log{flex:1;display:grid;gap:6px;align-content:end;overflow:hidden}
-  .roll{padding:8px 10px;border-radius:var(--r-lg);background:var(--surface-2);display:grid;gap:2px}
-  .roll b{font-size:var(--fs-sm)}.roll .res{display:flex;align-items:baseline;gap:8px}
-  .roll .big{font:700 22px/1 var(--font-display);color:var(--accent-text)}
-  .dice{display:flex;justify-content:space-between;color:var(--accent-text);font:600 var(--fs-xs)/1 var(--font-mono)}
-  .dice span{display:grid;place-items:center;gap:4px}.dice i{width:22px;height:22px;border-radius:6px;background:var(--accent-soft);display:block;rotate:45deg;scale:.8}
+  /* Critter */
+  .board{flex:1;position:relative;background:radial-gradient(circle,var(--hover-2) 1.1px,transparent 1.5px) 0 0/30px 30px,var(--ambient),var(--surface-0)}
+  .rail{position:absolute;left:12px;top:50%;translate:0 -50%;display:grid;gap:2px;padding:5px;border-radius:var(--r-lg);background:var(--surface-2);box-shadow:var(--shadow-2),var(--sheen);z-index:3}
+  .rail .iconbtn .gic{width:20px;height:20px}
+  .rail .iconbtn.on{background:var(--accent-fill);color:var(--on-accent);box-shadow:var(--accent-glow)}
+  .rail hr{border:0;height:1px;margin:3px 6px;background:var(--line)}
+  .scenes{position:absolute;left:72px;top:12px;display:flex;gap:10px;align-items:center;z-index:2}
+  .scenes .art{width:74px;height:46px;border-radius:var(--r-md)}
+  .scenes .art.on{outline:2px solid var(--accent);outline-offset:2px}
+  .token{position:absolute;display:grid;justify-items:center;gap:4px;z-index:1}
+  .token .art{width:54px;height:54px}
+  .token .art.on{box-shadow:0 0 0 3px var(--surface-0),0 0 0 5px var(--accent),0 0 22px var(--accent)}
+  .token b{font-size:var(--fs-xs);padding:2px 8px;border-radius:99px;background:var(--surface-3);box-shadow:var(--shadow-1)}
+  .sheet{position:absolute;left:84px;top:80px;width:330px;max-width:calc(100% - 100px);border-radius:var(--r-xl);background:var(--surface-3);box-shadow:var(--shadow-3),var(--sheen);overflow:hidden;z-index:4}
+  .sheet .shead{display:flex;gap:12px;align-items:center;padding:6px 12px 12px}
+  .sheet .shead .art{width:52px;height:52px}
+  .sheet .shead h3{font-size:var(--fs-xl)}
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:5px;padding:0 12px}
+  .stat{display:grid;justify-items:center;gap:1px;padding:6px 2px;border-radius:var(--r-md);background:var(--hover)}
+  .stat small{font-size:var(--fs-2xs);font-weight:700;letter-spacing:.08em;color:var(--ink-3)}
+  .stat b{font:var(--fw-display) 18px/1.1 var(--font-display)}
+  .hp{margin:10px 12px 12px;display:grid;gap:5px}
+  .bar{height:8px;border-radius:99px;background:var(--sunken);overflow:hidden}
+  .bar i{display:block;height:100%;width:var(--v);border-radius:inherit;background:linear-gradient(90deg,#e5484d,#ff8a5c);box-shadow:0 0 10px #e5484d}
+  .sheet .foot{display:flex;gap:6px;padding:0 12px 12px}
+  .gmw{position:absolute;left:432px;top:250px;width:236px;border-radius:var(--r-xl);background:var(--surface-3);box-shadow:var(--shadow-3),var(--sheen);z-index:4}
+  .gmw .body{padding:0 10px 12px;display:grid;gap:8px}
+  .chatp{position:absolute;right:10px;top:10px;bottom:10px;width:310px;border-radius:var(--r-xl);background:var(--surface-1);box-shadow:var(--shadow-2),var(--sheen);display:flex;flex-direction:column;padding:12px;gap:10px;z-index:3}
+  .chatp .head{display:flex;align-items:center;gap:8px}
+  .chatp .head .display{font-size:var(--fs-2xl)}
+  .chatp .head>.gic{width:26px;height:26px;color:var(--accent-text);filter:drop-shadow(0 0 8px color-mix(in oklab,var(--accent) 60%,transparent))}
+  .seats{display:flex;gap:6px;flex-wrap:wrap}
+  .seat{display:flex;align-items:center;gap:6px;padding:3px 10px 3px 3px;border-radius:99px;background:var(--surface-2);font-size:var(--fs-xs);font-weight:600}
+  .seat .art{width:22px;height:22px}
+  .log{flex:1;display:grid;gap:7px;align-content:end;overflow:hidden}
+  .roll{padding:9px 10px;border-radius:var(--r-lg);background:var(--surface-2);display:grid;gap:3px}
+  .roll.bleed::before{width:85%}
+  .roll .who{display:flex;align-items:center;gap:7px;font-size:var(--fs-sm);font-weight:650}
+  .roll .who .art{width:20px;height:20px}
+  .roll .res{display:flex;align-items:baseline;gap:8px}
+  .roll .big{font:var(--fw-display) 26px/1 var(--font-display);color:var(--ink)}
+  .roll.crit{box-shadow:0 0 0 1px color-mix(in oklab,var(--accent) 45%,transparent),0 0 26px -8px var(--accent)}
+  .roll.crit .big{color:var(--accent-text);text-shadow:0 0 14px color-mix(in oklab,var(--accent) 70%,transparent)}
+  .dice{display:flex;justify-content:space-between;gap:4px}
+  .dice button{display:grid;justify-items:center;gap:3px;border:0;background:transparent;color:var(--accent-text);font:600 var(--fs-xs)/1 var(--font-mono);padding:5px 4px;border-radius:var(--r-md);cursor:pointer}
+  .dice button:hover{background:var(--accent-softer)}
+  .dice .gic{width:24px;height:24px;filter:drop-shadow(0 2px 6px color-mix(in oklab,var(--accent) 50%,transparent))}
   .sendrow{display:flex;gap:6px}.sendrow .field{flex:1;min-width:0}
-  .fwin{position:absolute;left:76px;top:16px;width:340px;max-width:calc(100% - 90px);border-radius:var(--r-xl);background:var(--surface-3);box-shadow:var(--shadow-3),var(--sheen);display:grid}
-  .fwin .body{padding:0 12px 12px;display:grid;gap:8px}
-  .fwin .item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-lg);background:var(--surface-4)}
-  [data-theme=light] .fwin .item{background:var(--surface-0)}
-  .av{width:30px;height:30px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;color:var(--accent-text);font-weight:700;font-size:var(--fs-sm);flex:none}
-  .fwin.narrow{left:432px;width:230px;top:120px}
-  .dock{position:absolute;left:50%;bottom:10px;translate:-50% 0;display:flex;gap:2px;padding:4px;border-radius:var(--r-lg);background:var(--surface-2);box-shadow:var(--shadow-2),var(--sheen)}
-  .dock .btn{height:30px;padding:0 10px;font-size:var(--fs-sm)}
+  .dock{position:absolute;left:calc(50% - 160px);bottom:10px;translate:-50% 0;display:flex;gap:2px;padding:4px;border-radius:var(--r-lg);background:var(--surface-2);box-shadow:var(--shadow-2),var(--sheen);z-index:3}
+  .dock .btn{height:32px;padding:0 10px 0 8px;font-size:var(--fs-sm)}
+  .dock .btn .gic{width:17px;height:17px}
 
-  /* Sounds: top bar, tiled windows, transport */
-  .stop{display:flex;align-items:center;gap:8px;padding:10px 12px}
-  .tiles{flex:1;display:grid;grid-template-columns:1.25fr 1fr 210px;gap:8px;padding:0 8px 8px;min-height:0}
+  /* Sounds */
+  .stop{display:flex;align-items:center;gap:8px;padding:10px 12px;flex-wrap:nowrap;overflow:hidden}
+  .stop .fieldicon{width:230px;flex:none}
+  .stop .field{font-family:var(--font-mono);letter-spacing:.08em}
+  .tiles{flex:1;display:grid;grid-template-columns:1.2fr 1fr 230px;grid-template-rows:1fr 1fr;gap:8px;padding:0 8px 8px;min-height:0}
   .tile{border-radius:var(--r-xl);background:var(--surface-1);box-shadow:var(--sheen),var(--shadow-1);display:flex;flex-direction:column;min-height:0;overflow:hidden}
-  .tile .whead .ti{width:24px;height:24px;border-radius:8px;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center;flex:none}
-  .tile .body{padding:0 10px 10px;display:grid;gap:2px;align-content:start}
-  .trk{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;padding:7px 8px;border-radius:var(--r-md);color:var(--ink-2)}
-  .trk:hover{background:var(--hover)}.trk .n{color:var(--ink-3);font-size:var(--fs-xs);text-align:right}
+  .tile.tall{grid-row:span 2}
+  .tile .body{padding:0 10px 10px;display:grid;gap:2px;align-content:start;overflow:hidden}
+  .trk{display:grid;grid-template-columns:32px 1fr auto;gap:10px;align-items:center;padding:5px 8px;border-radius:var(--r-md);color:var(--ink-2)}
+  .trk .art{width:32px;height:32px;border-radius:var(--r-sm)}
+  .trk:hover{background:var(--hover)}.trk .n{color:var(--ink-3);font-size:var(--fs-xs);text-align:right;font-variant-numeric:tabular-nums}
   .trk.on{background:var(--accent-soft);color:var(--ink)}.trk.on .n{color:var(--accent-text)}
-  .scape{padding:10px;border-radius:var(--r-lg);background:var(--surface-2);display:grid;gap:8px}
-  .transport{flex:none;display:flex;align-items:center;gap:14px;padding:10px 16px;background:var(--surface-1)}
-  .playbig{width:46px;height:46px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:0 8px 22px -8px var(--accent);cursor:pointer}
-  .round{width:34px;height:34px;border-radius:50%}
+  .trk b{display:block;font-weight:600;color:var(--ink)}.trk small{display:block;font-size:var(--fs-xs);color:var(--ink-3)}
+  .scape{display:grid;grid-template-columns:62px 1fr;gap:10px;align-items:center;padding:8px;border-radius:var(--r-lg);background:var(--surface-2)}
+  .scape .art{width:62px;height:62px}
+  .scape .meta{display:grid;gap:6px;min-width:0}
+  .pads{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .pad{--c:var(--accent);display:grid;justify-items:start;gap:6px;padding:8px;border-radius:var(--r-lg);border:0;font:600 var(--fs-xs)/1.2 var(--font-ui);color:var(--ink);text-align:left;cursor:pointer;
+    background:linear-gradient(160deg,color-mix(in oklab,var(--c) 26%,transparent),color-mix(in oklab,var(--c) 8%,transparent));box-shadow:inset 0 1px 0 color-mix(in oklab,var(--c) 30%,transparent)}
+  .pad .gic{width:22px;height:22px;color:var(--c);filter:drop-shadow(0 0 6px color-mix(in oklab,var(--c) 60%,transparent))}
+  .pad:hover{background:linear-gradient(160deg,color-mix(in oklab,var(--c) 36%,transparent),color-mix(in oklab,var(--c) 12%,transparent))}
+  .transport{flex:none;display:flex;align-items:center;gap:14px;padding:12px 18px;background:color-mix(in oklab,var(--surface-1) 88%,transparent)}
+  .transport .now{display:flex;align-items:center;gap:12px;min-width:0;width:270px}
+  .transport .now .art{width:52px;height:52px}
+  .transport .now b{display:block;font-family:var(--font-display);font-weight:var(--fw-display);font-size:var(--fs-lg)}
+  .transport .now span{font-size:var(--fs-sm)}
+  .transport .prog{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;font-size:var(--fs-xs);font-variant-numeric:tabular-nums}
+  .playbig{width:48px;height:48px;border-radius:50%;border:0;background:var(--accent-fill);color:var(--on-accent);display:grid;place-items:center;box-shadow:var(--accent-glow),0 0 30px -6px var(--accent);cursor:pointer}
+  .playbig .ic{width:20px;height:20px}
+  .round{border-radius:50%}
+  .vol{display:flex;align-items:center;gap:8px;color:var(--ink-2)}
 
-  /* Notes: sidebar tree, the page, a side panel */
+  /* Notes */
   .nlay{flex:1;display:flex;min-height:0}
-  .side{width:230px;flex:none;background:var(--surface-1);padding:10px;display:flex;flex-direction:column;gap:8px}
-  .camp{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:var(--r-lg);background:var(--surface-2)}
-  .camp i{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 10px var(--accent)}
+  .side{width:240px;flex:none;background:var(--surface-1);padding:10px;display:flex;flex-direction:column;gap:8px}
+  .camp{display:flex;align-items:center;gap:10px;padding:7px;border-radius:var(--r-lg);background:var(--surface-2)}
+  .camp .art{width:38px;height:38px;border-radius:var(--r-md)}
+  .camp b{font-family:var(--font-display);font-weight:var(--fw-display)}
   .camp small{display:block;color:var(--ink-3);font-size:var(--fs-xs)}
   .tree{display:grid;gap:1px}
   .trow{position:relative;display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:var(--r-md);color:var(--ink-2)}
+  .trow .ic{color:var(--c,var(--ink-4));width:15px;height:15px}
   .trow:hover{background:var(--hover)}.trow.on{background:var(--hover-2);color:var(--ink)}
-  .trow.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:3px;background:var(--accent)}
-  .trow i{width:8px;height:8px;border-radius:2px;background:var(--c,var(--ink-4));flex:none}
-  .page{flex:1;min-width:0;padding:22px 34px;display:grid;gap:10px;align-content:start;background:radial-gradient(900px 400px at 80% -20%,var(--accent-softer),transparent 60%)}
+  .trow.on::before{content:"";position:absolute;left:0;top:6px;bottom:6px;width:3px;border-radius:3px;background:var(--accent);box-shadow:0 0 8px var(--accent)}
+  .page{flex:1;min-width:0;display:grid;align-content:start;overflow:hidden}
+  .page .banner{height:150px}
+  .page .pbody{padding:0 36px 20px;margin-top:-6px;display:grid;gap:12px;position:relative}
   .page h1{font-size:var(--fs-3xl)}
-  .page p{margin:0;font:var(--fs-lg)/var(--lh-read) "Sitka Text","Iowan Old Style",Georgia,serif;color:var(--ink-2);max-width:62ch}
-  .page .callout{padding:10px 14px;border-radius:var(--r-lg);background:var(--accent-2-soft);color:var(--ink)}
-  .page .callout b{color:var(--accent-2-text)}
+  .page p{margin:0;max-width:60ch}
+  .callout{display:flex;gap:10px;padding:11px 14px;border-radius:var(--r-lg);background:var(--accent-2-soft);color:var(--ink);max-width:60ch}
+  .callout .ic{color:var(--accent-2-text);margin-top:3px}
+  .rp .tabs{flex-wrap:nowrap}.rp .tabs>button{padding:8px 7px}
   .rp{width:250px;flex:none;background:var(--surface-1);padding:8px 12px;display:grid;gap:8px;align-content:start}
+  .person{display:flex;align-items:center;gap:10px;padding:8px;border-radius:var(--r-lg);background:var(--surface-2)}
+  .person .art{width:36px;height:36px}
+  .person small{display:block;color:var(--ink-3);font-size:var(--fs-xs)}
 
-  /* ---------- component sheet ---------- */
-  .sheet{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
-  .app{background:var(--surface-0);color:var(--ink);border-radius:var(--r-2xl);padding:16px;display:grid;gap:12px;align-content:start;box-shadow:var(--shadow-2)}
+  /* ---------- effects explainer, fonts, components ---------- */
+  .fx{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .fxbox{border-radius:var(--r-xl);background:var(--surface-1);padding:14px;display:grid;gap:10px;align-content:start;min-height:230px}
+  .fxbox p{margin:0;color:var(--ink-2);font-size:var(--fs-sm)}
+  .artpick{display:flex;gap:8px;flex-wrap:wrap}
+  .artpick button{width:58px;height:40px;border:0;border-radius:var(--r-md);background:var(--art) center/cover;cursor:pointer;box-shadow:var(--shadow-1)}
+  .artpick button.on{outline:2px solid var(--accent);outline-offset:2px}
+  .fontgal{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+  .fontcard{display:grid;gap:6px;padding:14px;border:0;border-radius:var(--r-lg);background:var(--surface-1);color:var(--ink);text-align:left;cursor:pointer;font:inherit;transition:background var(--dur-fast)}
+  .fontcard:hover{background:var(--surface-2)}
+  .fontcard.on{background:var(--accent-softer);box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--accent) 40%,transparent)}
+  .fontcard .fd{font-size:24px;line-height:1.1}
+  .fontcard .fu{color:var(--ink-2);font-size:var(--fs-sm);font-family:var(--font-ui)}
+  .fontcard small{color:var(--ink-3);font-size:var(--fs-xs)}
+  .sheetgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  .app{background:var(--ambient),var(--surface-0);color:var(--ink);border-radius:var(--r-2xl);padding:16px;display:grid;gap:12px;align-content:start;box-shadow:var(--shadow-2);font:var(--fw-regular) var(--fs-md)/var(--lh) var(--font-ui)}
   .app>h3{font-size:var(--fs-lg);display:flex;align-items:center;gap:8px}
   .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:7px 0 0 var(--accent-2);margin-right:7px}
   .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -97,121 +178,133 @@
   .app .dialog{width:100%}
   .stress{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
   .stress>div{padding:10px;border-radius:var(--r-lg);background:var(--surface-2);display:grid;gap:6px;justify-items:start}
-  @media (max-width:1000px){.sheet{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.tiles .tile:last-child{display:none}.rp{display:none}}
-  @media (max-width:700px){.chatp{display:none}.side{display:none}.fwin.narrow{display:none}.tiles{grid-template-columns:1fr}.tiles .tile:nth-child(2){display:none}}
+  .credit{color:var(--ink-3);font-size:var(--fs-xs)}
+
+  @media (max-width:1060px){.hero{grid-template-columns:1fr}.sheetgrid,.fx{grid-template-columns:1fr}.tiles{grid-template-columns:1fr 1fr}.tiles .tile.q{display:none}.rp{display:none}.dock{left:50%}.gmw{display:none}}
+  @media (max-width:760px){.chatp,.side,.scenes{display:none}.tiles{grid-template-columns:1fr;grid-template-rows:1fr}.tiles .tile:not(.tall){display:none}.transport .vol,.transport select,.transport .prog{display:none}.dock .btn span{display:none}.fontrow{grid-template-columns:1fr}.stop .btn:not(.primary){display:none}}
 </style>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l12-7.5z" fill="currentColor" stroke="none"/></symbol>
-  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
-  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="19" cy="12" r="1.6" fill="currentColor"/></symbol>
-  <symbol id="i-split" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M12 4.5v15"/></symbol>
-  <symbol id="i-pop" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-8 8M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></symbol>
-  <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
-  <symbol id="i-cursor" viewBox="0 0 24 24"><path d="M5 3l14 7-6 2-2 6z"/></symbol>
-  <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16z"/></symbol>
-  <symbol id="i-shape" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="3"/></symbol>
-  <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
-  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L10 14M21 3l-7 18-4-7-7-4z"/></symbol>
-  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="M20 20l-4-4"/></symbol>
-  <symbol id="i-prev" viewBox="0 0 24 24"><path d="M18 6l-8 6 8 6zM6 6v12"/></symbol>
-  <symbol id="i-next" viewBox="0 0 24 24"><path d="M6 6l8 6-8 6zM18 6v12"/></symbol>
-  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-</svg>
-
 <div class="wrap">
-  <header class="top">
+  <header class="hero">
     <div>
-      <span class="cap">Critter design system · draft</span>
-      <h1>One look for Critter, Sounds and Notes</h1>
-      <p>Surfaces lift by lightness and soft shadow instead of 1px outlines. Each app keeps its own colours; pick any two and everything else follows. Every text level is AA in both schemes.</p>
+      <span class="cap orn"><i data-g="dice-twenty-faces-twenty"></i>Critter design system · draft 2</span>
+      <h1 class="display">One look for Critter, Sounds and Notes</h1>
+      <p>Surfaces lift by light and shadow, not 1px outlines. Artwork glows into the space around it. Each app keeps its own colours and type, and every choice below is yours to change.</p>
     </div>
-    <div class="row">
-      <div class="seg" role="group" aria-label="Scheme">
-        <button type="button" class="on" data-scheme="dark">Dark</button>
-        <button type="button" data-scheme="light">Light</button>
-      </div>
-      <button type="button" class="btn sm ghost" id="resetAll">Reset colours</button>
-    </div>
+    <section class="float look" aria-label="Your look">
+      <div class="cap"><i data-i="palette"></i>Your look</div>
+      <div class="lrow"><span>Scheme</span><div class="seg" role="group" aria-label="Scheme"><button type="button" class="on" data-scheme="dark"><i data-i="moon"></i>Dark</button><button type="button" data-scheme="light"><i data-i="sun"></i>Light</button></div></div>
+      <div class="lrow"><span>Fonts</span><select class="field" id="fontSet" aria-label="Font pairing"></select></div>
+      <div class="lrow"><span>Titles · UI · Reading</span><div class="fontrow"><select class="field" id="fDisplay" aria-label="Title font"></select><select class="field" id="fUi" aria-label="Interface font"></select><select class="field" id="fRead" aria-label="Reading font"></select></div></div>
+      <div class="lrow"><span>Surface tint</span><input type="range" class="range" id="hue" min="0" max="14" value="6" aria-label="How much the colour tints the surfaces"></div>
+      <div class="lrow"><span>Art glow</span><div class="seg" role="group" aria-label="Art glow"><button type="button" data-bleed="0"><i data-i="eye-off"></i>Off</button><button type="button" data-bleed=".6"><i data-i="eye"></i>Soft</button><button type="button" class="on" data-bleed="1"><i data-i="sparkle"></i>Full</button></div></div>
+      <div class="lrow"><span>Grain</span><label class="optlabel"><input type="checkbox" class="switch" id="grain" checked> Film grain on backgrounds</label></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn sm ghost" type="button" id="resetAll"><i data-i="refresh"></i>Reset everything</button></div>
+    </section>
   </header>
 
   <!-- ===================== Critter ===================== -->
   <section class="appsec" data-app="critter">
-    <div class="sechead"><h2>Critter</h2><span class="note">Virtual tabletop. Accent follows the player's colour; game-system themes swap the tone.</span><div class="picks"></div></div>
+    <div class="sechead"><h2 class="display"><span class="logo"><i data-g="dice-twenty-faces-twenty"></i></span>Critter</h2><span class="note">The table. Portraits glow on the board, into the sheet's header and behind each roll.</span><div class="picks"></div></div>
     <div class="mock">
       <div class="board">
         <nav class="rail" aria-label="Tools">
-          <button class="iconbtn on" type="button" aria-label="Select"><svg class="gi"><use href="#i-cursor"/></svg></button>
-          <button class="iconbtn" type="button" aria-label="Draw"><svg class="gi"><use href="#i-pen"/></svg></button>
-          <button class="iconbtn" type="button" aria-label="Shapes"><svg class="gi"><use href="#i-shape"/></svg></button>
-          <button class="iconbtn" type="button" aria-label="Undo"><svg class="gi"><use href="#i-undo"/></svg></button>
+          <button class="iconbtn on" type="button" title="Select" aria-label="Select"><i data-g="arrow-cursor"></i></button>
+          <button class="iconbtn" type="button" title="Draw" aria-label="Draw"><i data-g="quill-ink"></i></button>
+          <button class="iconbtn" type="button" title="Measure" aria-label="Measure"><i data-g="pencil-ruler"></i></button>
+          <button class="iconbtn" type="button" title="Paint" aria-label="Paint"><i data-g="paint-brush"></i></button>
+          <button class="iconbtn" type="button" title="Fog" aria-label="Fog"><i data-g="fog"></i></button>
+          <hr>
+          <button class="iconbtn" type="button" title="Undo" aria-label="Undo"><i data-g="anticlockwise-rotation"></i></button>
+          <button class="iconbtn" type="button" title="Clear" aria-label="Clear"><i data-g="broom"></i></button>
         </nav>
-        <section class="fwin" aria-label="Library window">
-          <div class="whead"><span class="wtitle">Library</span><span class="wacts"><button class="iconbtn" type="button" aria-label="Pop out"><svg class="gi"><use href="#i-pop"/></svg></button><button class="iconbtn" type="button" aria-label="Close"><svg class="gi"><use href="#i-x"/></svg></button></span><button class="iconbtn wmore" type="button" aria-label="More"><svg class="gi"><use href="#i-more"/></svg></button></div>
-          <div class="body">
-            <div class="seg"><button class="on" type="button">This table</button><button type="button">SRD</button></div>
-            <div class="tabs"><button class="on" type="button">Characters</button><button type="button">NPCs</button><button type="button">Items</button><button type="button">Spells</button></div>
-            <div class="item"><span class="av">TG</span><span class="grow"><b>Test GM</b><br><span class="t-3" style="font-size:var(--fs-xs)">Level 3 wizard</span></span><button class="btn sm" type="button">Open</button></div>
-            <div class="item"><span class="av">BR</span><span class="grow"><b>Brannoc</b><br><span class="t-3" style="font-size:var(--fs-xs)">Level 3 fighter</span></span><button class="btn sm" type="button">Open</button></div>
-            <button class="btn primary" type="button"><svg class="gi"><use href="#i-plus"/></svg>New or import</button>
+        <div class="scenes" aria-label="Scenes"><span class="art on" data-art="tavern" title="The Gilded Goose"></span><span class="art" data-art="harbour" title="Stormy harbour"></span><span class="art" data-art="dungeon" title="The undercroft"></span><button class="iconbtn sm" type="button" aria-label="New scene"><i data-i="plus"></i></button></div>
+        <div class="token" style="left:470px;top:110px"><span class="art round on" data-portrait="wizard-face,#9d6bff,#2b1650"></span><b>Mirella</b></div>
+        <div class="token" style="left:560px;top:170px"><span class="art round" data-portrait="dwarf-king,#f5a524,#5a2a0a"></span><b>Brannoc</b></div>
+        <div class="token" style="left:500px;top:390px"><span class="art round" data-portrait="dragon-head,#e5484d,#3a0a10"></span><b>Ashfang</b></div>
+        <section class="sheet" aria-label="Character sheet">
+          <div class="bleed" data-art-portrait="wizard-face,#9d6bff,#2b1650">
+            <div class="whead"><span class="badge"><i data-g="spell-book"></i></span><span class="wtitle">Character sheet</span><span class="wacts"><button class="iconbtn sm" type="button" aria-label="Roll from sheet"><i data-g="rolling-dices"></i></button><button class="iconbtn sm" type="button" aria-label="Pop out"><i data-i="open"></i></button><button class="iconbtn sm" type="button" aria-label="Close"><i data-i="x"></i></button></span><button class="iconbtn sm wmore" type="button" aria-label="Window menu"><i data-i="more"></i></button></div>
+            <div class="shead"><span class="art round" data-portrait="wizard-face,#9d6bff,#2b1650"></span><span><h3>Mirella Vane</h3><span class="t-2">Level 5 wizard · Elf</span></span></div>
           </div>
+          <div class="stats"><span class="stat"><small>STR</small><b>8</b></span><span class="stat"><small>DEX</small><b>14</b></span><span class="stat"><small>CON</small><b>13</b></span><span class="stat"><small>INT</small><b>18</b></span><span class="stat"><small>WIS</small><b>12</b></span><span class="stat"><small>CHA</small><b>10</b></span></div>
+          <div class="hp"><div class="row" style="justify-content:space-between"><span class="cap"><i data-g="heart-plus"></i>Hit points</span><b>27 / 32</b></div><div class="bar"><i style="--v:84%"></i></div></div>
+          <div class="foot"><button class="btn sm primary" type="button"><i data-g="rolling-dices"></i>Roll</button><button class="btn sm" type="button"><i data-g="spell-book"></i>Spells</button><button class="btn sm ghost" type="button"><i data-g="chest"></i>Gear</button></div>
         </section>
-        <section class="fwin narrow" aria-label="Narrow window">
-          <div class="whead"><span class="wtitle">GM tools</span><span class="wacts"><button class="iconbtn" type="button" aria-label="Pop out"><svg class="gi"><use href="#i-pop"/></svg></button><button class="iconbtn" type="button" aria-label="Close"><svg class="gi"><use href="#i-x"/></svg></button></span><button class="iconbtn wmore" type="button" aria-label="Window menu"><svg class="gi"><use href="#i-more"/></svg></button></div>
-          <div class="body"><span class="t-3" style="font-size:var(--fs-sm)">Too narrow for its buttons: they fold into ⋯</span>
-            <div class="seg"><button class="on" type="button">Off</button><button type="button">Light</button><button type="button">Strong</button></div></div>
+        <section class="gmw" aria-label="GM tools">
+          <div class="whead"><span class="badge two"><i data-g="wizard-staff"></i></span><span class="wtitle">GM tools</span><span class="wacts"><button class="iconbtn sm" type="button" aria-label="Pop out"><i data-i="open"></i></button><button class="iconbtn sm" type="button" aria-label="Close"><i data-i="x"></i></button></span><button class="iconbtn sm wmore" type="button" aria-label="Window menu"><i data-i="more"></i></button></div>
+          <div class="body"><span class="t-2" style="font-size:var(--fs-sm)">Narrow: its buttons fold into ⋯</span>
+            <div class="seg"><button class="on" type="button"><i data-g="raining"></i>Rain</button><button type="button"><i data-g="fog"></i>Fog</button><button type="button"><i data-g="flame"></i>Fire</button></div></div>
         </section>
         <aside class="chatp" aria-label="Chat">
-          <div class="head"><span class="logo"></span>Critter<span class="grow"></span><button class="iconbtn" type="button" aria-label="More"><svg class="gi"><use href="#i-more"/></svg></button></div>
-          <div class="row"><span class="chip on">Test GM · you</span><span class="chip">Brannoc</span></div>
+          <div class="head"><i data-g="dice-twenty-faces-twenty"></i><span class="display">Critter</span><span class="grow"></span><button class="iconbtn sm" type="button" aria-label="Lobby"><i data-g="tabletop-players"></i></button><button class="iconbtn sm" type="button" aria-label="Dice sound"><i data-g="speaker"></i></button></div>
+          <div class="seats"><span class="seat"><span class="art round" data-portrait="wizard-face,#9d6bff,#2b1650"></span>Mirella</span><span class="seat"><span class="art round" data-portrait="dwarf-king,#f5a524,#5a2a0a"></span>Brannoc</span><span class="seat"><span class="art round" data-portrait="owl,#3cc4c4,#08333a"></span>GM</span></div>
           <div class="log">
-            <div class="roll"><b>Brannoc <span class="t-3">· 1d20+5</span></b><div class="res"><span class="big">17</span><span class="t-2">Attack, hits</span></div></div>
-            <div class="roll"><b>Test GM <span class="t-3">· 2d6</span></b><div class="res"><span class="big">9</span><span class="t-2">Fire damage</span></div></div>
+            <div class="roll bleed" data-art-portrait="dwarf-king,#f5a524,#5a2a0a"><span class="who"><span class="art round" data-portrait="dwarf-king,#f5a524,#5a2a0a"></span>Brannoc <span class="t-2">· 1d20+5</span></span><div class="res"><span class="big">17</span><span class="t-2">Attack, hits</span></div></div>
+            <div class="roll crit bleed" data-art-portrait="wizard-face,#9d6bff,#2b1650"><span class="who"><span class="art round" data-portrait="wizard-face,#9d6bff,#2b1650"></span>Mirella <span class="t-2">· 1d20+7</span></span><div class="res"><span class="big">27</span><span class="t-2">Natural 20! Critical</span></div></div>
           </div>
-          <div class="dice"><span><i></i>d4</span><span><i></i>d6</span><span><i></i>d8</span><span><i></i>d10</span><span><i></i>d12</span><span><i></i>d20</span></div>
-          <div class="sendrow"><input class="field" placeholder="Type 2d6+3 or a message" aria-label="Roll or message"><button class="btn primary" type="button" aria-label="Send"><svg class="gi"><use href="#i-send"/></svg></button></div>
+          <div class="dice"><button type="button"><i data-g="dice-six-faces-six"></i>d6</button><button type="button"><i data-g="dice-eight-faces-eight"></i>d8</button><button type="button"><i data-g="dice-twenty-faces-twenty"></i>d20</button><button type="button"><i data-g="perspective-dice-six-faces-random"></i>2d6</button><button type="button"><i data-g="rolling-dices"></i>Roll</button></div>
+          <div class="row"><button class="chip on" type="button"><i data-g="semi-closed-eye"></i>Hidden</button><button class="chip" type="button"><i data-g="scroll-unfurled"></i>My rolls</button><button class="chip" type="button"><i data-g="open-book"></i>Roll guide</button></div>
+          <div class="sendrow"><input class="field" placeholder="Type 2d6+3, or a message" aria-label="Roll or message"><button class="btn primary" type="button" aria-label="Send"><i data-g="paper-plane"></i></button></div>
         </aside>
-        <nav class="dock" aria-label="Windows"><button class="btn ghost" type="button">Notes</button><button class="btn on" type="button">Library</button><button class="btn ghost" type="button">Music</button><button class="btn ghost" type="button">GM tools</button><button class="btn ghost" type="button">Trackers</button></nav>
+        <nav class="dock" aria-label="Windows"><button class="btn ghost" type="button"><i data-g="notebook"></i><span>Notes</span></button><button class="btn on" type="button"><i data-g="book-pile"></i><span>Library</span></button><button class="btn ghost" type="button"><i data-g="lyre"></i><span>Music</span></button><button class="btn ghost" type="button"><i data-g="wizard-staff"></i><span>GM tools</span></button><button class="btn ghost" type="button"><i data-g="crossed-swords"></i><span>Fight</span></button><button class="btn ghost" type="button"><i data-g="hourglass"></i><span>Trackers</span></button></nav>
       </div>
     </div>
   </section>
 
   <!-- ===================== Critter Sounds ===================== -->
   <section class="appsec" data-app="sounds">
-    <div class="sechead"><h2>Critter Sounds</h2><span class="note">Music, pads and soundscapes. Tiled windows; each header folds its buttons into ⋯ when narrow.</span><div class="picks"></div></div>
+    <div class="sechead"><h2 class="display"><span class="logo"><i data-i="headphones"></i></span>Critter Sounds</h2><span class="note">The cover of what's playing bleeds out across the play bar; covers and pads glow in their own colours.</span><div class="picks"></div></div>
     <div class="mock">
-      <div class="tbar"><span class="logo"></span><span class="brand">Critter Sounds</span><span class="ctl"><span>–</span><span>□</span><span>✕</span></span></div>
-      <div class="stop"><input class="field" style="width:220px;font-family:var(--font-mono);letter-spacing:.08em" value="HUX97V-2ZMKB" aria-label="Music code"><button class="btn primary" type="button">Connect</button><span class="chip" style="background:var(--ok-soft);color:var(--ok)">Connected</span><span class="grow"></span><button class="btn secondary" type="button"><svg class="gi"><use href="#i-plus"/></svg>Windows</button><button class="btn ghost" type="button">Layouts</button><button class="iconbtn" type="button" aria-label="Appearance">◐</button></div>
+      <div class="tbar"><span class="logo"><i data-i="headphones"></i></span><span class="brand">Critter Sounds</span><span class="ctl"><span><i data-i="minus"></i></span><span><i data-i="square"></i></span><span><i data-i="x"></i></span></span></div>
+      <div class="stop">
+        <div class="fieldicon"><i data-i="link"></i><input class="field" value="HUX97V-2ZMKB" aria-label="Music code"></div>
+        <button class="btn primary" type="button"><i data-i="globe"></i>Connect</button>
+        <span class="chip" style="background:var(--ok-soft);color:var(--ok)"><i data-i="check"></i>At the table</span>
+        <span class="grow"></span>
+        <button class="btn secondary" type="button"><i data-i="window"></i>Windows</button><button class="btn ghost" type="button"><i data-i="layout"></i>Layouts</button><button class="btn ghost" type="button"><i data-i="help"></i>Help</button>
+        <button class="iconbtn" type="button" aria-label="Appearance"><i data-i="palette"></i></button><button class="iconbtn" type="button" aria-label="Settings"><i data-i="gear"></i></button>
+      </div>
       <div class="tiles">
-        <section class="tile">
-          <div class="whead"><span class="ti"><svg class="gi" style="width:14px;height:14px"><use href="#i-music"/></svg></span><span class="wtitle">Playlist</span><span class="wacts"><button class="iconbtn" type="button" aria-label="Split"><svg class="gi"><use href="#i-split"/></svg></button><button class="iconbtn" type="button" aria-label="Close"><svg class="gi"><use href="#i-x"/></svg></button></span><button class="iconbtn wmore" type="button" aria-label="Window menu"><svg class="gi"><use href="#i-more"/></svg></button></div>
+        <section class="tile tall">
+          <div class="whead"><span class="badge"><i data-i="music"></i></span><span class="wtitle">Playlist · Tavern nights</span><span class="wacts"><button class="iconbtn sm" type="button" aria-label="Split right"><i data-i="splitR"></i></button><button class="iconbtn sm" type="button" aria-label="Split down"><i data-i="splitD"></i></button><button class="iconbtn sm" type="button" aria-label="Swap"><i data-i="swap"></i></button><button class="iconbtn sm" type="button" aria-label="Close"><i data-i="x"></i></button></span><button class="iconbtn sm wmore" type="button" aria-label="Window menu"><i data-i="more"></i></button></div>
           <div class="body">
-            <div class="row" style="margin-bottom:6px"><button class="btn primary sm" type="button"><svg class="gi" style="width:12px"><use href="#i-play"/></svg>Play</button><button class="btn sm" type="button">Queue</button><button class="btn sm ghost" type="button">Add folder</button></div>
-            <div class="trk on"><span class="n">1</span><span>Tavern tune</span><span class="n">0:40</span></div>
-            <div class="trk"><span class="n">2</span><span>Battle drums</span><span class="n">1:12</span></div>
-            <div class="trk"><span class="n">3</span><span>Stormy harbour</span><span class="n">3:05</span></div>
-            <div class="trk"><span class="n">4</span><span>The Britons</span><span class="n">5:07</span></div>
+            <div class="row" style="margin-bottom:8px"><button class="btn primary sm" type="button"><i data-i="play"></i>Play</button><button class="btn sm" type="button"><i data-i="queue"></i>Queue</button><button class="btn sm ghost" type="button"><i data-i="folder"></i>Add folder</button><button class="btn sm ghost" type="button"><i data-i="shuffle"></i>Shuffle</button></div>
+            <div class="trk on"><span class="art" data-art="tavern"></span><span><b>The Gilded Goose</b><small>Tavern · loop</small></span><span class="n">3:40</span></div>
+            <div class="trk"><span class="art" data-art="harbour"></span><span><b>Stormy harbour</b><small>Ambience</small></span><span class="n">5:12</span></div>
+            <div class="trk"><span class="art" data-art="forest"></span><span><b>Moonlit pines</b><small>Ambience</small></span><span class="n">4:05</span></div>
+            <div class="trk"><span class="art" data-art="dungeon"></span><span><b>The undercroft</b><small>Tension</small></span><span class="n">2:58</span></div>
+            <div class="trk"><span class="art" data-art="desert"></span><span><b>Glass dunes</b><small>Travel</small></span><span class="n">6:21</span></div>
           </div>
         </section>
         <section class="tile">
-          <div class="whead"><span class="ti">✦</span><span class="wtitle">Soundscapes</span><span class="wacts"><button class="btn primary sm" type="button">New</button><button class="iconbtn" type="button" aria-label="Split"><svg class="gi"><use href="#i-split"/></svg></button><button class="iconbtn" type="button" aria-label="Close"><svg class="gi"><use href="#i-x"/></svg></button></span><button class="iconbtn wmore" type="button" aria-label="Window menu"><svg class="gi"><use href="#i-more"/></svg></button></div>
-          <div class="body"><div class="scape"><b>Stormy harbour</b><span class="t-3" style="font-size:var(--fs-xs)">14 nodes</span><div class="row"><button class="btn primary sm" type="button">Play</button><button class="btn sm" type="button">Edit</button></div><input type="range" class="range" style="--p:80%" value="80" aria-label="Storm"></div></div>
+          <div class="whead"><span class="badge two"><i data-i="sparkle"></i></span><span class="wtitle">Soundscapes</span><span class="wacts"><button class="btn primary sm" type="button"><i data-i="plus"></i>New</button><button class="iconbtn sm" type="button" aria-label="Split right"><i data-i="splitR"></i></button><button class="iconbtn sm" type="button" aria-label="Close"><i data-i="x"></i></button></span><button class="iconbtn sm wmore" type="button" aria-label="Window menu"><i data-i="more"></i></button></div>
+          <div class="body"><div class="scape"><span class="art" data-art="harbour"></span><div class="meta"><b>Stormy harbour</b><div class="row"><button class="btn primary sm" type="button"><i data-i="play"></i>Play</button><button class="btn sm" type="button"><i data-i="edit"></i>Edit</button></div><input type="range" class="range" style="--p:72%" value="72" aria-label="Storm"></div></div></div>
+        </section>
+        <section class="tile q tall">
+          <div class="whead"><span class="badge plain"><i data-i="queue"></i></span><span class="wtitle">Queue</span><span class="wacts"><button class="iconbtn sm" type="button" aria-label="Shuffle"><i data-i="shuffle"></i></button><button class="iconbtn sm" type="button" aria-label="Split right"><i data-i="splitR"></i></button><button class="iconbtn sm" type="button" aria-label="Close"><i data-i="x"></i></button></span><button class="iconbtn sm wmore" type="button" aria-label="Window menu"><i data-i="more"></i></button></div>
+          <div class="body"><span class="cap"><i data-i="wave"></i>Now playing</span><div class="trk on"><span class="art" data-art="tavern"></span><span><b>The Gilded Goose</b></span><span></span></div><span class="cap" style="margin-top:8px"><i data-i="list"></i>Up next</span><div class="trk"><span class="art" data-art="arcane"></span><span><b>Ley lines</b></span><span class="n">4:44</span></div><div class="trk"><span class="art" data-art="forest"></span><span><b>Moonlit pines</b></span><span class="n">4:05</span></div><button class="addtile" type="button"><i data-i="plus"></i>Add a track</button></div>
         </section>
         <section class="tile">
-          <div class="whead"><span class="ti">≡</span><span class="wtitle">Queue</span><span class="wacts"><button class="iconbtn" type="button" aria-label="Split"><svg class="gi"><use href="#i-split"/></svg></button><button class="iconbtn" type="button" aria-label="Close"><svg class="gi"><use href="#i-x"/></svg></button></span><button class="iconbtn wmore" type="button" aria-label="Window menu"><svg class="gi"><use href="#i-more"/></svg></button></div>
-          <div class="body"><span class="cap">Now playing</span><b>Tavern tune</b><span class="cap" style="margin-top:8px">Up next</span><div class="trk"><span class="n">1</span><span>The Britons</span><span></span></div></div>
+          <div class="whead"><span class="badge"><i data-i="pads"></i></span><span class="wtitle">Sound pads</span><span class="wacts"><button class="iconbtn sm" type="button" aria-label="Stop all"><i data-i="stop"></i></button><button class="iconbtn sm" type="button" aria-label="Close"><i data-i="x"></i></button></span><button class="iconbtn sm wmore" type="button" aria-label="Window menu"><i data-i="more"></i></button></div>
+          <div class="body"><div class="pads">
+            <button class="pad" type="button" style="--c:#e5484d"><i data-g="crossed-swords"></i>Sword clash</button>
+            <button class="pad" type="button" style="--c:#4cc9f0"><i data-g="raining"></i>Rain</button>
+            <button class="pad" type="button" style="--c:#f5a524"><i data-g="flame"></i>Fireball</button>
+            <button class="pad" type="button" style="--c:#b07cff"><i data-g="sparkles"></i>Magic</button>
+            <button class="pad" type="button" style="--c:#22c55e"><i data-g="owl"></i>Night owl</button>
+            <button class="pad" type="button" style="--c:#ec4899"><i data-g="drama-masks"></i>Crowd</button>
+          </div></div>
         </section>
       </div>
-      <div class="transport">
-        <div style="display:grid"><b>Tavern tune</b><span class="t-3" style="font-size:var(--fs-xs)">0:12 / 0:40</span></div>
-        <span class="grow"></span>
-        <button class="iconbtn round" type="button" aria-label="Previous"><svg class="gi"><use href="#i-prev"/></svg></button>
-        <button class="playbig" type="button" aria-label="Play"><svg class="gi"><use href="#i-play"/></svg></button>
-        <button class="iconbtn round" type="button" aria-label="Next"><svg class="gi"><use href="#i-next"/></svg></button>
-        <span class="grow"></span>
-        <label class="optlabel"><input type="checkbox" class="check" checked> Here</label>
-        <input type="range" class="range" style="--p:70%;width:120px" value="70" aria-label="Volume">
+      <div class="transport bleed" id="bar" data-art="tavern">
+        <div class="now"><span class="art" data-art="tavern"></span><span style="min-width:0"><b>The Gilded Goose</b><span>Tavern nights · loop</span></span></div>
+        <div class="grow" style="display:grid;gap:6px;justify-items:center">
+          <div class="row" style="gap:10px"><button class="iconbtn round" type="button" aria-label="Shuffle"><i data-i="shuffle"></i></button><button class="iconbtn round" type="button" aria-label="Previous"><i data-i="prev"></i></button><button class="playbig" type="button" aria-label="Pause"><i data-i="pause"></i></button><button class="iconbtn round" type="button" aria-label="Next"><i data-i="next"></i></button><button class="iconbtn round on" type="button" aria-label="Repeat"><i data-i="repeat"></i></button></div>
+          <div class="prog" style="width:min(100%,360px)"><span>1:12</span><input type="range" class="range" style="--p:33%" value="33" aria-label="Position"><span>3:40</span></div>
+        </div>
+        <div class="vol"><i data-i="headphones"></i><input type="range" class="range" style="--p:70%;width:110px" value="70" aria-label="Table volume"></div>
         <select class="field" aria-label="Sleep timer"><option>No sleep timer</option><option>15 minutes</option><option>1 hour</option></select>
       </div>
     </div>
@@ -219,49 +312,71 @@
 
   <!-- ===================== Critter Notes ===================== -->
   <section class="appsec" data-app="notes">
-    <div class="sechead"><h2>Critter Notes</h2><span class="note">The GM's planner. A reading surface first: calm, roomy, serif body.</span><div class="picks"></div></div>
+    <div class="sechead"><h2 class="display"><span class="logo"><i data-i="n-note"></i></span>Critter Notes</h2><span class="note">A page's picture becomes its banner and washes its colours down the page; campaign and people art glow too.</span><div class="picks"></div></div>
     <div class="mock">
-      <div class="tbar"><span class="logo"></span><span class="brand">Critter Notes</span><span class="ctl"><span>–</span><span>□</span><span>✕</span></span></div>
+      <div class="tbar"><span class="logo"><i data-i="n-note"></i></span><span class="brand">Critter Notes</span><span class="ctl"><span><i data-i="minus"></i></span><span><i data-i="square"></i></span><span><i data-i="x"></i></span></span></div>
       <div class="nlay">
         <aside class="side">
-          <div class="camp"><i></i><span class="grow"><b>Curse of the Reef</b><small>12 pages · 3 sessions</small></span></div>
-          <button class="btn ghost sm" type="button" style="justify-content:flex-start;background:var(--sunken);color:var(--ink-3)"><svg class="gi"><use href="#i-search"/></svg>Find anything</button>
-          <div class="seg" style="display:flex"><button class="on" type="button" style="flex:1">Pages</button><button type="button" style="flex:1">Board</button><button type="button" style="flex:1">Plan</button></div>
-          <span class="cap" style="padding:6px 8px 0">Places</span>
+          <div class="camp"><span class="art" data-art="harbour"></span><span class="grow"><b>Curse of the Reef</b><small>12 pages · 3 sessions</small></span><i data-i="down"></i></div>
+          <div class="fieldicon"><i data-i="search"></i><input class="field" placeholder="Find anything" aria-label="Find"></div>
+          <div class="seg" style="display:flex"><button class="on" type="button" style="flex:1"><i data-i="n-note"></i>Pages</button><button type="button" style="flex:1"><i data-i="board"></i>Board</button><button type="button" style="flex:1"><i data-i="timeline"></i>Plan</button></div>
+          <span class="cap orn" style="padding:6px 6px 0"><i data-i="location"></i>Places</span>
           <div class="tree">
-            <div class="trow on" style="--c:var(--accent)"><i></i>Saltmarsh harbour</div>
-            <div class="trow"><i></i>The drowned chapel</div>
-            <div class="trow"><i></i>Smugglers' caves</div>
+            <div class="trow on" style="--c:var(--accent-text)"><i data-i="location"></i>Saltmarsh harbour</div>
+            <div class="trow" style="--c:var(--accent-text)"><i data-i="location"></i>The drowned chapel</div>
+            <div class="trow" style="--c:var(--accent-text)"><i data-i="map"></i>Smugglers' caves</div>
           </div>
-          <span class="cap" style="padding:6px 8px 0">People</span>
-          <div class="tree"><div class="trow" style="--c:var(--accent-2)"><i></i>Captain Ilsa Marr</div><div class="trow" style="--c:var(--accent-2)"><i></i>Old Wendel</div></div>
+          <span class="cap orn" style="padding:6px 6px 0"><i data-i="character"></i>People</span>
+          <div class="tree"><div class="trow" style="--c:var(--accent-2-text)"><i data-i="character"></i>Captain Ilsa Marr</div><div class="trow" style="--c:var(--accent-2-text)"><i data-i="faction"></i>The Tide Guild</div><div class="trow" style="--c:var(--accent-2-text)"><i data-i="quest"></i>The two ledgers</div></div>
         </aside>
-        <article class="page">
-          <span class="cap">Place · Session 3</span>
-          <h1>Saltmarsh harbour</h1>
-          <p>Fog rolls in off the reef each evening. The harbour master keeps two ledgers, and only one of them is for the crown.</p>
-          <div class="callout"><b>GM only.</b> The bell in the chapel rings when the tide turns, whoever pulls the rope.</div>
-          <div class="row"><span class="chip on">Location</span><span class="chip">Act 1</span><span class="chip">Coast</span></div>
+        <article class="page bleed down" data-art="harbour">
+          <div class="banner" data-art="harbour"></div>
+          <div class="pbody">
+            <div class="row"><span class="chip on"><i data-i="location"></i>Place</span><span class="chip"><i data-i="session"></i>Session 3</span></div>
+            <h1 class="display">Saltmarsh harbour</h1>
+            <p class="read">Fog rolls in off the reef each evening. The harbour master keeps two ledgers, and only one of them is for the crown.</p>
+            <div class="callout"><i data-i="quote"></i><span><b>GM only.</b> The bell in the chapel rings when the tide turns, whoever pulls the rope.</span></div>
+            <div class="row"><button class="btn sm secondary" type="button"><i data-i="n-link"></i>Link a page</button><button class="btn sm ghost" type="button"><i data-i="image"></i>Change picture</button><button class="btn sm ghost" type="button"><i data-i="send"></i>Send to table</button></div>
+          </div>
         </article>
         <aside class="rp">
-          <div class="tabs"><button class="on" type="button">Outline</button><button type="button">Links</button><button type="button">Table</button></div>
-          <span class="cap" style="margin-top:6px">On this page</span>
-          <div class="trow">Arrival</div><div class="trow">The two ledgers</div><div class="trow">Hooks</div>
-          <div class="card" style="padding:10px;display:grid;gap:6px"><b style="font-size:var(--fs-sm)">Linked from</b><span class="t-2" style="font-size:var(--fs-sm)">Captain Ilsa Marr</span></div>
+          <div class="tabs"><button class="on" type="button"><i data-i="heading"></i>Outline</button><button type="button"><i data-i="n-link"></i>Links</button><button type="button"><i data-i="table"></i>Table</button></div>
+          <span class="cap" style="margin-top:6px"><i data-i="list"></i>On this page</span>
+          <div class="trow"><i data-i="right"></i>Arrival</div><div class="trow"><i data-i="right"></i>The two ledgers</div><div class="trow"><i data-i="right"></i>Hooks</div>
+          <span class="cap" style="margin-top:6px"><i data-i="users"></i>Linked from</span>
+          <div class="person"><span class="art round" data-portrait="hooded-assassin,#f5a524,#3a1d05"></span><span><b>Captain Ilsa Marr</b><small>Character</small></span></div>
+          <div class="person"><span class="art round" data-portrait="squid-head,#10b39b,#032820"></span><span><b>The Tide Guild</b><small>Faction</small></span></div>
         </aside>
       </div>
     </div>
   </section>
 
+  <!-- ===================== artwork effects ===================== -->
+  <section>
+    <div class="sechead"><h2 class="display">Artwork effects</h2><span class="note">Pick a picture: the Sounds play bar and the Notes page follow it.</span><div class="picks"><div class="artpick" id="artpick"></div></div></div>
+    <div class="fx">
+      <div class="fxbox bleed" id="fxBleed" data-art="tavern"><span class="cap"><i data-i="sparkle"></i>Bleed</span><b class="display" style="font-size:var(--fs-xl)">Colour spills out of the art</b><p>Blurred, saturated and graded into a safe band, then masked away from the picture. Text on it uses <b>ink</b> or <b>ink-2</b> only. For the play bar, sheet headers, roll cards and page washes.</p></div>
+      <div class="fxbox"><span class="cap"><i data-i="image"></i>Glow</span><div class="row" style="gap:16px;padding:8px 4px"><span class="art" data-art="forest" style="width:72px;height:72px"></span><span class="art round" data-portrait="dragon-head,#e5484d,#3a0a10" style="width:64px;height:64px"></span><span class="art" data-art="arcane" style="width:72px;height:72px"></span></div><p>A blurred copy of the picture sits under it as its shadow, so covers, tokens and portraits glow in their own colours.</p></div>
+      <div class="fxbox" style="padding:0;overflow:hidden"><div class="banner" data-art="desert" style="height:110px"></div><div style="padding:0 14px 14px;margin-top:-26px;display:grid;gap:8px;position:relative"><span class="cap"><i data-i="n-note"></i>Banner</span><p>A wide picture that fades into the surface below it. For page headers in Notes and scene cards in Critter.</p></div></div>
+    </div>
+  </section>
+
+  <!-- ===================== fonts ===================== -->
+  <section>
+    <div class="sechead"><h2 class="display">Fonts</h2><span class="note">Ten pairings to start from; each role (titles, interface, reading) can also be picked on its own. Click one to try it everywhere.</span></div>
+    <div class="fontgal" id="fontgal"></div>
+  </section>
+
   <!-- ===================== components ===================== -->
   <section>
-    <div class="sechead"><h2>Components</h2><span class="note">The same parts in each app's colours. Text samples sit on every surface level.</span></div>
-    <div class="sheet" id="sheet" style="margin-top:12px"></div>
+    <div class="sechead"><h2 class="display">Components</h2><span class="note">The same parts in each app's colours and fonts, with text on every surface level.</span></div>
+    <div class="sheetgrid" id="sheet"></div>
   </section>
   <section>
-    <div class="sechead"><h2>Any colour stays readable</h2><span class="note">Every preset from the three apps (and some extremes) as accent text, solid fill and soft chip.</span></div>
-    <div class="stress" id="stress" style="margin-top:12px"></div>
+    <div class="sechead"><h2 class="display">Any colour stays readable</h2><span class="note">Every preset from the three apps, and some extremes, as accent text, solid fill and soft chip.</span></div>
+    <div class="stress" id="stress"></div>
   </section>
+  <p class="credit">Game icons from game-icons.net by Lorc, Delapouite and contributors (CC BY 3.0). Line icons from Critter Sounds and Critter Notes. Fonts from Google Fonts (SIL Open Font License).</p>
 </div>
 
 <template id="tpl">
@@ -269,9 +384,9 @@
     <h3><span class="dot"></span><span class="nm"></span></h3>
     <div class="levels"></div>
     <div class="panel">
-      <span class="cap">Panel · surface 1</span>
-      <div class="row"><button class="btn primary" type="button">Play</button><button class="btn" type="button">Queue</button><button class="btn secondary" type="button">Save</button><button class="btn ghost" type="button">Cancel</button></div>
-      <div class="row"><input class="field" placeholder="Search" aria-label="Search" style="width:140px"><select class="field" aria-label="Timer"><option>No timer</option><option>15 minutes</option></select></div>
+      <span class="cap orn"><i data-i="layout"></i>Panel · surface 1</span>
+      <div class="row"><button class="btn primary" type="button"><i data-i="play"></i>Play</button><button class="btn" type="button"><i data-i="queue"></i>Queue</button><button class="btn secondary" type="button"><i data-i="save"></i>Save</button><button class="btn ghost" type="button"><i data-i="x"></i>Cancel</button></div>
+      <div class="row"><div class="fieldicon" style="width:150px"><i data-i="search"></i><input class="field" placeholder="Search" aria-label="Search"></div><select class="field" aria-label="Timer"><option>No timer</option><option>15 minutes</option></select></div>
       <div class="row">
         <label class="optlabel"><input type="checkbox" class="check" checked> Loop</label>
         <label class="optlabel"><input type="checkbox" class="check"> Shuffle</label>
@@ -279,42 +394,59 @@
         <label class="optlabel"><input type="checkbox" class="switch" checked> Duck</label>
       </div>
       <input type="range" class="range" aria-label="Volume" style="--p:62%" value="62">
-      <div class="row"><div class="seg"><button class="on" type="button">Effects</button><button type="button">Map</button><button type="button">Players</button></div><span class="chip on">All 22</span><span class="chip">Weather</span></div>
+      <div class="row"><div class="seg"><button class="on" type="button"><i data-i="sliders"></i>Effects</button><button type="button"><i data-i="map"></i>Map</button><button type="button"><i data-i="users"></i>Players</button></div><span class="chip on"><i data-i="pads"></i>All 22</span></div>
       <div class="card">
-        <div class="tabs"><button class="on" type="button">This table</button><button type="button">SRD</button></div>
+        <div class="tabs"><button class="on" type="button"><i data-i="home"></i>This table</button><button type="button"><i data-i="read"></i>SRD</button></div>
         <span class="t-2">Secondary text. <span class="t-accent">Accent text</span>, <span class="t-accent-2">second accent</span>.</span>
         <span class="t-3">Tertiary, the faintest words.</span>
+        <button class="addtile" type="button"><i data-i="plus"></i>New or import</button>
       </div>
     </div>
-    <div class="float menu" role="menu"><button type="button" role="menuitem">Rename <span class="kbd">F2</span></button><button type="button" role="menuitem">Duplicate</button><hr><button type="button" role="menuitem" style="color:var(--bad)">Delete</button></div>
-    <div class="float dialog"><b>Dialog · surface 3</b><span class="t-2">No outline: the shadow and the sheen carry the edge.</span><div class="foot"><button class="btn ghost" type="button">Defaults</button><button class="btn primary" type="button">Done</button></div></div>
-    <div class="toast">Saved. <span class="t-3">Toast · surface 4</span></div>
-    <div class="row"><span class="chip" style="background:var(--ok-soft);color:var(--ok)">Connected</span><span class="chip" style="background:var(--warn-soft);color:var(--warn)">Slow</span><span class="chip" style="background:var(--bad-soft);color:var(--bad)">Offline</span></div>
+    <div class="float menu" role="menu"><button type="button" role="menuitem"><i data-i="edit"></i>Rename <span class="kbd">F2</span></button><button type="button" role="menuitem"><i data-i="copy"></i>Duplicate</button><button type="button" role="menuitem"><i data-i="playnext"></i>Play next</button><hr><button type="button" role="menuitem" class="bad"><i data-i="trash"></i>Delete</button></div>
+    <div class="float dialog"><div class="dhead"><span class="badge"><i data-i="palette"></i></span><b class="display" style="font-size:var(--fs-lg)">Appearance</b></div><span class="t-2">Dialog · surface 3. No outline: the shadow and the sheen carry the edge.</span><div class="foot"><button class="btn ghost" type="button"><i data-i="refresh"></i>Defaults</button><button class="btn primary" type="button"><i data-i="check"></i>Done</button></div></div>
+    <div class="toast"><span class="badge"><i data-i="check"></i></span>Saved. <span class="t-3">Toast · surface 4</span></div>
+    <div class="row"><span class="chip" style="background:var(--ok-soft);color:var(--ok)"><i data-i="check"></i>Connected</span><span class="chip" style="background:var(--warn-soft);color:var(--warn)"><i data-i="clock"></i>Slow</span><span class="chip" style="background:var(--bad-soft);color:var(--bad)"><i data-i="alert"></i>Offline</span></div>
   </section>
 </template>
 
 <script>
-// each app's identity: its own accents and its own background tones (dark and light)
+// each app's identity: accents, background tones and fonts
 const APPS = {
-  critter: { nm: 'Critter', a: '#c9a45c', b: '#3cc4c4', td: '#0b0c0f', tl: '#f2f1ee' },
-  sounds: { nm: 'Critter Sounds', a: '#8800ff', b: '#4cc9f0', td: '#0b0a12', tl: '#f3f2f8' },
-  notes: { nm: 'Critter Notes', a: '#10b39b', b: '#f5a524', td: '#0c0e0e', tl: '#f1f4f3' }
+  critter: { nm: 'Critter', a: '#c9a45c', b: '#3cc4c4', td: '#0b0c0f', tl: '#f2f1ee', fonts: { display: 'Grenze', ui: 'Alegreya Sans', read: 'Spectral' } },
+  sounds: { nm: 'Critter Sounds', a: '#8800ff', b: '#4cc9f0', td: '#0b0a12', tl: '#f3f2f8', fonts: { display: 'Zalando Sans Expanded', ui: 'Zalando Sans', read: 'Literata' } },
+  notes: { nm: 'Critter Notes', a: '#10b39b', b: '#f5a524', td: '#0c0e0e', tl: '#f1f4f3', fonts: { display: 'Fraunces', ui: 'Zalando Sans', read: 'Literata' } }
 };
-const pick = Object.fromEntries(Object.entries(APPS).map(([k, v]) => [k, { a: v.a, b: v.b }]));
-let scheme = 'dark';
-const vars = k => `--accent:${pick[k].a};--accent-2:${pick[k].b};--tone-dark:${APPS[k].td};--tone-light:${APPS[k].tl}`;
+const PAGE_FONTS = { display: 'Zalando Sans Expanded', ui: 'Zalando Sans', read: 'Literata' };
+const state = { pick: {} };
+const reset = () => { Object.assign(state, { scheme: 'dark', fonts: null, hue: 6, bleed: 1, grain: 1, art: 'tavern' }); for (const k in APPS) state.pick[k] = { a: APPS[k].a, b: APPS[k].b }; };
+reset();
+
+const vars = k => `--accent:${state.pick[k].a};--accent-2:${state.pick[k].b};--tone-dark:${APPS[k].td};--tone-light:${APPS[k].tl}`;
+function paintArt(root) {
+  root.querySelectorAll('[data-art]').forEach(e => e.style.setProperty('--art', ART.scene(e.dataset.art)));
+  root.querySelectorAll('[data-portrait],[data-art-portrait]').forEach(e => { const [g, a, b] = (e.dataset.portrait || e.dataset.artPortrait).split(','); e.style.setProperty('--art', ART.portrait(g, a, b)); });
+}
 function paint() {
-  document.documentElement.dataset.theme = scheme;
+  const R = document.documentElement;
+  R.dataset.theme = state.scheme;
+  R.style.setProperty('--hue', state.hue + '%'); R.style.setProperty('--bleed', state.bleed); R.style.setProperty('--grain', state.grain);
+  applyFonts(R, state.fonts || PAGE_FONTS);
   for (const sec of document.querySelectorAll('.appsec')) {
     const k = sec.dataset.app, m = sec.querySelector('.mock');
-    m.dataset.theme = scheme; m.style.cssText = vars(k);
-    sec.querySelectorAll('.swatch').forEach(s => s.style.setProperty('--c', pick[k][s.dataset.key]));
+    m.dataset.theme = state.scheme; m.style.cssText = vars(k); applyFonts(m, state.fonts || APPS[k].fonts);
+    sec.querySelectorAll('.sechead .logo').forEach(l => { l.style.cssText = vars(k); });
+    sec.querySelectorAll('.swatch').forEach(s => s.style.setProperty('--c', state.pick[k][s.dataset.key]));
   }
+  for (const id of ['bar', 'fxBleed']) document.getElementById(id).dataset.art = state.art;
+  document.querySelector('.page.bleed').dataset.art = state.art; document.querySelector('.page .banner').dataset.art = state.art;
+  document.querySelector('#bar .now .art').dataset.art = state.art;
+  document.querySelectorAll('#artpick button').forEach(b => b.classList.toggle('on', b.dataset.n === state.art));
+  // component sheet
   const sheet = document.getElementById('sheet'); sheet.textContent = '';
   for (const k of Object.keys(APPS)) {
     const n = document.getElementById('tpl').content.firstElementChild.cloneNode(true);
-    n.dataset.theme = scheme; n.style.cssText = vars(k);
-    n.querySelector('.nm').textContent = `${APPS[k].nm} · ${scheme}`;
+    n.dataset.theme = state.scheme; n.style.cssText = vars(k); applyFonts(n, state.fonts || APPS[k].fonts);
+    n.querySelector('.nm').textContent = `${APPS[k].nm} · ${state.scheme}`;
     const lv = n.querySelector('.levels');
     for (const s of ['surface-0', 'surface-1', 'surface-2', 'surface-3', 'surface-4', 'sunken']) {
       const d = document.createElement('div'); d.style.background = `var(--${s})`;
@@ -325,31 +457,61 @@ function paint() {
     sheet.append(n);
   }
   const st = document.getElementById('stress'); st.textContent = '';
-  const STRESS = ['#8800ff', '#b07cff', '#d4a64a', '#ff7a1a', '#e5484d', '#ec4899', '#22c55e', '#14b8a6', '#3b82f6', '#4cc9f0', '#c9a45c', '#10b39b', '#f5a524', '#e2574c', '#f08c3a', '#e8c547', '#4fd18b', '#3cc4c4', '#5aa2ff', '#a37cff', '#ff6fb1', '#3d2f7a', '#1a1a1a', '#ffffff'];
-  for (const c of STRESS) {
-    const d = document.createElement('div'); d.dataset.theme = scheme; d.style.cssText = `--accent:${c};--accent-2:${c}`;
+  for (const c of ['#8800ff', '#b07cff', '#d4a64a', '#ff7a1a', '#e5484d', '#ec4899', '#22c55e', '#14b8a6', '#3b82f6', '#4cc9f0', '#c9a45c', '#10b39b', '#f5a524', '#e2574c', '#f08c3a', '#e8c547', '#4fd18b', '#3cc4c4', '#5aa2ff', '#a37cff', '#ff6fb1', '#3d2f7a', '#1a1a1a', '#ffffff']) {
+    const d = document.createElement('div'); d.dataset.theme = state.scheme; d.style.cssText = `--accent:${c};--accent-2:${c}`;
     d.innerHTML = `<span class="t-accent">${c} as text</span><button class="btn primary sm" type="button">On fill</button><span class="chip on">Soft chip</span>`;
     st.append(d);
   }
+  // controls reflect the state
+  document.querySelectorAll('[data-scheme]').forEach(b => b.classList.toggle('on', b.dataset.scheme === state.scheme));
+  document.querySelectorAll('[data-bleed]').forEach(b => b.classList.toggle('on', +b.dataset.bleed === state.bleed));
+  const hue = document.getElementById('hue'); hue.value = state.hue; hue.style.setProperty('--p', (state.hue / 14 * 100) + '%');
+  document.getElementById('grain').checked = !!state.grain;
+  const f = state.fonts, setName = f ? (FONT_SETS.find(s => s[1] === f.display && s[2] === f.ui && s[3] === f.read) || ['custom'])[0] : 'apps';
+  document.getElementById('fontSet').value = setName;
+  for (const [id, r] of [['fDisplay', 'display'], ['fUi', 'ui'], ['fRead', 'read']]) document.getElementById(id).value = (f || PAGE_FONTS)[r];
+  document.querySelectorAll('.fontcard').forEach(c => c.classList.toggle('on', c.dataset.set === setName));
+  paintArt(document); paintIcons(document);
+  document.querySelectorAll('.range').forEach(r => { if (!r.oninput) r.oninput = () => r.style.setProperty('--p', ((r.value - (r.min || 0)) / ((r.max || 100) - (r.min || 0)) * 100) + '%'); });
 }
-// the colour choice: two swatches per app, any colour
+
+// controls
+const opt = (v, t) => { const o = document.createElement('option'); o.value = v; o.textContent = t; return o; };
+const fs = document.getElementById('fontSet');
+fs.append(opt('apps', "Each app's own fonts"), ...FONT_SETS.map(s => opt(s[0], `${s[0]} · ${s[1]} + ${s[2]}`)), opt('custom', 'Custom (pick below)'));
+fs.onchange = () => { const s = FONT_SETS.find(x => x[0] === fs.value); if (fs.value === 'apps') state.fonts = null; else if (s) state.fonts = { display: s[1], ui: s[2], read: s[3] }; paint(); };
+for (const [id, r, label] of [['fDisplay', 'display', 'Titles'], ['fUi', 'ui', 'Interface'], ['fRead', 'read', 'Reading']]) {
+  const el = document.getElementById(id);
+  el.append(...FONTS[r].map(f => opt(f[0], f[0])));
+  el.onchange = () => { state.fonts = { ...(state.fonts || PAGE_FONTS), [r]: el.value }; paint(); };
+}
+document.querySelectorAll('[data-scheme]').forEach(b => b.onclick = () => { state.scheme = b.dataset.scheme; paint(); });
+document.querySelectorAll('[data-bleed]').forEach(b => b.onclick = () => { state.bleed = +b.dataset.bleed; paint(); });
+document.getElementById('hue').addEventListener('input', e => { state.hue = +e.target.value; paint(); });
+document.getElementById('grain').onchange = e => { state.grain = e.target.checked ? 1 : 0; paint(); };
+document.getElementById('resetAll').onclick = () => { reset(); document.querySelectorAll('.swatch input').forEach(i => { i.value = state.pick[i.closest('.appsec').dataset.app][i.parentNode.dataset.key]; }); paint(); };
 for (const sec of document.querySelectorAll('.appsec')) {
   const k = sec.dataset.app, p = sec.querySelector('.picks');
   for (const [key, label] of [['a', 'Accent'], ['b', 'Second accent']]) {
     const s = document.createElement('label'); s.className = 'swatch'; s.dataset.key = key; s.title = label;
-    const i = document.createElement('input'); i.type = 'color'; i.value = pick[k][key]; i.setAttribute('aria-label', `${APPS[k].nm} ${label.toLowerCase()}`);
-    i.oninput = () => { pick[k][key] = i.value; paint(); };
+    const i = document.createElement('input'); i.type = 'color'; i.value = state.pick[k][key]; i.setAttribute('aria-label', `${APPS[k].nm} ${label.toLowerCase()}`);
+    i.oninput = () => { state.pick[k][key] = i.value; paint(); };
     s.append(i); p.append(s);
   }
 }
-document.querySelectorAll('[data-scheme]').forEach(b => b.onclick = () => {
-  scheme = b.dataset.scheme; document.querySelectorAll('[data-scheme]').forEach(x => x.classList.toggle('on', x === b)); paint();
-});
-document.getElementById('resetAll').onclick = () => {
-  for (const k of Object.keys(APPS)) pick[k] = { a: APPS[k].a, b: APPS[k].b };
-  document.querySelectorAll('.appsec').forEach(sec => sec.querySelectorAll('.swatch input').forEach(i => { i.value = pick[sec.dataset.app][i.parentNode.dataset.key]; }));
-  paint();
-};
+const ap = document.getElementById('artpick');
+for (const n of ['tavern', 'harbour', 'forest', 'dungeon', 'desert', 'arcane']) {
+  const b = document.createElement('button'); b.type = 'button'; b.dataset.n = n; b.dataset.art = n; b.title = n; b.setAttribute('aria-label', `Use the ${n} picture`);
+  b.onclick = () => { state.art = n; paint(); }; ap.append(b);
+}
+const gal = document.getElementById('fontgal');
+for (const s of FONT_SETS) {
+  const c = document.createElement('button'); c.type = 'button'; c.className = 'fontcard'; c.dataset.set = s[0];
+  applyFonts(c, { display: s[1], ui: s[2], read: s[3] });
+  c.innerHTML = `<span class="cap">${s[0]}</span><span class="fd display">The dragon rolls a 20</span><span class="fu">${s[1]} titles, ${s[2]} for the interface.</span><span class="read" style="font-size:var(--fs-md);color:var(--ink-2)">Fog rolls in off the reef each evening.</span><small>Reading: ${s[3]}</small>`;
+  c.onclick = () => { state.fonts = { display: s[1], ui: s[2], read: s[3] }; paint(); };
+  gal.append(c);
+}
 paint();
 </script>
 </body>
