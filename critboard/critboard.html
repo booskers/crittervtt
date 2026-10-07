@@ -1386,7 +1386,13 @@ input.tval{width:100%;padding:2px;font-size:13px}
   .grab span{width:44px;height:5px;border-radius:99px;background:var(--line)}
   .ph{padding-top:2px}
   .overlay{place-items:end center;padding:0}
-  .overlay .card{width:100%;border-radius:14px 14px 0 0;max-height:92dvh;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+  .overlay .card{box-sizing:border-box;width:100%;border-radius:14px 14px 0 0;max-height:92dvh;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+  /* the start (Take a seat, Find your table) floats as a card with a gutter round it that grows with the screen and
+     keeps clear of notches and rounded corners; the title scales with the width */
+  #onboard{place-items:center;box-sizing:border-box;padding:max(clamp(10px,3.5vw,24px),env(safe-area-inset-top,0px)) max(clamp(10px,3.5vw,24px),env(safe-area-inset-right,0px)) max(clamp(10px,3.5vw,24px),env(safe-area-inset-bottom,0px)) max(clamp(10px,3.5vw,24px),env(safe-area-inset-left,0px))}
+  #onboard .card{box-sizing:border-box;grid-template-columns:minmax(0,1fr);width:100%;max-width:520px;max-height:100%;border-radius:18px;padding:20px clamp(14px,4.5vw,22px);gap:clamp(10px,3vw,14px)}
+  #onboard .card h2{font-size:clamp(24px,7.5vw,32px)}
+  #onboard .card > p{font-size:clamp(13.5px,3.9vw,15px)}
   .avgrid{grid-template-columns:repeat(6,1fr)}
   #toast{bottom:auto;top:calc(64px + var(--sat,env(safe-area-inset-top,0px)))}
   .grow-row{grid-template-columns:1fr}
@@ -1512,6 +1518,16 @@ body.mob #rollInput,body.mob #rollForm button{min-height:44px}
 body.mob #sheetGrab{min-height:36px}
 /* the panel's swipe is ours, not the browser's (the log keeps scrolling when it's open) */
 body.mob #panel.peek,body.mob #panel .roller{touch-action:none}
+/* the start screen on a phone: the Critter VTT menu and the settings above the card, as at the table */
+.obbar{display:none}
+body.mob #onboard:not([hidden]){display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:8px}
+body.mob #onboard > .card{flex:0 1 auto;min-height:0;margin-block:auto}
+body.mob #onboard .obbar{display:flex;justify-content:space-between;align-items:center;width:100%;max-width:520px;flex:none}
+.obbtn{display:inline-flex;align-items:center;gap:8px;min-height:44px;min-width:44px;justify-content:center;padding:0 12px;border:1px solid var(--line);border-radius:12px;background:var(--panel-2);color:var(--ink);font:600 14px var(--f-body)}
+.obbtn .gi{width:22px;height:22px}
+.obburger{display:grid;gap:3.5px;width:18px}.obburger span{display:block;height:2px;border-radius:2px;background:currentColor}
+/* Next stays in reach at the bottom of Take a seat while the tokens scroll */
+body.mob #onboardForm > .prow.end{position:sticky;bottom:-20px;z-index:2;margin:0 calc(-1 * clamp(14px,4.5vw,22px)) -20px;padding:12px clamp(14px,4.5vw,22px) 16px;background:linear-gradient(transparent,var(--panel-3) 30%)}
 body.mob .menu{z-index:46}
 /* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
 body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
@@ -1825,6 +1841,8 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 .joinbar input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.12em;font-family:var(--f-mono)}
 @media (max-width:520px){.joinbar{flex-wrap:wrap}.joinbar label{width:100%}}
 /* on a phone the code field stays in reach at the bottom of the card while the campaigns scroll */
+body.mob .lobbycard .joinbar{box-sizing:border-box;max-width:100%}
+body.mob .joinbar input{flex:1 1 0;min-width:0}
 body.mob .lobbycard .joinbar{position:sticky;bottom:-20px;z-index:2;margin-bottom:-20px;border-radius:14px 14px 0 0;background:var(--panel-3);box-shadow:0 -8px 20px -10px rgb(0 0 0/.5)}
 /* Critter VTT for players: the start screen is the code field */
 html.player-app #campListLabel,html.player-app #campList,html.player-app #campListHint,html.player-app #newCampBox{display:none!important}
@@ -1964,6 +1982,7 @@ body.mob.chatoff #panel{transform:none;pointer-events:auto}
 <div id="whisperPop" class="menu" hidden role="dialog" aria-label="Whisper to"></div>
 
 <div id="onboard" class="overlay" hidden>
+  <div class="obbar" id="obBar"><button type="button" id="obMenuBtn" class="obbtn" aria-label="Critter VTT menu"><span class="obburger" aria-hidden="true"><span></span><span></span><span></span></span>Menu</button><button type="button" id="obGearBtn" class="obbtn" aria-label="Settings" aria-haspopup="true" aria-expanded="false"><svg class="gi" aria-hidden="true"><use href="#gi-cog"/></svg></button></div>
   <form class="card" id="onboardForm" autocomplete="off">
     <h2 id="obTitle">Take a seat</h2>
     <p id="obText">Pick a name and a token. Everyone at the table sees them next to your rolls and your cursor.</p>
@@ -5786,6 +5805,9 @@ function paintVolume() {
 function buildVolume() {
   paintVolume();
   $('#soundBtn').onclick = () => { audio(); renderSoundMusic(); paintSettingsPop(); togglePop($('#soundPop'), $('#soundBtn')); };
+  // on a phone the start screen has its own way to the settings and the Critter VTT menu, before joining a table
+  $('#obGearBtn').onclick = () => { audio(); renderSoundMusic(); paintSettingsPop(); togglePop($('#soundPop'), $('#obGearBtn')); };
+  $('#obMenuBtn').onclick = () => openCritterMenu();
   $('#volume').addEventListener('input', e => { vol = (+e.target.value) / 100; if (vol) volBeforeMute = vol; lsSet('tt.vol', vol); paintVolume(); });
   $('#volume').addEventListener('change', () => { audio(); setTimeout(() => rattle(), 30); });
   $('#muteBtn').onclick = () => { audio(); vol = vol ? 0 : (volBeforeMute || 0.6); lsSet('tt.vol', vol); paintVolume(); if (vol) setTimeout(() => clack(0.7), 30); };
@@ -13299,6 +13321,8 @@ function openCritterMenu() {
   card.append(head, el('p', 'cmenusub', 'Open source Virtual Table Top System' + (window.CRITTER_VERSION ? ' · Version ' + window.CRITTER_VERSION : '')));
   const grid = el('div', 'cmenugrid');
   const host = isHost(), lobby = mode === 'shared' && !!S.lobby;
+  // opened from the start screen (on a phone), before joining a table: no lobby to show or leave, nothing to tour yet
+  const away = notAtTable();
   const item = (ic, label, hint, fn, show = true) => { if (!show) return; const b = el('button', 'cmitem'); b.type = 'button'; b.innerHTML = icon(ic); b.append(HB.el('span', '', el('b', '', label), el('small', '', hint))); b.onclick = () => { closeCritterMenu(); fn(); }; grid.append(b); };
   const svgItem = (svg, label, hint, fn, show = true) => { if (!show) return; const b = el('button', 'cmitem'); b.type = 'button'; b.insertAdjacentHTML('afterbegin', svg); b.append(HB.el('span', '', el('b', '', label), el('small', '', hint))); b.onclick = () => { closeCritterMenu(); fn(); }; grid.append(b); };
   svgItem($('#saveBtn') ? $('#saveBtn').innerHTML : '', 'Save', `To ${savesHere()} (Ctrl+S)`, saveByHand, host);
@@ -13306,9 +13330,9 @@ function openCritterMenu() {
   item('cycle', 'Rewind the table', 'Go back to an earlier save', openRewind, host);
   item('open-treasure-chest', 'Export everything', 'The whole table as one .zip', exportTable, host);
   item('chest', 'Restore from a file', 'Load a table backup', () => { openRules(); rulesTab('Backup'); }, host);
-  item('tabletop-players', 'Lobby', lobby ? `Code, players, settings` : 'Join or create a table', () => { if (lobby) { renderLobbyPop(); togglePop($('#lobbyPop'), $('#lobbyBtn')); } else showLobbyCard(true); }, mode === 'shared');
-  item('exit-door', 'Leave lobby', 'Then join or start another table', () => switchLobbyAsk(), mode === 'shared');
-  item('compass', 'Walkthrough', 'A short tour of what\'s where', () => offerTour(true));
+  item('tabletop-players', 'Lobby', lobby ? `Code, players, settings` : 'Join or create a table', () => { if (lobby) { renderLobbyPop(); togglePop($('#lobbyPop'), $('#lobbyBtn')); } else showLobbyCard(true); }, mode === 'shared' && !away);
+  item('exit-door', 'Leave lobby', 'Then join or start another table', () => switchLobbyAsk(), mode === 'shared' && !away);
+  item('compass', 'Walkthrough', 'A short tour of what\'s where', () => offerTour(true), !away);
   item('person', 'Your name and token', 'How the table sees you', () => openOnboard(true));
   item('palette', 'Look', 'Colours, light or dark, fonts', openLook);
   item('person', 'Accessibility', 'Motion, contrast, keyboard and screen readers', openA11y);
@@ -13322,7 +13346,7 @@ function openCritterMenu() {
   card.append(grid);
   const foot = el('div', 'cmenufoot');
   const made = el('span', 'hint', 'Made with love by booskers / Polychrome.');
-  const back = el('button', 'btn primary cmenuback', 'Back to the table'); back.type = 'button'; back.onclick = closeCritterMenu;
+  const back = el('button', 'btn primary cmenuback', away ? 'Close' : 'Back to the table'); back.type = 'button'; back.onclick = closeCritterMenu;
   const gh = el('a', 'polylink'); gh.href = CRITTER_GITHUB; gh.target = '_blank'; gh.rel = 'noopener'; gh.innerHTML = GITHUB_SVG; gh.append('GitHub', el('small', '', 'crittervtt'));
   gh.onclick = e => { if (desktopUpdates()) { e.preventDefault(); openGitHub(); } };
   foot.append(made, gh, el('span', 'grow'), el('span', 'hint', 'Esc opens and closes this menu'), back);

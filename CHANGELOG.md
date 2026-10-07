@@ -3,6 +3,11 @@
 Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
+## 1.3.1 (website and Android, 2026-10-07)
+- On a phone, the start screens (Take a seat, Find your table) float as a card with margins that fit the screen, from small phones to large ones, and keep clear of notches. They were wider than the screen, with no margins. Every phone dialog now fits the screen's width.
+- On a phone, the Critter VTT menu and the settings are available on the start screen, before joining a table (Menu and the gear above the card). Before joining, the menu leaves out the lobby and the walkthrough.
+- Next stays in reach at the bottom of Take a seat.
+
 ## 1.3.0 (2026-10-07)
 **Highlights**
 - Critter VTT for Android, for players: join your group's table from your phone. It opens on Join a table, and takes you back to the same table next time. Download Critter-VTT-Player.apk from this release.
