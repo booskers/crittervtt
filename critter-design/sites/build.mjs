@@ -129,12 +129,12 @@ const PAGES = {
     how: true, iphone: true
   },
   notes: {
-    title: 'Critter Notes', desc: 'Critter Notes is a notebook for game masters: plan sessions, write the world, draw maps, boards and mind maps, and send it all to your Critter VTT table.',
-    nav: [['#write', 'Features'], ['#maps', 'Maps'], ['#table', 'At the table'], ['#download', 'Download']],
+    title: 'Critter Notes', desc: 'Critter Notes is a notebook for game masters: plan sessions, write the world, draw maps, boards and mind maps, and send it all to your Critter VTT table. On Windows, in your browser, and on your phone, kept in step between your devices.',
+    nav: [['#write', 'Features'], ['#maps', 'Maps'], ['#table', 'At the table'], ['#phone', 'Phone'], ['#devices', 'Your devices'], ['#download', 'Download'], ['#iphone', 'iPhone']],
     h1: 'Your campaign, <em>planned and ready to run.</em>',
     lede: 'A notebook for game masters. Plan sessions, write the world, draw maps, boards and mind maps, and bring it all to your Critter VTT table when you play.',
-    ctas: [['primary', 'down', 'Download for Windows', dl('notes')], ['', 'book', 'See what’s inside', '#write']],
-    note: 'Free and open source. Your campaigns stay on your computer as plain files.',
+    ctas: [['primary', 'down', 'Download for Windows', dl('notes')], ['', 'play', 'Open in your browser', 'https://notes.crittervtt.com']],
+    note: 'Free and open source. Windows 10 and 11, or any modern browser. Your campaigns stay on your own devices.',
     hero: ['notes-home.jpg', 'The home page of a Critter Notes campaign: the next session with its scenes, paths and clues, the open threads, and what changed recently', 2559, 1404, 'The Lantern Road, the sample campaign that comes with the app: the next session at a glance, the open threads, and what changed.'],
     sections: [
       { id: 'write', eyebrow: 'Writing', h2: 'A page for everything in your world.', sub: 'Characters, locations, factions, quests, items, lore and events, each with its own fields, written in a visual editor and linked to each other as you type.', rev: true,
@@ -148,9 +148,16 @@ const PAGES = {
         body: ticks([['A graph', 'of everything, or only what you pick.'], ['Home', 'shows the next session, open threads, recent changes, and names mentioned but not written yet.'], ['Find', 'anything with Ctrl+K.']]) },
       { id: 'table', eyebrow: 'At the table', h2: 'From your notes to the table.', sub: 'Link a campaign to your Critter VTT lobby, and send what you’ve prepared at the moment it matters.',
         media: shot('notes-board.jpg', 'The board “How Session 1 might go”, from a strong start through the tavern to the sea wall, with a branch if the party refuses', 2559, 1404),
-        body: ticks([['Send to the table', 'notes, handouts, character and monster sheets, and scenes.'], ['Run a session', 'with your plan beside you.'], ['Cue the music', 'in Critter Sounds from your scene notes.'], ['Share', 'with co-writers (encrypted), and give players their own view without your secrets.']]) }
+        body: ticks([['Send to the table', 'notes, handouts, character and monster sheets, and scenes.'], ['Run a session', 'with your plan beside you.'], ['Cue the music', 'in Critter Sounds from your scene notes.'], ['Share', 'with co-writers (encrypted), and give players their own view without your secrets.']]) },
+      { id: 'phone', eyebrow: 'In your browser', h2: 'Your notebook on a phone or tablet.', sub: 'Critter Notes also runs in a browser at <a href="https://notes.crittervtt.com">notes.crittervtt.com</a>. On a phone it works like an app: sections along the bottom, sheets that slide up, and the gestures you know from your iPhone.', rev: true, phone: true,
+        media: shot('notes-phone.jpg', 'Critter Notes on a phone: the home page of The Lantern Road with the next session, its scenes, paths and clues, the open threads, and the sections along the bottom', 1170, 2532),
+        body: ticks([['Like an app', 'on iPhone and iPad: add it to your Home Screen from Safari’s Share menu (<a href="#iphone">how</a>), and it opens full screen, even offline.'], ['Gestures', 'swipe from the edge for the sidebar, down to close a sheet, along a row to delete it, pinch to zoom maps and boards, and hold for a menu. Every gesture has a button too.'], ['Kept in your browser', 'on your device, nothing uploaded. Download a backup of everything in one file whenever you like.'], ['On a tablet', 'the sidebar sits beside the page, as on a computer.']]) },
+      { id: 'devices', eyebrow: 'Your devices', h2: 'One campaign, on every device you own.', sub: 'Link a campaign on your computer to your phone, tablet or a browser, and it stays in step both ways: what you add, change or delete on one, the others do too. On the same Wi-Fi, the phone finds the computer by itself.', phone: true,
+        media: shot('notes-phone-link.jpg', 'A phone linking to the Game room PC: both screens show the same four digits, 3 2 4 6, to compare before the computer approves it', 1170, 2532),
+        body: ticks([['Nothing stored online', 'every device keeps the whole campaign. The devices talk to each other directly, inside your home network when they share one.'], ['Encrypted', 'with a key only your devices have. Where a network won’t let them talk directly, the Homebase passes their messages along without being able to read them.'], ['You approve it', 'both screens show the same four digits, and nothing is shared until you press <b>Yes, link it</b> on the computer.'], ['Nothing lost', 'changed on two devices while they were apart, the newer version wins and the other waits in the trash. A sync check compares everything and repairs what differs.']]) }
     ],
-    cards: [['pen', 'A visual editor', 'Write like in a word processor; it’s kept as plain Markdown underneath.'], ['board', 'Boards and mind maps', 'Cards and arrows for plans and plots.'], ['clock', 'Calendar and timeline', 'Your world’s calendar, with events on a timeline.'], ['table', 'Random tables and encounters', 'Roll on your own tables, and build encounters from the compendium.'], ['lock', 'Your files', 'Campaigns are plain files on your computer, easy to back up.'], ['eye', 'Focus mode', 'Hide everything but the page, with a reading size and font of your own.']]
+    iphone: true,
+    cards: [['rewind', 'Undo and the trash', 'Undo anything from anywhere; deleted pages wait 30 days in the trash, on every linked device.'], ['update', 'Updates itself', 'New versions install from inside the app, with what changed.'], ['pen', 'A visual editor', 'Write like in a word processor; it’s kept as plain Markdown underneath.'], ['board', 'Boards and mind maps', 'Cards and arrows for plans and plots.'], ['clock', 'Calendar and timeline', 'Your world’s calendar, with events on a timeline.'], ['table', 'Random tables and encounters', 'Roll on your own tables, and build encounters from the compendium.'], ['lock', 'Your files', 'Campaigns are plain files on your computer, easy to back up.'], ['eye', 'Focus mode', 'Hide everything but the page, with a reading size and font of your own.']]
   }
 };
 
@@ -185,7 +192,18 @@ function page(k) {
   const PLAY = 'https://live.crittervtt.com/?app=player';
   // Critter Sounds: the same on iPhones (the web version on the home screen), and an app of its own for Android
   const SOUNDS_WEB = 'https://sounds.crittervtt.com', SOUNDS_APK = `${GH}/critter-sounds/releases/latest/download/Critter-Sounds.apk`;
-  const iphone = P.iphone && k === 'sounds' ? `
+  const NOTES_WEB = 'https://notes.crittervtt.com';
+  const iphone = P.iphone && k === 'notes' ? `
+<section id="iphone">
+  <div class="wrap">
+    <span class="eyebrow">iPhone and iPad</span>
+    <h2>Put Critter Notes on your home screen.</h2>
+    <p class="sub">There’s nothing to download from the App Store. Safari adds Critter Notes to your home screen, and it opens full screen with its own icon, like an app, even without a connection. It updates by itself whenever Critter Notes does.</p>
+    <div class="grid">${card(['globe', '1. Open it in Safari', 'On your iPhone or iPad, open <a href="' + NOTES_WEB + '"><b>notes.crittervtt.com</b></a>.'])}${card(['share', '2. Tap Share', 'The square with the arrow, at the bottom of Safari (on an iPad, at the top). Then scroll down a little.'])}${card(['plus', '3. Add to Home Screen', 'Leave <b>Open as Web App</b> on, then tap <b>Add</b>. Critter Notes is now on your home screen.'])}</div>
+    <div class="ctas" style="margin-top:24px"><a class="btn primary" href="${NOTES_WEB}">${ic('play')} Open notes.crittervtt.com</a></div>
+    <p class="small" style="margin-top:20px"><b>Your campaign from the computer:</b> on the computer, open Settings › <b>Your devices</b> › <b>Link a device</b>; on the phone, choose <b>Link to my computer</b>. On Android, the same works in Chrome.</p>
+  </div>
+</section>` : P.iphone && k === 'sounds' ? `
 <section id="iphone">
   <div class="wrap">
     <span class="eyebrow">iPhone, iPad and Android</span>
