@@ -3,6 +3,10 @@
 Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
+## 1.2.3 (2026-10-07)
+- Campaign pictures stay on the start screen after a restart: the save made while starting up no longer runs before the picture has arrived.
+- The "Your campaign" dialog has its margins back and no stray hover: it had picked up the start screen's card style.
+
 ## 1.2.2 (2026-10-07)
 - Colour pickers no longer make everything lag: the colour is taken when you close the picker, instead of recolouring everything on every move inside it.
 - Campaign pictures fill the whole card on the start screen, cropped rather than squeezed, and are kept sharper.
