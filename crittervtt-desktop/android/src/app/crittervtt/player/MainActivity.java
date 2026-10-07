@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.HapticFeedbackConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowInsets;
@@ -115,6 +116,7 @@ public class MainActivity extends Activity {
         });
         web.setDownloadListener((url, ua, cd, mime, len) -> { if (url.startsWith("http")) open(Uri.parse(url)); });
 
+        backGesture();
         if (saved != null) web.restoreState(saved);
         else if (!getSharedPreferences("move", MODE_PRIVATE).getBoolean("done", false)) moveStart();
         else web.loadUrl(startUrl(getIntent()));
@@ -143,6 +145,12 @@ public class MainActivity extends Activity {
         public String moveTake() { String d = moveData; return d == null ? "{}" : d; }
         @JavascriptInterface
         public void moveIn(boolean ok) { runOnUiThread(() -> moveEnd(ok)); }
+        // a tap you feel (dice landing, a menu opening): the phone's own haptics, light to strong (0..1)
+        @JavascriptInterface
+        public void haptic(double strength) {
+            int k = strength > 0.66 ? HapticFeedbackConstants.LONG_PRESS : strength > 0.33 ? HapticFeedbackConstants.CONTEXT_CLICK : HapticFeedbackConstants.CLOCK_TICK;
+            runOnUiThread(() -> web.performHapticFeedback(k));
+        }
         // the page's "Check for updates" (the Critter VTT menu and Help)
         @JavascriptInterface
         public void checkUpdate() { runOnUiThread(() -> { if (updater != null) updater.check(true); }); }
@@ -248,9 +256,27 @@ public class MainActivity extends Activity {
     // a second one within two seconds sends Critter VTT to the background (it stays at the table)
     long backAt;
 
+    // Android 13 and later send back through a callback (onBackPressed is for older ones); from Android 14 it comes with
+    // the gesture's progress, and the page lets what it would close follow it (critterBackPeek)
+    void backGesture() {
+        if (Build.VERSION.SDK_INT >= 34) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, new android.window.OnBackAnimationCallback() {
+                @Override public void onBackStarted(android.window.BackEvent e) { peek(0, e.getSwipeEdge()); }
+                @Override public void onBackProgressed(android.window.BackEvent e) { peek(e.getProgress(), e.getSwipeEdge()); }
+                @Override public void onBackCancelled() { peek(-1, 0); }
+                @Override public void onBackInvoked() { peek(-1, 0); goBack(); }
+            });
+        } else if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::goBack);
+        }
+    }
+    void peek(float p, int edge) { web.evaluateJavascript("window.critterBackPeek && critterBackPeek(" + p + "," + (edge == 1 ? 1 : 0) + ")", null); }
+
     @Override
     @SuppressWarnings("deprecation")
-    public void onBackPressed() {
+    public void onBackPressed() { goBack(); }
+
+    void goBack() {
         web.evaluateJavascript("(window.critterBack && window.critterBack()) ? '1' : '0'", r -> {
             if (r != null && r.contains("1")) { backAt = 0; return; }
             long now = System.currentTimeMillis();

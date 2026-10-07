@@ -5979,6 +5979,8 @@ let buzzSwitch = null, lastBuzz = 0;
 function buzz(strength) {
   if (!FEEL.buzz || !coarse.matches || document.hidden) return;
   const now = performance.now(); if (now - lastBuzz < 70) return; lastBuzz = now;
+  // the Android app: the phone's own haptics (they follow its touch-feedback setting)
+  if (window.CritterAndroid && typeof window.CritterAndroid.haptic === 'function') { try { window.CritterAndroid.haptic(strength); } catch {} return; }
   if (navigator.vibrate) { try { navigator.vibrate(Math.round(6 + strength * 24)); } catch {} return; }
   if (!IOS) return;
   // Safari has no vibration, but since iOS 18 a switch flipped in the page gives one tap of the Taptic Engine;
@@ -17529,6 +17531,20 @@ tabLayout(); touchFirst.addEventListener('change', tabLayout); phone.addEventLis
   // after "once more to leave", touching the page again means staying: back closes things again
   addEventListener('pointerdown', () => setTimeout(arm, 0), true);
 })();
+/* Android's predictive back (the Android app, Android 14 and later): while the back gesture is held, what it would close
+   (a page, a dialog, the menu) shrinks a little and follows it; let go and it closes (critterBack), or it springs back.
+   p is 0..1 of the gesture, edge 0 for a swipe from the left and 1 from the right; p < 0 puts it back. */
+window.critterBackPeek = (p, edge) => {
+  const shown = x => x && !x.hidden && x.getClientRects().length;
+  const top = document.querySelector('#critterMenu .card') || [...document.querySelectorAll('.overlay')].filter(o => shown(o) && o.id !== 'onboard' && o.id !== 'splash').map(o => o.querySelector('.card')).filter(Boolean).pop()
+    || (shown(document.getElementById('mMenu')) && document.getElementById('mMenu'))
+    || [...document.querySelectorAll('.fwin, .sheetwin')].filter(shown).sort((a, b) => (+getComputedStyle(b).zIndex || 0) - (+getComputedStyle(a).zIndex || 0))[0];
+  if (!top) return;
+  if (p < 0 || reduceMotion.matches) { top.style.transform = ''; top.style.borderRadius = ''; top.style.transition = ''; return; }
+  const dx = (edge ? -1 : 1) * Math.round(p * 32);
+  top.style.transition = 'none'; top.style.transformOrigin = edge ? '100% 50%' : '0 50%';
+  top.style.transform = `translateX(${dx}px) scale(${(1 - 0.08 * p).toFixed(3)})`; top.style.borderRadius = Math.round(p * 24) + 'px';
+};
 /* the iPhone or iPad home-screen app has no back button: a swipe in from the left edge goes back, the page following
    the finger (Safari itself does this as a browser back, which the above turns into the same) */
 (() => {

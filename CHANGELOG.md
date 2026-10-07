@@ -15,6 +15,8 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - Feels like an app: no text magnifier or "Copy" callout from holding buttons or the board, no delay on taps, and iPhones no longer zoom into a text field when it's tapped (pinching still zooms).
 - Tablets get their own layout: the full table with every control at least 44 px to touch, a narrower chat when the tablet is upright (more board), the walkthrough in touch words, and what a mouse shows on hover (in the notes) shows once you tap into it.
 
+- In the Android app (1.3.1): Android's back gesture shows what it will close (a page, a dialog, the menu) shrinking and following your finger, as Android 14 and later do; let go to close it. Taps you feel (dice landing, a long press) use the phone's own haptics, which follow its touch-feedback setting.
+
 **More play on the same Homebase** (the free Cloudflare plan goes about 5–10 times as far)
 - Cursors: nothing is sent while you're alone at the table; another player's cursor arrives about 8 times a second (was 20) and glides smoothly in between; a stroke being drawn about 12 times a second. A tab in the background sends nothing.
 - The Homebase sends just the player whose cursor moved, not everyone's every time.
