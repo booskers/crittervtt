@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="https://critter.poly-chrome.cc">Play in your browser</a> ·
-  <a href="https://booskers.github.io/critter/">Website</a> ·
-  <a href="https://github.com/booskers/critter/releases/latest">Download for Windows</a>
+  <a href="https://booskers.github.io/crittervtt/">Website</a> ·
+  <a href="https://github.com/booskers/crittervtt/releases/latest">Download for Windows</a>
 </p>
 
 ![Critter's table](docs/img/critter-table.png)
@@ -53,7 +53,7 @@ npm start
 
 ## License
 
-Critter and Critter Sounds are released under the [MIT License](LICENSE): use, change and share them freely, as long as you keep the copyright notice and give credit.
+Critter VTT, Critter Sounds and Critter Notes are released under the [MIT License](LICENSE): use, change and share them freely, as long as you keep the copyright notice and give credit. Made with love by booskers / Polychrome. What changed in each version: [CHANGELOG.md](CHANGELOG.md).
 
 The third-party content below keeps its own license.
 

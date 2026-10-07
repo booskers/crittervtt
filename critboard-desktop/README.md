@@ -125,6 +125,7 @@ npm run dist
 - **The window:** each window is frameless, with Critter's own title bar (`titlebar.html`, in its own view above the page) that takes the colours of the page's theme. The ▾ next to the logo opens the Critter menu; the usual shortcuts (Ctrl+N, Ctrl+R, F11, Ctrl+0/+/-, Ctrl+Shift+I) still work.
 - **Icons:** `build/icon.ico` is the app and installer icon; `assets/` holds the window icon and the favicons that `build.mjs` copies into `www/` for the browser version.
 - **Testing the Cloudflare Homebase locally:** run `npx wrangler dev` in `homebase-cloudflare/` to start it at `http://localhost:8787`. Then build the app against it with `HOMEBASE_SERVER=http://localhost:8787 node build.mjs`.
+- **Updates:** `updater.js` (electron-updater) checks this repository's latest release when the app starts (the settings gear › Updates turns that off) and from **Check for updates** in the gear, the Critter VTT menu, Help and the title bar's menu. The pop-up (`update.html`) lists up to five changes from the release notes, offers Update now, Later or Skip this version, shows the download, and hands over to the installer, which for an update (`build/installer.nsh`) asks nothing, shows its progress and starts the app again. A release needs `Critter-Setup.exe`, `Critter-Setup.exe.blockmap` and `latest.yml` from `dist/`; put the five most important changes first in its notes. Testing: `UPDATE_TEST_FEED=<url of a folder with latest.yml>`, `UPDATE_TEST_VERSION=<x.y.z>`.
 
 ## Critter Sounds (the desktop music player)
 

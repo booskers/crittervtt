@@ -14,6 +14,13 @@ contextBridge.exposeInMainWorld('critterDesktop', {
     list: p => ipcRenderer.invoke('saves:list', rel(p)),
     remove: p => ipcRenderer.invoke('saves:remove', rel(p)),
     open: p => ipcRenderer.invoke('saves:open', rel(p))
+  },
+  // updates from GitHub: { auto, skip, version, repo, changelog }, the on-start setting, a check now, the GitHub page
+  updates: {
+    get: () => ipcRenderer.invoke('upd:get'),
+    set: auto => ipcRenderer.invoke('upd:set', { auto: !!auto }),
+    check: () => ipcRenderer.invoke('upd:check'),
+    github: () => ipcRenderer.invoke('upd:github')
   }
 });
 const mark = () => { if (document.documentElement) document.documentElement.classList.add('critter-app'); };

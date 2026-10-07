@@ -4,6 +4,13 @@ Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critb
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
 ## 1.1.0 (2026-10-07)
+**Highlights**
+- Updates inside the desktop app: it checks GitHub when it starts (Settings › Updates turns that off), shows the most important changes, and updates with one click: a progress bar for the download, then the installer's own, and Critter VTT opens again.
+- Update now, Later, or Skip this version; Check for updates also sits in the settings gear, the Critter VTT menu and Help.
+- The shared Critter look, and your own colour for the logo and the whole interface.
+- Scene settings per scene, a chat that slides away with pop-up messages, and an Accessibility menu.
+- A GitHub button in the Critter VTT menu and Help. The repository is now github.com/booskers/crittervtt.
+
 **The shared Critter look** (one design with Critter Sounds and Critter Notes, specified in `critter-design/`)
 - Critter is now called Critter VTT. New logo and app icons; the logo, its badge and the desktop title-bar mark follow your highlight colour.
 - Surfaces lift by light instead of lines, glows only on hover, Atkinson Hyperlegible Next, and a Look dialog in the Critter VTT menu:

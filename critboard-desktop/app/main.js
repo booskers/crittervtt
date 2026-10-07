@@ -39,6 +39,11 @@ const THEME_JS = `(() => {
 })()`;
 
 const partitions = new Set(), wins = new Map();   // BaseWindow -> { bar, page }
+// updates from the GitHub releases (updater.js): the window in front carries the pop-up; every window closes before the installer takes over
+const frontWin = () => { const f = BaseWindow.getFocusedWindow(); return f && wins.has(f) ? f : [...wins.keys()][0] || null; };
+const updates = require('./updater')({ owner: 'booskers', repo: 'crittervtt', name: 'Critter VTT', parent: frontWin,
+  page: () => { const w = frontWin(); return w && wins.get(w) ? wins.get(w).page.webContents : null; },
+  beforeInstall: () => Promise.all([...wins.keys()].map(w => new Promise(res => { if (w.isDestroyed()) return res(); w.once('closed', res); w.close(); }))) });
 function openWindow(partition, page) {
   const ses = partition ? session.fromPartition(partition) : session.defaultSession;
   if (!partitions.has(partition || 'default')) { partitions.add(partition || 'default'); serveFiles(ses); }
@@ -118,6 +123,8 @@ function critterMenu(win) {
       { type: 'separator' },
       { label: 'Developer tools', accelerator: 'CmdOrCtrl+Shift+I', click: () => wc && wc.toggleDevTools() }
     ] },
+    ...updates.menuItems(),
+    { type: 'separator' },
     { label: 'Cloudflare dashboard', click: () => shell.openExternal('https://dash.cloudflare.com/') },
     { type: 'separator' },
     { label: 'Quit Critter VTT', click: () => app.quit() }
@@ -187,6 +194,7 @@ ipcMain.on('page:theme', (e, t) => { const win = winOf(e.sender); if (win && win
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
   const win = openWindow();
+  if (!process.env.CB_SELFTEST) updates.onStart();
   // CB_SELFTEST=<folder>: load, check the page and its SRD data, save a screenshot, quit (used when building)
   if (process.env.CB_SELFTEST) {
     const fs = require('node:fs');

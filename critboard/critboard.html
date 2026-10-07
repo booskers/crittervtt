@@ -5421,6 +5421,14 @@ function paintSettingsPop() {
   go('person', 'Your seat', 'Name, token and colour', () => openOnboard(true));
   go('palette', 'Look', 'Light or dark, highlight colour, fonts', () => openLook());
   go('eyeball', 'Accessibility', 'Motion, contrast, keyboard and screen readers', () => openA11y());
+  const U = desktopUpdates();
+  if (U) {
+    box.append(el('div', 'sec-label', 'Updates'));
+    const row = el('label', 'togglerow'), chk = document.createElement('input'); chk.type = 'checkbox'; chk.checked = true; chk.onchange = () => U.set(chk.checked);
+    row.append(chk, el('span', '', 'Check for updates when starting')); box.append(row);
+    go('cycle', 'Check for updates', 'Critter VTT …', () => U.check());
+    U.get().then(u => { chk.checked = u.auto; const sm = box.querySelector('.menuitem:last-child small'); if (sm) sm.textContent = 'You have Critter VTT ' + u.version; }).catch(() => {});
+  }
   p.append(box);
 }
 function paintVolume() {
@@ -12563,6 +12571,11 @@ function folderSaves(fs, label, open) {
 }
 // the desktop app's folder access
 const desktopSaves = () => window.critterDesktop && window.critterDesktop.saves;
+// the desktop app's updates (from GitHub), and the GitHub page itself
+const desktopUpdates = () => window.critterDesktop && window.critterDesktop.updates;
+const CRITTER_GITHUB = 'https://github.com/booskers/crittervtt';
+const GITHUB_SVG = '<svg class="gi" viewBox="0 0 24 24" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4M9 18c-4.51 2-5-2-7-2"/></svg>';
+function openGitHub() { const u = desktopUpdates(); if (u) u.github(); else window.open(CRITTER_GITHUB, '_blank', 'noopener'); }
 // a browser's own folder access (Chrome, Edge): a folder handle kept in this browser's storage
 const fsaOk = () => { try { return typeof window.showDirectoryPicker === 'function' && window.self === window.top; } catch { return false; } };   // (not inside a frame, as on claude.ai: browsers don't allow it there)
 function fsaFiles(root) {
@@ -12824,6 +12837,7 @@ function openCritterMenu() {
   item('palette', 'Look', 'Colours, light or dark, fonts', openLook);
   item('person', 'Accessibility', 'Motion, contrast, keyboard and screen readers', openA11y);
   item('help', 'Help', 'Shortcuts and how things work', openHelp);
+  item('cycle', 'Check for updates', 'A newer Critter VTT, from GitHub', () => desktopUpdates().check(), !!desktopUpdates());
   item('rolling-dices', 'Roll guide', 'How to write any roll', openGuide);
   item('wizard-staff', 'GM tools', 'Effects, fog, handouts, rules', () => toggleGmWin(), host);
   if (document.fullscreenEnabled) item('eye-target', document.fullscreenElement ? 'Leave full screen' : 'Full screen', 'Just the table', () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {}));
@@ -12833,7 +12847,9 @@ function openCritterMenu() {
   const foot = el('div', 'cmenufoot');
   const pc = el('a', 'polylink'); pc.href = POLYCHROME; pc.target = '_blank'; pc.rel = 'noopener'; pc.innerHTML = icon('paint-brush'); pc.append('Polychrome', el('small', '', 'poly-chrome.cc'));
   const back = el('button', 'btn primary', 'Back to the table'); back.type = 'button'; back.onclick = closeCritterMenu;
-  foot.append(pc, el('span', 'grow'), el('span', 'hint', 'Esc opens and closes this menu'), back);
+  const gh = el('a', 'polylink'); gh.href = CRITTER_GITHUB; gh.target = '_blank'; gh.rel = 'noopener'; gh.innerHTML = GITHUB_SVG; gh.append('GitHub', el('small', '', 'crittervtt'));
+  gh.onclick = e => { if (desktopUpdates()) { e.preventDefault(); openGitHub(); } };
+  foot.append(pc, gh, el('span', 'grow'), el('span', 'hint', 'Esc opens and closes this menu'), back);
   card.append(foot);
   ov.onclick = e => { if (e.target === ov) closeCritterMenu(); };
   ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); closeCritterMenu(); } };
@@ -12984,9 +13000,13 @@ function openHelp() {
 - **Whispers** are private chats between two people; the GM doesn't see them either.
 - **Saves**: the lobby owner's page saves after every change; the Critter VTT menu rewinds to any save.`);
   const tourP = el('button', 'btn small', 'Walkthrough for players'), tourG = el('button', 'btn small', 'Walkthrough for GMs'), done = el('button', 'btn small primary', 'Close');
+  const updB = el('button', 'btn small', 'Check for updates'), ghB = el('button', 'btn small ghost'); updB.type = ghB.type = 'button';
+  ghB.innerHTML = GITHUB_SVG; ghB.append('GitHub'); ghB.title = 'Critter VTT on GitHub'; ghB.onclick = openGitHub;
+  updB.onclick = () => { ov.remove(); desktopUpdates().check(); };
   tourP.type = tourG.type = done.type = 'button';
   tourP.onclick = () => { ov.remove(); startTour('player'); }; tourG.onclick = () => { ov.remove(); startTour('gm'); }; done.onclick = () => ov.remove();
-  card.append(h, el('div', 'sec-label', 'Keys and mouse'), tbl, more, HB.el('div', 'prow end', tourP, tourG, el('span', 'grow'), done));
+  card.append(h, el('div', 'sec-label', 'Keys and mouse'), tbl, more, HB.el('div', 'prow end', tourP, tourG, desktopUpdates() ? updB : null, ghB, el('span', 'grow'), done),
+    el('p', 'hint', 'Made with love by booskers / Polychrome. Open source, MIT License.'));
   ov.onclick = e => { if (e.target === ov) ov.remove(); }; ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); ov.remove(); } };
   ov.append(card); document.body.append(ov); done.focus();
 }
