@@ -1539,6 +1539,43 @@ body.mob .overlay .helpcard > .prow.end{order:5;margin-bottom:0}
 /* the "moved" notice at the old address */
 .movebar{position:fixed;left:50%;top:calc(12px + var(--sat,env(safe-area-inset-top,0px)));transform:translateX(-50%);z-index:65;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:min(720px,calc(100vw - 24px));box-sizing:border-box;padding:10px 12px 10px 16px;border:1px solid var(--accent-line);border-radius:14px;background:var(--panel-3);box-shadow:var(--shadow)}
 .movebar .mbtx{flex:1 1 260px;font-size:13.5px;line-height:1.4}
+/* touch screens feel like an app: no text magnifier or "copy" callout from holding a button or the board, no delay on
+   taps (and no double-tap zoom on them); what a mouse shows on hover shows once you tap into it */
+@media (hover:none){
+  button,[role=button],.ctab,.tb,.ib,a,label{touch-action:manipulation;-webkit-touch-callout:none}
+  #board,#tools,.chatbar,#panel .ph,.mmenu,.menu,.ctxmenu,.cmenucard,#chatTab,.mburger{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  img{-webkit-touch-callout:none}
+  .nblk:focus-within .ngrip,.nblk:focus-within .nacts{visibility:visible}
+  .nblk:focus-within .nbtrash{opacity:1}
+  .nsechead .nact{opacity:.7}
+  .nimgbox:focus-within .nimgh{opacity:1}
+}
+/* tablets (body.tab: a touch screen wider than a phone): the desktop layout, with everything at least 44 px to touch */
+body.tab{--tap:44px}
+body.tab .zoom{min-height:40px}
+body.tab .ctab{min-height:42px;min-width:44px;justify-content:center;padding:8px 12px 8px 9px}
+body.tab #panel .brand{min-height:40px;display:flex;align-items:center}
+body.tab #campTag .camptx{min-height:42px}
+body.tab .cmode,body.tab .chip,body.tab .icon-btn{min-height:40px}
+body.tab .menu > button{min-height:44px}
+body.tab #rollInput,body.tab #rollForm button{min-height:46px}
+body.tab .fwin .fwhead button,body.tab .fwin .fwhead .xbtn{min-width:42px;min-height:42px}
+body.tab #campTag .sessbtn{min-width:42px;min-height:42px}
+body.tab #campTag .camptx{padding-block:10px}
+body.tab .seat{min-height:42px}
+body.tab #chatTab{width:40px;height:92px;margin-top:-46px}
+body.tab.chatoff #chatTab{width:30px}
+body.tab .dot{position:relative}
+body.tab .dot::after{content:'';position:absolute;inset:-6px}
+/* a tablet upright: a narrower chat, so the board gets more of the screen */
+@media (orientation:portrait){
+  body.tab #panel{width:340px}
+  body.tab:not(.chatoff) #chatTab{right:340px}
+  body.tab .wnote,body.tab .noteswin,body.tab .handwin,body.tab .turnwin{right:364px}
+  body.tab:not(.chatoff) .chatdock{right:364px}
+  body.tab .camptag{right:370px;max-width:min(460px,calc(100vw - 520px))}
+  body.tab:not(.chatoff):not(.mob) .buildbar{left:calc(72px + (100vw - 72px - 364px) / 2);max-width:calc(100vw - 72px - 364px - 24px)}
+}
 body.mob .menu{z-index:46}
 /* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
 body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
@@ -3721,7 +3758,7 @@ function renderLog() {
   const oldest = S.log.length >= LOG_MAX ? +S.log[0].ts || 0 : 0;
   const notes = soundNotesOn() ? (S.soundlog || []).filter(x => x.ts >= oldest) : [];
   if (!S.log.length && !notes.length) {
-    const e = el('div', 'empty'); e.innerHTML = icon('rolling-dices'); e.append(el('div', '', 'No rolls yet. Tap dice below to build a roll, then send it. ' + (document.body.classList.contains('mob') ? 'Long-press a die to take one away; swipe the panel down to tuck it away.' : 'Right-click a die to take one away.')));
+    const e = el('div', 'empty'); e.innerHTML = icon('rolling-dices'); e.append(el('div', '', 'No rolls yet. Tap dice below to build a roll, then send it. ' + (document.body.classList.contains('mob') ? 'Long-press a die to take one away; swipe the panel down to tuck it away.' : matchMedia('(hover: none)').matches ? 'Long-press a die to take one away.' : 'Right-click a die to take one away.')));
     box.append(e); return;
   }
   let ni = 0;
@@ -5271,16 +5308,34 @@ function boardMenuAt(cx, cy, id) {
     ]);
   }
 }
-let lastPointerTouch = false;
+let lastPointerTouch = false, tapAt = null, lastTap = null;
+// a quick tap on a touch screen, and two of them in a row
+function boardTap(e) {
+  if (!tapAt || tapAt.id !== e.pointerId) return; const t = tapAt; tapAt = null;
+  if (Date.now() - t.t > 300 || Math.hypot(e.clientX - t.x, e.clientY - t.y) > 10) { lastTap = null; return; }
+  if (lastTap && Date.now() - lastTap.t < 330 && Math.hypot(e.clientX - lastTap.x, e.clientY - lastTap.y) < 30) { lastTap = null; boardDoubleTap(e.clientX, e.clientY); return; }
+  lastTap = { x: e.clientX, y: e.clientY, t: Date.now() };
+}
+function boardDoubleTap(cx, cy) {
+  if (boardOpenAt(cx, cy)) return;
+  animateZoom(cx, cy, 1.8);
+}
+// zooming in steps over about a sixth of a second, so a double-tap doesn't jump
+function animateZoom(cx, cy, f) {
+  const steps = reduceMotion.matches ? 1 : 8, each = Math.pow(f, 1 / steps); let i = 0;
+  const go = () => { zoomAt(cx, cy, each); if (++i < steps) setTimeout(go, 20); };
+  go();
+}
 cv.addEventListener('pointerdown', e => {
   lastPointerTouch = e.pointerType === 'touch';
+  if (lastPointerTouch && pointers.size === 0) tapAt = { id: e.pointerId, x: e.clientX, y: e.clientY, t: Date.now() };
   if (act && act.kind === 'text') { commitText(); return; }
   try { cv.setPointerCapture(e.pointerId); } catch {}
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
   if (pointers.size === 2) {
     if (act && act.kind === 'draw') setDraftPresence(null);
     const [a, b] = [...pointers.values()];
-    act = { kind: 'pinch', d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, m0: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, v0: { ...V } };
+    act = { kind: 'pinch', d0: Math.hypot(a.x - b.x, a.y - b.y) || 1, m0: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, v0: { ...V }, t0: Date.now() }; tapAt = null;
     requestDraw(); return;
   }
   if (pointers.size > 2) return;
@@ -5297,7 +5352,7 @@ cv.addEventListener('pointerdown', e => {
       if (act && ['pan', 'marquee', 'lasso', 'move'].includes(act.kind)) { act = null; cv.classList.remove('panning'); }
       // on a touch screen, holding a token (or a note, a door, a drawing) opens its menu, as a right-click does; holding the board pings
       const hold = touch && topHit(pingAt.w, 6 / V.z);
-      if (hold) { boardMenuAt(pingAt.x, pingAt.y, hold); if (navigator.vibrate) try { navigator.vibrate(12); } catch {} }
+      if (hold) { boardMenuAt(pingAt.x, pingAt.y, hold); buzz(0.25); }
       else doPing(pingAt.w, pingAt.pull);
       pingAt = null;
     }, 600);
@@ -5396,6 +5451,7 @@ cv.addEventListener('pointermove', e => {
 function endPointer(e) {
   pointers.delete(e.pointerId);
   clearTimeout(pingTimer); pingAt = null;
+  if (e.type === 'pointerup' && e.pointerType === 'touch') boardTap(e); else tapAt = null;
   if (!act) return;
   if (act.kind === 'fog' || act.kind === 'gridalign') {
     const a = act; act = null; requestDraw();
@@ -5404,7 +5460,13 @@ function endPointer(e) {
     else { alignGridTo(a.x0, a.y0, a.x1, a.y1); setTool('select'); }
     return;
   }
-  if (act.kind === 'pinch') { if (pointers.size === 0) act = null; return; }
+  if (act.kind === 'pinch') {
+    if (pointers.size) return;
+    // two fingers that touched and let go without pinching: zoom out, as in Maps
+    const a = act; act = null;
+    if (e.pointerType === 'touch' && Date.now() - a.t0 < 320 && Math.abs(V.z / a.v0.z - 1) < 0.06) { Object.assign(V, a.v0); animateZoom(a.m0.x, a.m0.y, 1 / 1.8); }
+    return;
+  }
   if (act.kind === 'draw') { commitDraw(act.shape); setDraftPresence(null); }
   else if (act.kind === 'move' && (act.dx || act.dy) && overNotes(e.clientX, e.clientY) && boardToNotes(act.ids, e.clientX, e.clientY)) { /* copied into the notes; the drawings stay where they were */ }
   else if (act.kind === 'move' && act.walk) {
@@ -5435,13 +5497,18 @@ function endPointer(e) {
 cv.addEventListener('pointerup', endPointer);
 cv.addEventListener('pointercancel', endPointer);
 cv.addEventListener('pointerleave', () => { if (eraserAt) { eraserAt = null; requestDraw(); } });
-cv.addEventListener('dblclick', e => {
-  const door = doorAt(toWorld(e.clientX, e.clientY)); if (door) { toggleDoor(door); return; }
-  const id = topHit(toWorld(e.clientX, e.clientY), 4 / V.z);
-  if (id && S.shapes.get(id).t === 'text' && mayTouch(S.shapes.get(id))) openTextEditor(null, id);
-  else if (id && S.shapes.get(id).t === 'token' && S.shapes.get(id).ent) openEnt(S.shapes.get(id).ent);
-  else if (id && S.shapes.get(id).t === 'note') openBoardNote(S.shapes.get(id));
-});
+// what a double-click (or a double-tap) opens: a door, text to edit, a token's sheet, a pinned note; false if nothing
+function boardOpenAt(cx, cy) {
+  const door = doorAt(toWorld(cx, cy)); if (door) { toggleDoor(door); return true; }
+  const id = topHit(toWorld(cx, cy), 4 / V.z), s = id && S.shapes.get(id);
+  if (s && s.t === 'text' && mayTouch(s)) openTextEditor(null, id);
+  else if (s && s.t === 'token' && s.ent) openEnt(s.ent);
+  else if (s && s.t === 'note') openBoardNote(s);
+  else return false;
+  return true;
+}
+// (on a touch screen the double-tap above has it)
+cv.addEventListener('dblclick', e => { if (!lastPointerTouch) boardOpenAt(e.clientX, e.clientY); });
 cv.addEventListener('wheel', e => {
   e.preventDefault();
   // with the cone tool, the wheel opens and closes the cone instead of scrolling
@@ -5902,6 +5969,7 @@ function tick(now) {
    toss it up and they jump. Only the look and feel: every result is decided before the dice are thrown. ---------------- */
 const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const coarse = matchMedia('(pointer: coarse)');
+if (IOS) { const vp = document.querySelector('meta[name=viewport]'); if (vp && !/maximum-scale/.test(vp.content)) vp.content += ',maximum-scale=1'; }
 const motionAsks = !!(window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function');
 // motion starts on everywhere; iPhones and iPads ask once, the first time the dice panel is touched
 let FEEL = { buzz: true, motion: true, ...(lsGet('tt.feel', {}) || {}) };
@@ -13623,7 +13691,9 @@ function openA11y() {
 ### On a phone
 - **The menu** (☰, top left) holds the tools, sheets, notes and the Library; each opens as a full page. **Swipe sideways** on a page, or use Android's back gesture, to go back a step.
 - **The dice panel**: tap dice to build a roll, **long-press** a die to take one away. **Swipe the panel up** for the roll log and the table, **down** to tuck them away.
-- **The board**: drag with one finger, **pinch** to zoom and move with two. **Long-press** a token for its menu.
+- **The board**: drag with one finger, **pinch** to zoom and move with two. **Double-tap** an empty spot to zoom in, **tap with two fingers** to zoom out. **Long-press** a token for its menu; double-tap it for its sheet.
+- **Back** (Android's back gesture, Safari's swipe from the left edge, or the browser's back) closes what's open, one step at a time. In the iPhone or iPad home-screen app, swipe in from the left edge.
+- **A tablet** gets the full layout with bigger controls; upright, the chat is narrower so the board has more room. The chat's tab slides it away entirely.
 - **Text size**: the Android app follows your phone's font size (Settings › Display), up to 130%. In a browser, use its own text size setting.
 - With TalkBack, the menu, the pages and the token list read like the rest of Critter VTT; double-tap to press.
 
@@ -13836,7 +13906,7 @@ const TOUR = [
 // the walkthrough on a phone: the same steps in touch words; what lives in the menu (☰) is shown there, opened for it
 const TOUR_MOB = {
   'Welcome to Critter VTT': { p: 'A table for playing role-playing games together: a board for maps and tokens, dice everyone sees land, sheets, notes and music. This tour is hands-on: steps marked Try it move on by themselves once you\'ve done what they say. Next skips ahead any time, and End the tour stops it.' },
-  'Look around the board': { p: 'The board is as big as you need. Drag with one finger to move around, and pinch with two to zoom. Hold a finger still on an empty spot to ping it for everyone.' },
+  'Look around the board': { p: 'The board is as big as you need. Drag with one finger to move around, and pinch with two to zoom (or double-tap to zoom in, tap with two fingers to zoom out). Hold a finger still on an empty spot to ping it for everyone.' },
   'Build a roll': { p: 'Tap dice to add them to your next roll; long-press a die to take one away. You can also type rolls like 2d6+3 straight into the chat box.', try: 'Tap the d20.' },
   'Roll it': { try: 'Tap the send button.' },
   'Modifiers and quick rolls': { p: 'Swipe the dice panel up (or tap its handle) for the roll log and these: advantage, disadvantage and your system\'s other ways of rolling apply to the next roll, beside your system\'s own quick rolls. Swipe it down to tuck it away.', pre: () => setSheet(true) },
@@ -13854,7 +13924,7 @@ const TOUR_MOB = {
   'Saves': { at: '#mMenu .brand', p: 'Your campaign saves itself after every change, under its own name. Save in the Critter VTT menu makes a named save; Rewind goes back to any of them. Next time, the start screen shows your campaigns: long-press one to open an older save.' },
   'You\'re ready': { pre: () => { MOB.fromMenu = false; mobMenu(false); }, p: 'Have a good game. Help, this walkthrough and Accessibility are in the Critter VTT menu (the logo at the top of ☰) whenever you need them.' }
 };
-const touchWords = x => String(x || '').replace(/Right-click/g, 'Long-press').replace(/right-click/g, 'long-press').replace(/Double-click/g, 'Double-tap').replace(/double-click/g, 'double-tap').replace(/Click/g, 'Tap').replace(/click/g, 'tap').replace(/ \(Ctrl\+Z\)/g, '');
+const touchWords = x => String(x || '').replace(/Right-click/g, 'Long-press').replace(/right-click/g, 'long-press').replace(/Double-click/g, 'Double-tap').replace(/double-click/g, 'double-tap').replace(/Click/g, 'Tap').replace(/click/g, 'tap').replace(/ \(Ctrl\+Z\)/g, '').replace(/Ctrl\+S makes a named save/g, 'Save, in the Critter VTT menu, makes a named save');
 function tourForPhone(st) {
   const o = TOUR_MOB[st.t] || {}, m = { ...st, p: touchWords(st.p), ...(st.try ? { try: touchWords(st.try) } : {}), ...o };
   if (m.at === '#panel .brand') m.at = '#mMenu .brand';
@@ -13869,10 +13939,18 @@ function tourForPhone(st) {
   };
   return m;
 }
+// on a tablet the layout is the desktop's: the same steps, in touch words, and the board and dice as on a phone
+function tourForTablet(st) {
+  const o = TOUR_MOB[st.t] || {}, keep = ['Welcome to Critter VTT', 'Look around the board', 'Build a roll', 'Roll it', 'Move your token', 'Hidden things', 'You\'re ready'];
+  const m = { ...st, p: touchWords(st.p), ...(st.try ? { try: touchWords(st.try) } : {}) };
+  if (keep.includes(st.t)) { if (o.p) m.p = o.p.replace(' (the logo at the top of ☰)', ' (tap the logo)'); if (o.try) m.try = o.try; }
+  if (st.t === 'The Critter VTT menu') m.p = 'Tap the Critter VTT logo: Help, this walkthrough, Accessibility, the Look, saving and more.';
+  return m;
+}
 let tourState = null;
 function startTour(kind) {
   endTour();
-  const steps = TOUR.filter(st => st.who === 'all' || kind === 'gm').map(st => MOB.on ? tourForPhone(st) : st).filter(st => !st.skip);
+  const steps = TOUR.filter(st => st.who === 'all' || kind === 'gm').map(st => MOB.on ? tourForPhone(st) : document.body.classList.contains('tab') ? tourForTablet(st) : st).filter(st => !st.skip);
   closeCritterMenu(); closePop();
   const ov = el('div', 'tourov'), spot = el('div', 'tourspot'), card = el('div', 'tourcard'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-live', 'polite'); card.setAttribute('aria-label', 'Walkthrough');
   ov.append(spot, card); document.body.append(ov);
@@ -17433,6 +17511,46 @@ function mobAfterClose() { setTimeout(() => { if (MOB.on && MOB.fromMenu && !mob
 })();
 /* phones: the dice panel is a bottom sheet. Peeking keeps the dice and roll box in reach; open shows the log and table */
 const phone = matchMedia('(max-width: 760px)');
+// tablets: a touch screen without a mouse, wider than a phone: the desktop layout, made for fingers (see body.tab)
+const touchFirst = matchMedia('(hover: none) and (pointer: coarse)');
+function tabLayout() { document.body.classList.toggle('tab', touchFirst.matches && !phone.matches); }
+tabLayout(); touchFirst.addEventListener('change', tabLayout); phone.addEventListener('change', tabLayout);
+/* back, as phones and tablets do it: the browser's back (Android's back gesture, Safari's swipe from the edge) closes
+   what's open first, a step at a time, and only leaves Critter VTT when there's nothing left to close. (The Android
+   app does this itself.) */
+(() => {
+  if (/CritterPlayer\//.test(navigator.userAgent) || !matchMedia('(hover: none)').matches) return;
+  const arm = () => { try { if (!(history.state && history.state.critter)) history.pushState({ critter: 1 }, ''); } catch {} };
+  arm();
+  addEventListener('popstate', () => {
+    if (window.critterBack && window.critterBack()) arm();
+    else toast('Go back once more to leave Critter VTT.');
+  });
+  // after "once more to leave", touching the page again means staying: back closes things again
+  addEventListener('pointerdown', () => setTimeout(arm, 0), true);
+})();
+/* the iPhone or iPad home-screen app has no back button: a swipe in from the left edge goes back, the page following
+   the finger (Safari itself does this as a browser back, which the above turns into the same) */
+(() => {
+  if (!IOS || !(navigator.standalone || matchMedia('(display-mode: standalone)').matches)) return;
+  let d = null;
+  const topPage = () => [...document.querySelectorAll('.fwin, .sheetwin')].filter(w => !w.hidden && w.getClientRects().length && w.getBoundingClientRect().left <= 2).sort((a, b) => (+getComputedStyle(b).zIndex || 0) - (+getComputedStyle(a).zIndex || 0))[0];
+  addEventListener('touchstart', e => { d = null; if (e.touches.length !== 1 || e.touches[0].clientX > 22) return; d = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: Date.now(), dx: 0, page: topPage(), on: false }; }, { passive: true, capture: true });
+  addEventListener('touchmove', e => {
+    if (!d) return; const dx = e.touches[0].clientX - d.x, dy = e.touches[0].clientY - d.y;
+    if (!d.on) { if (Math.abs(dy) > 12 && Math.abs(dy) > dx) { d = null; return; } if (dx < 10) return; d.on = true; }
+    e.preventDefault(); d.dx = Math.max(0, dx);
+    if (d.page) { d.page.style.transition = 'none'; d.page.style.transform = `translateX(${d.dx}px)`; }
+  }, { passive: false, capture: true });
+  const end = () => {
+    if (!d || !d.on) { d = null; return; }
+    const { page, dx, t } = d; d = null;
+    const go = dx > innerWidth * 0.33 || (dx > 50 && dx / Math.max(1, Date.now() - t) > 0.5);
+    if (page) { page.style.transition = 'transform .2s ease'; page.style.transform = go ? `translateX(${innerWidth}px)` : ''; }
+    setTimeout(() => { if (page) { page.style.transform = ''; page.style.transition = ''; } if (go && window.critterBack) window.critterBack(); }, go ? 190 : 0);
+  };
+  addEventListener('touchend', end, { capture: true }); addEventListener('touchcancel', end, { capture: true });
+})();
 function setSheet(open) {
   const p = $('#panel'), g = $('#sheetGrab');
   p.classList.toggle('peek', phone.matches && !open);

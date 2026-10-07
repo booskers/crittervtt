@@ -9,6 +9,12 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - The Android app (1.3.0) opens the new address and moves what it kept by itself on its first start. Invite links to either address open it.
 - The desktop apps connect to the new address (their own data stays where it is).
 
+**Touch: gestures as on iOS, and tablets**
+- Back works as phones and tablets expect: Android's back gesture, Safari's swipe from the left edge and the browser's back close what's open, one step at a time, and only leave Critter VTT when nothing is left (it says so first). In the iPhone and iPad home-screen app, swipe in from the left edge: the page follows your finger.
+- On the board: double-tap an empty spot to zoom in, tap with two fingers to zoom out; double-tap a token for its sheet. Holding a token gives a light tap on iPhones too.
+- Feels like an app: no text magnifier or "Copy" callout from holding buttons or the board, no delay on taps, and iPhones no longer zoom into a text field when it's tapped (pinching still zooms).
+- Tablets get their own layout: the full table with every control at least 44 px to touch, a narrower chat when the tablet is upright (more board), the walkthrough in touch words, and what a mouse shows on hover (in the notes) shows once you tap into it.
+
 **More play on the same Homebase** (the free Cloudflare plan goes about 5–10 times as far)
 - Cursors: nothing is sent while you're alone at the table; another player's cursor arrives about 8 times a second (was 20) and glides smoothly in between; a stroke being drawn about 12 times a second. A tab in the background sends nothing.
 - The Homebase sends just the player whose cursor moved, not everyone's every time.
