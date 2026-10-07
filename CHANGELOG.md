@@ -7,6 +7,8 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - On a phone, the start screens (Take a seat, Find your table) float as a card with margins that fit the screen, from small phones to large ones, and keep clear of notches. They were wider than the screen, with no margins. Every phone dialog now fits the screen's width.
 - On a phone, the Critter VTT menu and the settings are available on the start screen, before joining a table (Menu and the gear above the card). Before joining, the menu leaves out the lobby and the walkthrough.
 - Next stays in reach at the bottom of Take a seat.
+- Android's back swipe goes back a step instead of leaving: it closes what's open (a menu, the settings, a dialog, a sheet), and Find your table goes back to Take a seat. With nothing left to go back to, the app says "Swipe back again to leave Critter VTT" (Android app 1.2.1).
+- Your seat, opened on the start screen, no longer jumps back to Find your table after a second or two.
 
 ## 1.3.0 (2026-10-07)
 **Highlights**

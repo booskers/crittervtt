@@ -166,15 +166,20 @@ public class MainActivity extends Activity {
         web.loadDataWithBaseURL(HOME, html, "text/html", "utf-8", null);
     }
 
-    // back: the page closes what's open (a sheet, a menu, a dialog) first; with nothing open, Critter VTT goes to the
-    // background and stays at the table
+    // back (the swipe from the edge, or the back button) goes back a step on the page: it closes what's open (a sheet,
+    // a menu, a dialog) or goes to the previous start screen. With nothing to go back to, a first swipe only says so;
+    // a second one within two seconds sends Critter VTT to the background (it stays at the table)
+    long backAt;
+
     @Override
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
         web.evaluateJavascript("(window.critterBack && window.critterBack()) ? '1' : '0'", r -> {
-            if (r != null && r.contains("1")) return;
-            if (web.canGoBack()) { web.goBack(); return; }
-            moveTaskToBack(true);
+            if (r != null && r.contains("1")) { backAt = 0; return; }
+            long now = System.currentTimeMillis();
+            if (now - backAt < 2000) { backAt = 0; moveTaskToBack(true); return; }
+            backAt = now;
+            android.widget.Toast.makeText(this, "Swipe back again to leave Critter VTT", android.widget.Toast.LENGTH_SHORT).show();
         });
     }
 

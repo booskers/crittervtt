@@ -4451,7 +4451,8 @@ function closeOnboard() {
 const notAtTable = () => mode === 'shared' && !S.lobby;
 function ensureAtTable() {
   if (!notAtTable() || !S.me) return;
-  if ($('#onboard').hidden || $('#lobbyCard').hidden) showLobbyCard(false);
+  // (Take a seat, or Your seat, is a start screen too: it stays while someone is choosing)
+  if ($('#onboard').hidden || ($('#lobbyCard').hidden && $('#onboardForm').hidden)) showLobbyCard(false);
 }
 setInterval(ensureAtTable, 2000);
 function paintOnboard() {
@@ -17105,6 +17106,7 @@ window.critterBack = () => {
     const shown = x => x && !x.hidden && x.getClientRects().length;
     if (shown(document.getElementById('ctxMenu'))) { closeCtx(); return true; }
     if (tourState) { endTour(); return true; }
+    if (critterMenuOpen()) { closeCritterMenu(); return true; }   // (an Escape would also reach the start screen under it)
     const esc = t => t.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true }));
     const ovs = [...document.querySelectorAll('.overlay')].filter(o => shown(o) && o.id !== 'onboard' && o.id !== 'splash');
     if (ovs.length) { const o = ovs[ovs.length - 1]; const x = o.querySelector('[data-x], .xbtn'); if (x) x.click(); else esc(o); if (shown(o)) o.hidden = true; return true; }
@@ -17114,8 +17116,12 @@ window.critterBack = () => {
     // the topmost window (a sheet, the notes, the library)
     const wins = [...document.querySelectorAll('.fwin, .sheetwin, #sceneDock')].filter(shown).sort((a, b) => (+getComputedStyle(b).zIndex || 0) - (+getComputedStyle(a).zIndex || 0));
     if (wins.length) { const x = wins[0].querySelector('[data-x], .xbtn'); if (x) { x.click(); return true; } }
-    // the seat dialog opened from the menu goes back to the table (the start screen stays: it's where a player is)
-    if (shown(document.getElementById('onboardForm')) && S.me && S.lobby) { closeOnboard(); return true; }
+    // the start screens step back the way they came: Your seat (opened from a menu) goes back to where it was opened,
+    // and Find your table goes back to Take a seat; Take a seat itself is the first screen (nothing to go back to)
+    if (shown(document.getElementById('onboardForm')) && S.me && (S.lobby || obEditing)) { closeOnboard(); return true; }
+    const nc = document.getElementById('newCampBox');
+    if (shown(document.getElementById('lobbyCard')) && shown(nc)) { nc.hidden = true; const t = document.querySelector('.campitem.newc'); if (t) { t.setAttribute('aria-expanded', 'false'); t.focus({ preventScroll: true }); } return true; }
+    if (shown(document.getElementById('lobbyCard')) && S.me && notAtTable()) { openOnboard(false); return true; }
   } catch (e) { console.warn('back', e); }
   return false;
 };
