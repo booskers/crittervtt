@@ -3,6 +3,11 @@
 Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
+## 1.2.2 (2026-10-07)
+- Colour pickers no longer make everything lag: the colour is taken when you close the picker, instead of recolouring everything on every move inside it.
+- Campaign pictures fill the whole card on the start screen, cropped rather than squeezed, and are kept sharper.
+- The Critter VTT menu: Back to the table spans the whole width, and the footer says "Made with love by booskers / Polychrome." like the other apps.
+
 ## 1.2.1 (2026-10-07)
 - Deleting a scene works: the bin now asks "Delete this scene?" on the scene's card and waits for Delete or Keep. Before, its second click had to come within three seconds, or nothing happened.
 - The bin on Main and on the scene the players see says why it can't delete them, instead of doing nothing.
