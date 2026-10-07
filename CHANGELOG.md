@@ -4,10 +4,16 @@ Critter VTT (the page, `crittervtt/crittervtt.html`, and the desktop app in `cri
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
 ## Unreleased
-- In the Android app, the version of the app shows next to "Made with love" (the Critter VTT menu and Help).
-- For developers: the code says Critter VTT instead of Critboard. `critboard/critboard.html` is now `crittervtt/crittervtt.html`, `critboard-desktop/` is `crittervtt-desktop/`, and `window.CRITBOARD_DESKTOP` is `window.CRITTER_DESKTOP` (the old name still works). App ids, the desktop app's storage, password hashes and the Homebase keep their old names on purpose, so nothing existing breaks: see the README.
 
-## 1.3.1 (website and Android, 2026-10-07)
+## 1.3.1 (2026-10-07)
+**Highlights**
+- Dice you can feel on a phone: it buzzes when your dice hit the table (in Chrome on Android and the Android app; a light tap on iPhones with iOS 18 or later).
+- Tilt your phone and the dice roll downhill; toss it up and the dice on the table jump and spin once, landing on the same face. Turn it on or off in Settings › Dice feel (iPhones ask to allow motion first). Rolls are never affected.
+- Critter VTT on iPhone and iPad: add it to the home screen from Safari and it opens full screen, like an app. The steps are on the website (booskers.github.io/crittervtt, "iPhone and iPad"); the players' link opens on Join a table.
+- On a phone, the start screens fit the screen with margins, the menu and settings are there before joining, dialogs open at their top and close with a drag down.
+- The Android app (1.2.4) has a sharper icon (drawn as a vector) and can buzz; since 1.2.1 it has a back swipe that steps back, edge-to-edge display and Check for updates.
+
+**Also on phones** (the website and the Android app)
 - On a phone, the start screens (Take a seat, Find your table) float as a card with margins that fit the screen, from small phones to large ones, and keep clear of notches. They were wider than the screen, with no margins. Every phone dialog now fits the screen's width.
 - On a phone, the Critter VTT menu and the settings are available on the start screen, before joining a table (Menu and the gear above the card). Before joining, the menu leaves out the lobby and the walkthrough.
 - Next stays in reach at the bottom of Take a seat.
@@ -20,6 +26,10 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - The walkthrough on a phone: in touch words, with the menu opened at the right tile for each step, and offered once you're at a table.
 - The Android app (1.2.3) has Check for updates: in the gear's settings, the Critter VTT menu and Help. It says when you're up to date, and offers a version you skipped again. On its own it now checks every hour (was every 6), always reading the release's current version.
 - The Android app (1.2.2) runs edge to edge: the table shows under the status bar and the gesture bar, with no black strips; Critter VTT keeps its own buttons clear of both.
+
+**Other**
+- In the Android app, the version of the app shows next to "Made with love" (the Critter VTT menu and Help).
+- For developers: the code says Critter VTT instead of Critboard. `critboard/critboard.html` is now `crittervtt/crittervtt.html`, `critboard-desktop/` is `crittervtt-desktop/`, and `window.CRITBOARD_DESKTOP` is `window.CRITTER_DESKTOP` (the old name still works). App ids, the desktop app's storage, password hashes and the Homebase keep their old names on purpose, so nothing existing breaks: see the README.
 
 ## 1.3.0 (2026-10-07)
 **Highlights**
