@@ -704,8 +704,9 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .sccard.dropafter{box-shadow:0 3px 0 var(--accent-line)}
 .scdel{width:28px;height:28px}
 .scdel svg{width:16px;height:16px}
-.scdel.armed{background:#c9353b;color:#fff}
-.scdel:disabled{opacity:.35;cursor:not-allowed}
+.scdel.off{opacity:.35;cursor:help}
+.scask{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-height:30px}
+.scaskq{flex:1;min-width:0;font-weight:700}
 .scmenu{position:relative}
 .scmenu summary{list-style:none;cursor:pointer;width:28px;height:28px;display:grid;place-items:center}
 .scmenu summary::-webkit-details-marker{display:none}
@@ -12621,7 +12622,20 @@ function toggleScenes(force) {
   lsSet('tt.scenesOpen', force !== undefined ? !!force : !lsGet('tt.scenesOpen', false));
   renderScenes();
 }
-let scRename = '';
+let scRename = '', scDelAsk = '';
+// deleting a scene asks first, right on its card, and waits for an answer
+function sceneDelAsk(sc) {
+  const box = el('div', 'scask'); box.setAttribute('role', 'group'); box.setAttribute('aria-label', `Delete ${sc.name}?`);
+  const yes = el('button', 'btn small danger', 'Delete'), no = el('button', 'btn small ghost', 'Keep'); yes.type = no.type = 'button';
+  yes.title = 'Undo (Ctrl+Z) brings it back';
+  const keep = () => { scDelAsk = ''; renderScenes(); };
+  yes.onclick = async () => { scDelAsk = ''; yes.disabled = no.disabled = true; await deleteScene(sc.id); toast(`${sc.name} deleted. Undo (Ctrl+Z) brings it back.`); };
+  no.onclick = keep;
+  box.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); keep(); } };
+  box.append(el('span', 'scaskq', `Delete ${sc.name}?`), yes, no);
+  setTimeout(() => yes.focus(), 0);
+  return box;
+}
 function renderScenes() {
   renderRevealBar();
   const want = isHost() && (mode === 'solo' || !!S.lobby) && !!lsGet('tt.scenesOpen', false);
@@ -12671,15 +12685,17 @@ function renderScenes() {
     menu.append(mi); acts.append(menu);
     // delete: right on the card; the first scene and the one the players see stay
     const del = el('button', 'icon-btn scdel'); del.type = 'button'; del.innerHTML = icon('trash-can');
-    const why = sc.id === 'main' ? 'The first scene stays; rename it or clear what\'s on it instead' : live ? 'The players see this scene; reveal another one first' : '';
-    del.disabled = !!why; del.title = why || `Delete ${sc.name} (click twice; Undo brings it back)`; del.setAttribute('aria-label', why || `Delete ${sc.name}`);
-    del.onclick = () => { if (del.classList.contains('armed')) { del.classList.remove('armed'); deleteScene(sc.id); toast(`${sc.name} deleted. Undo (Ctrl+Z) brings it back.`); return; } del.classList.add('armed'); del.title = 'Click again to delete'; setTimeout(() => del.classList.remove('armed'), 3000); };
+    const why = sc.id === 'main' ? 'Main is where every table starts, so it stays: rename it, or clear what\'s on it' : live ? 'The players are looking at this scene: reveal another one first, then delete this one' : '';
+    // (not disabled: a disabled button shows no tooltip, so a click says why instead)
+    if (why) del.classList.add('off'); del.setAttribute('aria-disabled', String(!!why));
+    del.title = why || `Delete ${sc.name}`; del.setAttribute('aria-label', why || `Delete ${sc.name}`);
+    del.onclick = () => { if (why) { toast(why + '.'); return; } scDelAsk = sc.id; renderScenes(); };
     acts.append(del);
     // drag the card to another place in the list
     card.dataset.id = sc.id; card.classList.add('scdrag');
     card.addEventListener('pointerdown', e => sceneDragStart(e, card, list));
     row.append(acts);
-    card.append(tb, row); list.append(card);
+    card.append(tb, scDelAsk === sc.id ? sceneDelAsk(sc) : row); list.append(card);
   });
   const foot = d.querySelector('.scfoot'); foot.textContent = '';
   const nb = el('button', 'btn small'); nb.type = 'button'; nb.textContent = '+ New scene'; nb.onclick = () => newScene();
