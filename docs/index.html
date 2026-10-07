@@ -3,156 +3,138 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Critter</title>
-<meta name="description" content="Critter is a free virtual tabletop: a battle map, dice, character sheets and rulebooks, shared live with your group in a browser or on Windows.">
-<meta property="og:title" content="Critter">
-<meta property="og:description" content="A free virtual tabletop for your group, in the browser or on Windows.">
-<meta property="og:image" content="img/critter-table.png">
-<link rel="icon" href="img/critter-icon.png">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya+Sans:wght@400;500;700;800&family=Grenze:wght@600;700&display=swap">
-<link rel="stylesheet" href="style.css">
-<style>
-.hero::before{background:radial-gradient(closest-side at 50% 50%,rgba(232,88,76,.24),transparent)}
-.logos img{height:88px}
-</style>
+<title>Critter VTT</title>
+<meta name="description" content="A free virtual tabletop: battle maps, 3D dice, character sheets and rulebooks, shared live with your group in a browser or on Windows.">
+<meta property="og:title" content="Critter VTT">
+<meta property="og:description" content="A free virtual tabletop: battle maps, 3D dice, character sheets and rulebooks, shared live with your group in a browser or on Windows.">
+<meta property="og:image" content="https://booskers.github.io/crittervtt/img/vtt-hero.jpg">
+<meta name="theme-color" content="#0c0d10">
+<link rel="icon" href="img/icon-vtt.png">
+<link rel="stylesheet" href="site.css">
+<style>:root{--accent:#ff5c00;--accent-2:#3cc4c4;--on-accent:#1a0900;}</style>
 </head>
-<body class="critter">
-
-<nav>
-  <a class="promo to-sounds" href="https://booskers.github.io/critter-sounds/">
-    <div class="wrap">
-      <span class="lbl">Check out also:</span>
-      <img src="img/sounds-icon.png" alt="">
-      <b>Critter Sounds</b>
-      <span class="what">music, sound pads and soundscapes, played live to your table</span>
-      <span class="go">Take a look →</span>
-    </div>
-  </a>
+<body>
+<header>
+<div class="promo"><div class="wrap"><span class="lbl">Check out also:</span><a href="https://booskers.github.io/critter-sounds/" style="--c:#8800ff"><img src="img/icon-sounds.png" alt=""><b>Critter Sounds</b><span class="what">music and sound, played live to your table</span></a><a href="https://booskers.github.io/critter-notes/" style="--c:#ffbd00"><img src="img/icon-notes.png" alt=""><b>Critter Notes</b><span class="what">your campaign, planned and ready to run</span></a></div></div>
+<nav class="top" aria-label="Critter VTT">
   <div class="wrap">
-    <a class="brand" href="#top" aria-label="Critter home"><img src="img/critter-logo.svg" alt="Critter"></a>
-    <div class="links">
-      <a href="#features" class="hide-s">Features</a>
-      <a href="#homebase" class="hide-s">Host it</a>
-      <a href="#sounds" class="hide-s">Music</a>
-      <a href="#download">Download</a>
-      <a href="https://github.com/booskers/crittervtt">GitHub</a>
-    </div>
+    <a class="brand" href="#top" aria-label="Critter VTT home"><img src="img/logo-vtt.svg" alt="Critter VTT"></a>
+    <div class="links"><a href="#play" class="hide-s">Features</a><a href="#sheets" class="hide-s">Sheets</a><a href="#host">Host it</a><a href="#download">Download</a><a href="https://github.com/booskers/crittervtt">GitHub</a></div>
   </div>
 </nav>
-
-<header class="hero" id="top">
-  <div class="wrap">
-    <div class="logos"><img src="img/critter-logo.svg" alt="Critter"></div>
-    <h1>A game table everyone<br>can sit at, <span class="r">online</span>.</h1>
-    <p class="lede">Critter is a free virtual tabletop. Share a lobby code and your group is in, with the same battle map, dice, character sheets and rulebooks, and every roll as it happens.</p>
-    <div class="ctas">
-      <a class="btn red" href="https://critter.poly-chrome.cc">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l14 8-14 8z"/></svg>
-        Play in your browser</a>
-      <a class="btn ghost" href="https://github.com/booskers/crittervtt/releases/latest/download/Critter-Setup.exe">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
-        Download for Windows</a>
-    </div>
-    <p class="note">Free and open source. Nothing to install to play in a browser.</p>
-    <div class="shot">
-      <img src="img/critter-table.png" alt="Critter: the battle map, the dice panel and the Take a seat dialog for choosing a name, token and colour" width="1440" height="900">
-    </div>
-  </div>
 </header>
-
-<section id="features">
+<main>
+<section class="hero" id="top">
   <div class="wrap">
-    <span class="eyebrow red-t"><img src="img/critter-icon.png" alt="">Features</span>
-    <h2>Everything the table needs.</h2>
-    <p class="sub">Everyone at the table sees the same thing at the same moment: maps, rolls, sheets and music.</p>
-    <div class="split">
-      <div>
-        <ul class="ticks">
-          <li><b>A battle map</b> with tokens, drawing tools and each player's live cursor.</li>
-          <li><b>Dice</b> from d4 to d100, with modifiers, hidden GM rolls and typed rolls like <span class="code">2d6+3</span>.</li>
-          <li><b>Character sheets and items</b>, with D&amp;D Beyond import for the owner of a lobby.</li>
-          <li><b>Built-in rules compendium</b> for D&amp;D 5e, Pathfinder 2e, Daggerheart, Blades in the Dark and Fate.</li>
-          <li><b>Autosaves and Rewind</b> on the server, plus the GM's own saves folder on their computer.</li>
-          <li><b>Works on phones</b>, in any modern browser, or as a Windows app.</li>
-        </ul>
-      </div>
-      <div class="grid" style="grid-template-columns:1fr 1fr;margin-top:0">
-        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M10 10a4 4 0 100-8 4 4 0 000 8zM21 20v-2a4 4 0 00-3-3.87M16 2.13a4 4 0 010 7.75"/></svg></div>
-          <h3>Players and seats</h3><p>The owner sets up the players; each person claims theirs with a name, token and colour.</p></div>
-        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5zM4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg></div>
-          <h3>Library and creators</h3><p>Spells, monsters, items and classes, plus importers and creature builders.</p></div>
-        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8M3 3v5h5"/></svg></div>
-          <h3>Rewind the table</h3><p>Saves every ten minutes while you play. Rewind a lost evening, and undo the rewind too.</p></div>
-        <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div>
-          <h3>Browser or desktop</h3><p>The same table in a browser, or in the Windows app with its own window.</p></div>
-      </div>
-    </div>
+    <img class="logo" src="img/logo-vtt.svg" alt="Critter VTT">
+    <h1>Your table, <em>ready to play.</em></h1>
+    <p class="lede">Critter VTT is a free virtual tabletop. Share a lobby code and your group sits down at the same battle map, with the same dice, sheets and rulebooks, and every roll as it happens.</p>
+    <div class="ctas"><a class="btn primary" href="https://critter.poly-chrome.cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg> Play in your browser</a><a class="btn " href="https://github.com/booskers/crittervtt/releases/latest/download/Critter-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg> Download for Windows</a></div>
+    <p class="note">Free and open source. Nothing to install to play in a browser.</p>
+    <figure class="shot"><img src="img/vtt-hero.jpg" alt="A battle in Critter VTT: the dungeon map with character and monster tokens, a fireball measured over three goblins, 3D dice rolling, the turn order and a busy chat" width="3200" height="1920"><figcaption>Round one in the crypt: Seraphine’s Fireball rolls 8d6 in her colour while the GM rolls the goblins’ saves. The turn order, live cursors and the 20 ft radius are all shared.</figcaption></figure>
   </div>
 </section>
 
-<section id="homebase">
+<section id="play">
   <div class="wrap">
-    <span class="eyebrow" style="color:var(--gold)">Host it yourself</span>
-    <h2>Your group, your server.</h2>
-    <p class="sub">Critter connects through Homebase, a small server that keeps your tables and pushes every change live. Run your own in one of two ways.</p>
-    <div class="flow">
-      <div class="step"><h3>On Cloudflare</h3><p>A Worker on your own free Cloudflare account. One double-click on <span class="code">setup-homebase.cmd</span> puts it online and builds an installer that connects to it.</p></div>
-      <div class="step"><h3>On your computer</h3><p>A Node server: <span class="code">node server.mjs --port 8787</span>. Players open its address in a browser, or point the app at it.</p></div>
-      <div class="step"><h3>Your data</h3><p>Tables, autosaves and uploaded music stay on your server, in a folder you can back up.</p></div>
+    <div class="split">
+      <div>
+        <span class="eyebrow">At the table</span>
+        <h2>Everyone sees the same moment.</h2>
+        <p class="sub">The board, the dice and the chat are shared live. Rolls tumble on everyone’s screen in the roller’s colour, and land in the chat with every die shown.</p>
+        <ul class="ticks"><li><b>3D dice</b> from d4 to d100 with real physics, plus typed rolls like <code>2d20kh1+7</code>, modifiers, advantage, and hidden GM rolls.</li><li><b>A battle map</b> with tokens, health bars, drawing tools, arrows, text and live cursors for every player.</li><li><b>Measuring</b> lines, cones and circles that count squares and light up every token they catch.</li><li><b>Turn order</b> with initiative rolled from each sheet, rounds, and a ring around whoever’s up.</li><li><b>Chat and whispers</b> with messages, replies, private rolls and handouts.</li></ul>
+      </div>
+      
     </div>
+  </div>
+</section>
+<section id="sheets" class="alt">
+  <div class="wrap">
+    <div class="split rev">
+      <div>
+        <span class="eyebrow two">Characters</span>
+        <h2>Sheets that roll for you.</h2>
+        <p class="sub">Each player claims their seat and gets their own sheet, coloured in their colour. Click a skill, a save or an attack, and it rolls.</p>
+        <ul class="ticks"><li><b>Character sheets</b> for D&amp;D 5e, Pathfinder 2e, Daggerheart and more, with conditions that change the rolls.</li><li><b>Bring your character</b> from D&amp;D Beyond (through your Homebase), Foundry VTT, or a filled-in PDF.</li><li><b>Level up</b> step by step, with the rules of your system.</li></ul>
+      </div>
+      <figure class="media"><img src="img/vtt-sheet.jpg" alt="Brannoc Ironfist’s D&amp;D 5e character sheet open beside the board and the chat" width="3200" height="1920" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+<section id="library">
+  <div class="wrap">
+    <div class="split">
+      <div>
+        <span class="eyebrow">Rulebooks</span>
+        <h2>The rules are already on the table.</h2>
+        <p class="sub">A built-in compendium of monsters, spells, items, classes and backgrounds: search it, drop a monster on the board, or add it straight to the turn order.</p>
+        <ul class="ticks"><li><b>Compendium</b> for D&amp;D 5e, Pathfinder 2e, Daggerheart, Blades in the Dark and Fate.</li><li><b>Eleven game systems</b> with their own dice rules, from plain dice to Call of Cthulhu, Powered by the Apocalypse, Vampire and Shadowrun.</li><li><b>Your own books</b> imported for your private games, kept in your browser or shared with the table.</li></ul>
+      </div>
+      <figure class="media"><img src="img/vtt-library.jpg" alt="The Library window searching the D&amp;D 5e compendium for dragons, beside the battle map" width="3200" height="1920" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+<section id="phone" class="alt">
+  <div class="wrap">
+    <div class="split phone">
+      <div>
+        <span class="eyebrow two">Anywhere</span>
+        <h2>Play from a phone.</h2>
+        <p class="sub">Critter VTT runs in any modern browser. On a phone, the board fills the screen and the dice and chat slide up from the bottom.</p>
+        <ul class="ticks"><li><b>No install</b> for players: open the link and type the lobby code.</li><li><b>The Windows app</b> adds a saves folder on your computer and updates itself.</li><li><b>Accessible</b> with keyboard control of tokens, screen reader labels and an accessibility menu.</li></ul>
+      </div>
+      <figure class="media"><img src="img/vtt-phone.jpg" alt="Critter VTT on a phone, showing the board and the dice tray in Seraphine’s green" width="1170" height="2532" loading="lazy"></figure>
+    </div>
+  </div>
+</section>
+<section id="more">
+  <div class="wrap">
+    <span class="eyebrow">And more</span>
+    <h2>The little things that help.</h2>
+    <div class="grid" style="margin-top:28px"><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v6M15 10v5M9 15v5"/></svg></div><h3>Scene builder</h3><p>Walls, doors, windows and lights, with fog of war that the GM reveals as the party explores.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg></div><h3>Rewind the table</h3><p>The server saves every ten minutes while you play. Rewind a lost evening, and undo the rewind too.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 20v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/></svg></div><h3>Players and seats</h3><p>The owner sets up the players; each person claims theirs with a name, token and colour.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h3>Trackers and clocks</h3><p>Progress clocks and trackers the whole table can see.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg></div><h3>Music at the table</h3><p>Critter Sounds streams to every player. Each player keeps their own volume.</p></div><div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></div><h3>GM tools</h3><p>Hidden rolls, a GM layer, an encounter builder, random tables and scenes prepared in advance.</p></div></div>
+  </div>
+</section>
+
+<section id="host" class="alt">
+  <div class="wrap">
+    <span class="eyebrow two">Host it yourself</span>
+    <h2>Your group, your server.</h2>
+    <p class="sub">Critter VTT connects through Homebase, a small server that keeps your tables and pushes every change live. Use the shared one, or run your own.</p>
+    <div class="grid"><div class="card two"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01"/></svg></div><h3>On Cloudflare</h3><p>A Worker on your own free Cloudflare account: one double-click on <code>setup-homebase.cmd</code> puts it online.</p></div><div class="card two"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div><h3>On your computer</h3><p>A small Node server: <code>node server.mjs --port 8787</code>. Players open its address in a browser.</p></div><div class="card two"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg></div><h3>Your data</h3><p>Tables, autosaves and uploaded music stay on your server, in a folder you can back up.</p></div></div>
     <p class="small" style="margin-top:20px">The full guide is in the <a href="https://github.com/booskers/crittervtt/blob/main/critboard-desktop/README.md">project README</a>.</p>
   </div>
 </section>
-
-<section id="sounds" class="sounds">
+<section id="family">
   <div class="wrap">
-    <div class="split rev">
-      <div class="media"><img src="img/sounds-game.png" alt="Critter Sounds: playlists, sound pads, soundscapes, scenes and effects side by side" loading="lazy" width="1280" height="820"></div>
-      <div>
-        <span class="eyebrow purple-t"><img src="img/sounds-icon.png" alt="">Pairs with Critter Sounds</span>
-        <h2>Music, played live to the table.</h2>
-        <p class="sub">Critter Sounds is the companion app for whoever runs the music. In Critter, the owner opens <b>Music</b>, copies the table's music code and pastes it into Critter Sounds. Everyone hears the music, and each player sets their own volume.</p>
-        <a class="btn purple" href="https://booskers.github.io/critter-sounds/">Meet Critter Sounds</a>
-      </div>
-    </div>
+    <span class="eyebrow">The Critter family</span>
+    <h2>Three apps, one table.</h2>
+    <p class="sub">Critter VTT is where you play. Critter Sounds runs the music, and Critter Notes keeps the campaign. They connect through the same Homebase.</p>
+    <div class="family"><div class="fam here" style="--c:#ff5c00"><img class="lg" src="img/logo-vtt.svg" alt="Critter VTT"><p>The free virtual tabletop: battle maps, 3D dice and sheets, in a browser or on Windows.</p><span class="here-tag">You’re here</span></div><a class="fam" href="https://booskers.github.io/critter-sounds/" style="--c:#8800ff"><img class="lg" src="img/logo-sounds.svg" alt="Critter Sounds"><p>Music, sound pads and soundscapes, played live to your table, Discord or Fluxer.</p><span class="go">Take a look →</span></a><a class="fam" href="https://booskers.github.io/critter-notes/" style="--c:#ffbd00"><img class="lg" src="img/logo-notes.svg" alt="Critter Notes"><p>Plan sessions, write the world, draw maps and boards, and send it all to the table.</p><span class="go">Take a look →</span></a></div>
   </div>
 </section>
-
-<section id="download">
+<section id="download" class="alt">
   <div class="wrap">
-    <span class="eyebrow" style="color:var(--muted)">Download</span>
-    <h2>Get Critter.</h2>
+    <span class="eyebrow">Download</span>
+    <h2>Get Critter VTT.</h2>
     <div class="dl">
-      <div class="dlcard c">
-        <img class="lg" src="img/critter-logo.svg" alt="Critter">
-        <p>The Windows app, with its own window and a saves folder on your computer.</p>
-        <div class="row">
-          <a class="btn red" href="https://github.com/booskers/crittervtt/releases/latest/download/Critter-Setup.exe">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg>
-            Critter for Windows</a>
-        </div>
+      <div class="dlcard main">
+        <img src="img/logo-vtt.svg" alt="Critter VTT" style="height:44px;width:auto;align-self:flex-start">
+        <p>The Windows app, with its own window, a saves folder on your computer, and updates from inside the app.</p>
+        <div class="row"><a class="btn primary" href="https://github.com/booskers/crittervtt/releases/latest/download/Critter-Setup.exe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/></svg> Critter VTT for Windows</a></div>
       </div>
       <div class="dlcard">
-        <h3 style="margin:0;font:700 30px var(--display)">In your browser</h3>
-        <p>Nothing to install. Works on computers, tablets and phones.</p>
-        <div class="row">
-          <a class="btn ghost" href="https://critter.poly-chrome.cc">Open critter.poly-chrome.cc</a>
-        </div>
+        <h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones.</p><div class="row"><a class="btn" href="https://critter.poly-chrome.cc"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 4l14 8-14 8z"/></svg> Open critter.poly-chrome.cc</a></div>
       </div>
     </div>
-    <p class="small" style="margin-top:20px">The installer isn't code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>. Every version is on the <a href="https://github.com/booskers/crittervtt/releases">Releases page</a>.</p>
-    <p class="small">Running the music for your group? Get <a href="https://booskers.github.io/critter-sounds/#download">Critter Sounds</a> too: it plays your playlists, sound pads and soundscapes live to everyone at the table.</p>
+    <p class="small" style="margin-top:20px">The installer isn’t code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>. Every version and what changed is on the <a href="https://github.com/booskers/crittervtt/releases">Releases page</a>.</p>
   </div>
 </section>
-
+</main>
 <footer>
   <div class="wrap">
-    <div>Critter · <a href="https://github.com/booskers/crittervtt">Source on GitHub</a> · MIT License</div>
-    <div>Icons from <a href="https://game-icons.net">game-icons.net</a> (CC BY 3.0).</div>
+    <div>Critter VTT · Made with love by booskers / Polychrome · <a href="https://github.com/booskers/crittervtt">Source on GitHub</a> · MIT License</div>
+    <div>Game icons from <a href="https://game-icons.net">game-icons.net</a> (CC BY 3.0) · Font: Atkinson Hyperlegible Next (OFL)</div>
   </div>
 </footer>
-
 </body>
 </html>
