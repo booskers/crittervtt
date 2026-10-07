@@ -18,6 +18,17 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 
 - In the Android app (1.3.1): Android's back gesture shows what it will close (a page, a dialog, the menu) shrinking and following your finger, as Android 14 and later do; let go to close it. Taps you feel (dice landing, a long press) use the phone's own haptics, which follow its touch-feedback setting.
 
+**Feels like an app**
+- Critter VTT opens at once, even on a poor connection: it's kept on the device and a fresh copy comes for next time (the home-screen app, the Android app, and browsers). The dice and fonts are kept too. The live table itself always comes from the Homebase.
+- Share the table's code from the lobby: the phone's share sheet (WhatsApp, Signal, Messages…) sends the code and a link that opens the table.
+- On a phone, pages slide in from the right, the menu from the left, and dialogs rise from the bottom.
+- A launch screen with the Critter mark: on iPhones and iPads added to the home screen, and in the Android app (until the table has drawn).
+- More you can feel: your turn starting, sending a roll, flipping a switch.
+- Phones and tablets stay awake while you're at a table.
+- "Tell me when it's my turn" (Settings): a notification when your turn comes while Critter VTT is in the background (the Android app, and browsers that allow notifications).
+- The Android app (1.4.0) does all of this natively: Android's share sheet, its own notifications (Android 13 asks first) and launch screen.
+- The self-hosted Homebase server no longer stops on a malformed web address; it answers "Bad request" and carries on.
+
 **More play on the same Homebase** (the free Cloudflare plan goes about 5–10 times as far)
 - Cursors: nothing is sent while you're alone at the table; another player's cursor arrives about 8 times a second (was 20) and glides smoothly in between; a stroke being drawn about 12 times a second. A tab in the background sends nothing.
 - The Homebase sends just the player whose cursor moved, not everyone's every time.

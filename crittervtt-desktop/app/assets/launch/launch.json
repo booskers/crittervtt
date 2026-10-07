@@ -1,0 +1,191 @@
+[
+ {
+  "file": "1320x2868.png",
+  "w": 440,
+  "h": 956,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1290x2796.png",
+  "w": 430,
+  "h": 932,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1284x2778.png",
+  "w": 428,
+  "h": 926,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1242x2688.png",
+  "w": 414,
+  "h": 896,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1206x2622.png",
+  "w": 402,
+  "h": 874,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1179x2556.png",
+  "w": 393,
+  "h": 852,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1170x2532.png",
+  "w": 390,
+  "h": 844,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "1125x2436.png",
+  "w": 375,
+  "h": 812,
+  "dpr": 3,
+  "o": "portrait"
+ },
+ {
+  "file": "828x1792.png",
+  "w": 414,
+  "h": 896,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "750x1334.png",
+  "w": 375,
+  "h": 667,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "640x1136.png",
+  "w": 320,
+  "h": 568,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2064x2752.png",
+  "w": 1032,
+  "h": 1376,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2752x2064.png",
+  "w": 1032,
+  "h": 1376,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "2048x2732.png",
+  "w": 1024,
+  "h": 1366,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2732x2048.png",
+  "w": 1024,
+  "h": 1366,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "1668x2388.png",
+  "w": 834,
+  "h": 1194,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2388x1668.png",
+  "w": 834,
+  "h": 1194,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "1640x2360.png",
+  "w": 820,
+  "h": 1180,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2360x1640.png",
+  "w": 820,
+  "h": 1180,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "1668x2224.png",
+  "w": 834,
+  "h": 1112,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2224x1668.png",
+  "w": 834,
+  "h": 1112,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "1620x2160.png",
+  "w": 810,
+  "h": 1080,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2160x1620.png",
+  "w": 810,
+  "h": 1080,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "1536x2048.png",
+  "w": 768,
+  "h": 1024,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2048x1536.png",
+  "w": 768,
+  "h": 1024,
+  "dpr": 2,
+  "o": "landscape"
+ },
+ {
+  "file": "1488x2266.png",
+  "w": 744,
+  "h": 1133,
+  "dpr": 2,
+  "o": "portrait"
+ },
+ {
+  "file": "2266x1488.png",
+  "w": 744,
+  "h": 1133,
+  "dpr": 2,
+  "o": "landscape"
+ }
+]

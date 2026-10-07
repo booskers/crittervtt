@@ -1582,6 +1582,16 @@ body.tab .dot::after{content:'';position:absolute;inset:-6px}
   body.tab .camptag{right:370px;max-width:min(460px,calc(100vw - 520px))}
   body.tab:not(.chatoff):not(.mob) .buildbar{left:calc(72px + (100vw - 72px - 364px) / 2);max-width:calc(100vw - 72px - 364px - 24px)}
 }
+/* pages slide in from the right, the menu from the left, dialogs rise from the bottom (translate, so the drag and back
+   gestures, which use transform, still work on top of it) */
+@media (prefers-reduced-motion:no-preference){
+  body.mob .fwin:not([hidden]){animation:pageIn .24s cubic-bezier(.2,.8,.2,1)}
+  body.mob .mmenu:not([hidden]){animation:drawerIn .22s cubic-bezier(.2,.8,.2,1)}
+  body.mob .overlay:not([hidden]):not(#splash):not(.cmenu) > .card{animation:sheetUp .26s cubic-bezier(.2,.8,.2,1)}
+}
+@keyframes pageIn{from{translate:30% 0;opacity:.2}to{translate:0 0;opacity:1}}
+@keyframes drawerIn{from{translate:-22% 0;opacity:.2}to{translate:0 0;opacity:1}}
+@keyframes sheetUp{from{translate:0 36%;opacity:.3}to{translate:0 0;opacity:1}}
 body.mob .menu{z-index:46}
 /* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
 body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
@@ -4203,6 +4213,7 @@ function buildRoller() {
   $('#rollForm').onsubmit = e => {
     e.preventDefault();
     const inp = $('#rollInput'), v = inp.value.trim(); if (!v) return;
+    buzz(0.2);
     if (needSeat()) return;
     const t = v.replace(/^\/r(oll)?\s+/i, '');
     const w = /^\/w(?:hisper)?\s+(.+)$/i.exec(v);
@@ -5879,6 +5890,12 @@ function paintSettingsPop() {
     tog('buzz', 'Buzz when your dice hit the table');
     if (window.DeviceMotionEvent) tog('motion', 'Tilt the phone to steer the dice, toss it to make them jump');
   }
+  if (coarse.matches || turnAlertsPossible()) {
+    box.append(el('div', 'sec-label', 'Your turn'));
+    const row = el('label', 'togglerow'), c = el('input'); c.type = 'checkbox'; c.checked = !!FEEL.turn;
+    c.onchange = async () => { if (c.checked && !(await askTurnAlerts())) { c.checked = false; return; } setFeel({ turn: c.checked }); };
+    row.append(c, el('span', '', 'Tell me when it\u2019s my turn while Critter VTT is in the background')); box.append(row);
+  }
   box.append(el('div', 'sec-label', 'You'));
   go('person', 'Your seat', 'Name, token and colour', () => openOnboard(true));
   go('palette', 'Look', 'Light or dark, highlight colour, fonts', () => openLook());
@@ -5978,7 +5995,7 @@ const coarse = matchMedia('(pointer: coarse)');
 if (IOS) { const vp = document.querySelector('meta[name=viewport]'); if (vp && !/maximum-scale/.test(vp.content)) vp.content += ',maximum-scale=1'; }
 const motionAsks = !!(window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function');
 // motion starts on everywhere; iPhones and iPads ask once, the first time the dice panel is touched
-let FEEL = { buzz: true, motion: true, ...(lsGet('tt.feel', {}) || {}) };
+let FEEL = { buzz: true, motion: true, turn: false, ...(lsGet('tt.feel', {}) || {}) };
 // (it was off on iOS until it could be asked for at the right moment: an old "off" that nobody chose goes)
 if (IOS && !lsGet('tt.feelAsked', 0)) { FEEL.motion = true; lsSet('tt.feelAsked', 1); }
 let buzzSwitch = null, lastBuzz = 0;
@@ -12390,7 +12407,9 @@ function renderLobbyPop() {
   code.title = lobReveal ? 'Click to hide the code' : 'Click to show the code'; code.setAttribute('aria-label', lobReveal ? `Lobby code ${S.lobby}. Click to hide it.` : 'Lobby code, hidden. Click to show it.');
   code.onclick = () => { lobReveal = !lobReveal; renderLobbyPop(); };
   const cp = btn('Copy', () => $('#copyCode').click(), 'ghost'); cp.title = 'Copy the code without showing it';
-  row.append(code, cp); p.append(row);
+  row.append(code, cp);
+  if (canShare()) { const sh = btn('Share', () => { closePop(); shareInvite(); }, 'primary'); sh.title = 'Send the code and a link to the table, with WhatsApp, Signal, Messages…'; row.append(sh); }
+  p.append(row);
   p.append(el('div', 'sec-label', 'Players'));
   if (isOwner()) p.append(btn(`Set up the players (${S.plist.length})`, () => { closePop(); dmTab = 'roles'; lsSet('tt.dmTab', 'roles'); toggleGmWin(true); }, '', 'id-card'));
   else { const pl = plOf(whoOf(S.uid)); p.append(el('p', 'hint pophint', pl ? `You're playing ${pl.name}.` : 'You are watching.'), btn(pl ? 'Switch player' : 'Pick a player', () => { closePop(); openPlayerPick(); }, pl ? '' : 'primary', 'id-card')); }
@@ -13860,6 +13879,49 @@ function offerMove() {
   document.body.append(bar);
 }
 setTimeout(offerMove, 2500);
+/* ---------------- feeling like an app on phones and tablets ---------------- */
+// an invite through the phone's own share sheet (WhatsApp, Signal, Messages…): the code, and a link that opens the table
+const canShare = () => !!((window.CritterAndroid && typeof window.CritterAndroid.share === 'function') || navigator.share);
+async function shareInvite() {
+  if (!S.lobby) return;
+  const url = 'https://live.crittervtt.com/#' + S.lobby, text = `Join my Critter VTT table: the code is ${S.lobby}.`;
+  if (window.CritterAndroid && typeof window.CritterAndroid.share === 'function') { window.CritterAndroid.share(text, url); return; }
+  try { await navigator.share({ title: 'Critter VTT', text, url }); }
+  catch (e) { if (!e || e.name !== 'AbortError') $('#copyCode').click(); }
+}
+// your turn while Critter VTT is in the background: a notification (the Android app's own, or the browser's)
+const turnAlertsPossible = () => !!((window.CritterAndroid && typeof window.CritterAndroid.notify === 'function') || ('Notification' in window && 'serviceWorker' in navigator && navigator.serviceWorker.controller));
+async function askTurnAlerts() {
+  if (window.CritterAndroid && typeof window.CritterAndroid.askNotify === 'function') { window.CritterAndroid.askNotify(); return true; }
+  if (!('Notification' in window)) { toast('This browser can\u2019t show notifications. Add Critter VTT to your home screen, or use the Android app.'); return false; }
+  const r = Notification.permission === 'granted' ? 'granted' : await Notification.requestPermission();
+  if (r !== 'granted') { toast('Notifications aren\u2019t allowed for this site, so Critter VTT can\u2019t tell you. You can allow them in the browser\u2019s site settings.'); return false; }
+  return true;
+}
+function turnAlert() {
+  const title = 'Your turn', body = `It\u2019s your turn at ${(S.campaign && S.campaign.title) || 'the table'}.`;
+  if (window.CritterAndroid && typeof window.CritterAndroid.notify === 'function') { try { window.CritterAndroid.notify(title, body); } catch {} return; }
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  const opts = { body, tag: 'critter-turn', renotify: true, icon: 'icon-192.png', badge: 'icon-192.png' };
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) navigator.serviceWorker.ready.then(r => r.showNotification(title, opts)).catch(() => {});
+  else try { new Notification(title, opts); } catch {}
+}
+// phones and tablets stay awake while you're at a table (the Android app keeps the screen on by itself)
+let wakeLock = null;
+async function keepAwake() {
+  try {
+    if (!('wakeLock' in navigator) || !coarse.matches) return;
+    const want = !!S.lobby && !document.hidden;
+    if (want && !wakeLock) { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { wakeLock = null; }); }
+    else if (!want && wakeLock) { const w = wakeLock; wakeLock = null; await w.release(); }
+  } catch {}
+}
+document.addEventListener('visibilitychange', keepAwake); setInterval(keepAwake, 20000);
+// a switch flipped on a touch screen gives a little tap
+document.addEventListener('change', e => { const t = e.target; if (t && t.matches && t.matches('input[type=checkbox], input[type=radio]')) buzz(0.12); }, true);
+// Critter VTT kept on the device (sw.js): it opens at once, even on a poor connection, and a fresh copy comes for next time
+if ('serviceWorker' in navigator && ((location.protocol === 'https:' && /(^|\.)(crittervtt\.com|poly-chrome\.cc|workers\.dev)$/.test(location.hostname)) || location.hostname === 'localhost'))
+  addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 /* the walkthrough: one card at a time, pointing at the thing it talks about */
 function offerTour(fromMenu) {
   const gm = isHost() || lsGet('tt.myRole', 'player') === 'gm';
@@ -17254,7 +17316,7 @@ function renderTurns() {
   w.hidden = !TRN.active || turnHidden || (mode === 'shared' && !S.lobby);
   if (TRN.active && TRN.cur && TRN.cur !== lastTurnCur) {
     lastTurnCur = TRN.cur;
-    if (TRN.cur === myTurnId()) { toast("It's your turn."); clack(0.6); }
+    if (TRN.cur === myTurnId()) { toast("It's your turn."); clack(0.6); buzz(0.9); if (FEEL.turn && (document.hidden || window.__critterAway)) turnAlert(); }
     if (followOn()) setTimeout(() => followTurn(true), 50);
     requestDraw();
   }

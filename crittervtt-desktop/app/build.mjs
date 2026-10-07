@@ -29,6 +29,9 @@ await build({ entryPoints: [join(here, 'shim', 'homebase-client.js')], bundle: t
 
 // the move from critter.poly-chrome.cc to live.crittervtt.com (see move.js): first, so a page that is only moving data never starts
 const moveJs = await readFile(join(here, 'move.js'), 'utf8');
+// iPhone and iPad launch screens (made by logo-src/launch-screens.py): one <link> per screen size
+const launch = existsSync(join(here, 'assets', 'launch', 'launch.json')) ? JSON.parse(await readFile(join(here, 'assets', 'launch', 'launch.json'), 'utf8')) : [];
+const launchTags = launch.map(l => `<link rel="apple-touch-startup-image" href="launch/${l.file}" media="(device-width: ${l.w}px) and (device-height: ${l.h}px) and (-webkit-device-pixel-ratio: ${l.dpr}) and (orientation: ${l.o})">`).join('\n');
 const wrap = body => `<!doctype html>
 <html lang="en">
 <head>
@@ -42,6 +45,7 @@ const wrap = body => `<!doctype html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Critter VTT">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+${launchTags}
 <script>${moveJs}</script>
 <script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)}; window.CRITTER_VERSION = ${JSON.stringify(version)};</script>
 <script src="homebase.js"></script>
@@ -56,6 +60,9 @@ await writeFile(join(out, 'index.html'), html);
 // Critter Music Link: hears and controls a table's music from outside, with the lobby code
 await writeFile(join(out, 'music.html'), wrap(await readFile(join(here, 'music-link.html'), 'utf8')));
 await cp(join(src, 'srd'), join(out, 'srd'), { recursive: true });
+if (launch.length) await cp(join(here, 'assets', 'launch'), join(out, 'launch'), { recursive: true, filter: f => !f.endsWith('.json') });
+// the service worker that keeps Critter VTT on the device (see sw.js): its version makes each release start over
+await writeFile(join(out, 'sw.js'), (await readFile(join(here, 'sw.js'), 'utf8')).replace('__VERSION__', version + '-' + Date.now().toString(36)));
 // the Critter icon for browser tabs and home screens
 for (const f of ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) await cp(join(here, 'assets', f), join(out, f));
 // installable from the browser (Chrome's "Install app", Safari's "Add to Home Screen"): its own window and home-screen icon.

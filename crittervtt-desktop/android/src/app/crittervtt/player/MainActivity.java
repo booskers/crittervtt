@@ -1,6 +1,12 @@
 package app.crittervtt.player;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.pm.PackageManager;
+import android.view.ViewTreeObserver;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.graphics.Color;
@@ -41,6 +47,8 @@ public class MainActivity extends Activity {
     ValueCallback<Uri[]> picked;
     Updater updater;
     int navPx, topPx;
+    boolean shown;   // the table has drawn: the launch screen can go
+    void pageShown() { if (!shown) { shown = true; findViewById(android.R.id.content).invalidate(); } }
 
     @Override
     protected void onCreate(Bundle saved) {
@@ -53,6 +61,14 @@ public class MainActivity extends Activity {
         web.setBackgroundColor(Color.rgb(11, 12, 15));
         root.addView(web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(root);
+        final View content = findViewById(android.R.id.content);
+        content.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
+            @Override public boolean onPreDraw() {
+                if (!shown) return false;
+                content.getViewTreeObserver().removeOnPreDrawListener(this); return true;
+            }
+        });
+        root.postDelayed(this::pageShown, 4000);
 
         // the table runs edge to edge, under the status bar and the navigation bar (the gesture handle), which float over
         // it in its colours. The page keeps its own buttons clear of them from --sat and --sab; a notch at the side and the
@@ -92,6 +108,8 @@ public class MainActivity extends Activity {
             @Override
             public void onPageFinished(WebView view, String url) { sendInsets(); moveStep(url); }
             @Override
+            public void onPageCommitVisible(WebView view, String url) { pageShown(); }
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 Uri u = req.getUrl();
                 if (ours(u)) return false;                     // the table stays here
@@ -125,8 +143,16 @@ public class MainActivity extends Activity {
 
     // a newer version of the app on GitHub? (checked on opening and on coming back, every few hours at most)
     @Override
+    protected void onPause() {
+        super.onPause();
+        if (web != null) web.evaluateJavascript("window.__critterAway = true", null);
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
+        if (web != null) web.evaluateJavascript("window.__critterAway = false", null);
+        try { getSystemService(NotificationManager.class).cancel(TURN); } catch (Exception ignored) { }
         if (updater != null) updater.check(false);
     }
 
@@ -145,6 +171,22 @@ public class MainActivity extends Activity {
         public String moveTake() { String d = moveData; return d == null ? "{}" : d; }
         @JavascriptInterface
         public void moveIn(boolean ok) { runOnUiThread(() -> moveEnd(ok)); }
+        // an invite through Android's share sheet (WhatsApp, Signal, Messages…)
+        @JavascriptInterface
+        public void share(String text, String url) {
+            runOnUiThread(() -> {
+                Intent s = new Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_SUBJECT, "Critter VTT").putExtra(Intent.EXTRA_TEXT, text + " " + url);
+                try { startActivity(Intent.createChooser(s, "Invite to the table")); } catch (Exception ignored) { }
+            });
+        }
+        // "your turn" while the app is in the background; Android 13 and later ask first (askNotify, from the setting)
+        @JavascriptInterface
+        public void notify(String title, String text) { runOnUiThread(() -> turnNote(title, text)); }
+        @JavascriptInterface
+        public void askNotify() {
+            if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission("android.permission.POST_NOTIFICATIONS") != PackageManager.PERMISSION_GRANTED)
+                runOnUiThread(() -> requestPermissions(new String[] { "android.permission.POST_NOTIFICATIONS" }, 42));
+        }
         // a tap you feel (dice landing, a menu opening): the phone's own haptics, light to strong (0..1)
         @JavascriptInterface
         public void haptic(double strength) {
@@ -156,6 +198,19 @@ public class MainActivity extends Activity {
         public void checkUpdate() { runOnUiThread(() -> { if (updater != null) updater.check(true); }); }
         @JavascriptInterface
         public String version() { return updater != null ? updater.myName() : ""; }
+    }
+
+    static final int TURN = 1;
+    void turnNote(String title, String text) {
+        NotificationManager nm = getSystemService(NotificationManager.class); if (nm == null) return;
+        NotificationChannel ch = new NotificationChannel("turns", "Your turn", NotificationManager.IMPORTANCE_HIGH);
+        ch.setDescription("When it's your turn at the table and Critter VTT is in the background");
+        nm.createNotificationChannel(ch);
+        Intent open = new Intent(this, MainActivity.class).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pi = PendingIntent.getActivity(this, 7, open, PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT);
+        Notification n = new Notification.Builder(this, "turns").setSmallIcon(app.critboard.player.R.drawable.ic_launcher_foreground).setColor(0xFFFF5C00)
+            .setContentTitle(title).setContentText(text).setContentIntent(pi).setAutoCancel(true).setCategory(Notification.CATEGORY_REMINDER).build();
+        try { nm.notify(TURN, n); } catch (Exception ignored) { }
     }
 
     // how tall the navigation bar is, in the page's pixels, for its --sab (safe area at the bottom)

@@ -334,8 +334,10 @@ function leaveRoom(ws, room) {
 
 /* ---------- http: health check, and the app itself when it's there ---------- */
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.json': 'application/json', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.ico': 'image/x-icon' };
+// one bad request never stops the server: it's answered (or logged), and everyone else keeps playing
+process.on('unhandledRejection', e => console.error('request failed:', e && e.message ? e.message : e));
 const server = createServer(async (req, res) => {
-  const url = new URL(req.url, 'http://x');
+  let url; try { url = new URL(req.url, 'http://x'); } catch { res.statusCode = 400; res.end('Bad request'); return; }
   res.setHeader('access-control-allow-origin', '*');
   if (url.pathname === '/health' || url.pathname === '/api/health') { res.setHeader('content-type', 'application/json'); res.end(JSON.stringify({ ok: true, service: 'homebase', players: [...wss.clients].length })); return; }
   // D&D Beyond imports, for a lobby's owner and co-owners (see ddb.mjs); sent as text so browsers skip a preflight
