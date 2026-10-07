@@ -499,6 +499,7 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .cmitem span{display:grid;gap:2px;min-width:0}
 .cmitem small{color:var(--muted);font-size:12px;line-height:1.3}
 .cmenufoot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:10px}
+.cmenufoot .cmenuback{flex:1 1 100%;justify-content:center}
 .polylink{display:inline-flex;align-items:center;gap:7px;color:var(--ink);text-decoration:none;font-weight:600}
 .polylink .gi{width:18px;height:18px;color:var(--accent-text)}
 .polylink small{color:var(--muted);font-weight:400;margin-left:4px}
@@ -1760,7 +1761,6 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 .campcard:focus-visible{outline:2px solid var(--accent-line);outline-offset:2px}
 .campcard .cthumb{aspect-ratio:16/10;width:100%;background:var(--panel) center/cover no-repeat;display:grid;place-items:center;color:var(--muted)}
 .campcard .cthumb svg{width:42%;height:42%;opacity:.6}
-.campcard .cthumb.logo{background-size:contain;background-color:var(--panel);background-origin:content-box;padding:10px}
 .campcard b{padding:0 10px;font-family:var(--f-display);font-weight:var(--w-display);font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .campcard small{padding:0 10px;color:var(--muted);font-size:12px;line-height:1.3}
 .campcard .cmore{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:8px;background:rgb(0 0 0/.45);color:#fff;display:grid;place-items:center;cursor:pointer}
@@ -3114,7 +3114,7 @@ async function enterLobby(code) {
     if (TX && TX.phase === 'in') { TX.pendingBg = d.bg || null; TX.pendingScenes = [d.scene, d.scenes]; }
     else { syncBackground(sanitizeBg(d.bg)); applyScenes(d.scene, d.scenes); }
     syncCamp(d.camp); SESS = sanitizeSess(d.sess); renderCampTag();
-    if (!CAMP.id && isOwner()) setTimeout(ensureCampId, 1500);
+    if (!CAMP.id && isOwner() && Date.now() - (+d.ts || 0) > 60000) setTimeout(ensureCampId, 1500);
     onIdentity(); renderQuick();
     if ($('#rulesBox') && !$('#rulesBox').hidden && !isHost()) { rulesDraft = cloneRules(S.rules); bgDraft = null; renderRulesForm(); }
   }, () => {}));
@@ -4419,7 +4419,7 @@ function buildOnboard() {
   $('#obCancel').onclick = closeOnboard;
   // the colour as highlight too, or kept apart: saved with the seat (before the seat's own save repaints)
   $('#obAccent').onchange = () => { obTouched = true; paintOnboard(); };
-  $('#obUiCustom').addEventListener('input', e => { obTouched = true; obUi = e.target.value; paintOnboard(); });
+  $('#obUiCustom').addEventListener('change', e => { obTouched = true; obUi = e.target.value; paintOnboard(); });
   $('#onboardForm').addEventListener('submit', () => {
     const L = lookPrefs(), want = $('#obAccent').checked ? 'mine' : (obUi === '#ff5c00' ? 'vtt' : obUi);
     if (want !== L.hl) lsSet('tt.look', { ...lsGet('tt.look', {}), hl: want });
@@ -4430,7 +4430,7 @@ function buildOnboard() {
     try { obPick.img = await avatarFromFile(f); obTouched = true; $('#obErr').hidden = true; paintOnboard(); }
     catch (er) { const e = $('#obErr'); e.textContent = er && er.message === 'type' ? 'Pick a picture file, like a .jpg or .png.' : 'That picture couldn\'t be used. Try another one.'; e.hidden = false; }
   };
-  $('#obColorCustom').addEventListener('input', e => { if (isHex(e.target.value)) { obTouched = true; obPick.color = e.target.value.toLowerCase(); paintOnboard(); } });
+  $('#obColorCustom').addEventListener('change', e => { if (isHex(e.target.value)) { obTouched = true; obPick.color = e.target.value.toLowerCase(); paintOnboard(); } });
   $('#onboardForm').onsubmit = e => {
     e.preventDefault();
     const p = sanitizeProfile({ name: $('#obName').value, ...obPick });
@@ -4484,10 +4484,12 @@ async function renderCampList() {
   if (tok !== campListTok) return;
   box.textContent = '';
   const { store, list } = res, top = list.slice(0, 5);
+  for (const c of top) if (!c.thumb && !c.logo) { try { const live = (await store.list(c.lobby)).find(m => m.live); if (live) { c.thumb = live.thumb || ''; c.logo = live.logo || ''; } } catch {} }
+  if (tok !== campListTok) return;
   for (const c of top) {
     const card = el('div', 'campcard'); card.setAttribute('role', 'listitem'); card.tabIndex = 0;
     const pic = lsGet(campPicKey(c), '') || c.logo || c.thumb || '';
-    const th = el('span', 'cthumb' + (pic && pic !== c.thumb ? ' logo' : '')); th.setAttribute('aria-hidden', 'true');
+    const th = el('span', 'cthumb'); th.setAttribute('aria-hidden', 'true');
     if (pic) th.style.backgroundImage = `url("${pic}")`; else th.innerHTML = icon((THEMES[c.sys] || THEMES.generic).emblem);
     const when = new Date(c.ts), title = c.title || (c.cid ? 'Untitled campaign' : `Table ${c.lobby}`);
     const sub = [SYSTEMS[c.sys] ? SYSTEMS[c.sys].name : '', c.sess, `${when.toLocaleDateString([], { day: 'numeric', month: 'short' })} ${when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`].filter(Boolean).join(' · ');
@@ -5549,7 +5551,7 @@ function buildTools() {
   }
   const cw = el('label', 'swcustom'); cw.id = 'inkCustomWrap'; cw.title = 'Any colour';
   const ci = el('input'); ci.type = 'color'; ci.id = 'inkCustom'; ci.setAttribute('aria-label', 'Pick any ink colour');
-  ci.oninput = () => setInk(ci.value.toLowerCase());
+  ci.onchange = () => setInk(ci.value.toLowerCase());
   cw.innerHTML = icon('palette'); cw.append(ci);
   swr.append(cw);
   pop.append(swr);
@@ -6921,7 +6923,7 @@ function buildBackground() {
   $('#bgSize').oninput = () => { bgDraft.size = +$('#bgSize').value; touch(); };
   $('#bgDim').oninput = () => { bgDraft.dim = +$('#bgDim').value; touch(); };
   $('#bgCenter').onclick = () => { centreBgOnView(); touch(); };
-  $('#clothColor').oninput = () => { sceneDraft.cloth = { ...sceneDraft.cloth, color: $('#clothColor').value }; requestDraw(); };
+  $('#clothColor').onchange = () => { sceneDraft.cloth = { ...sceneDraft.cloth, color: $('#clothColor').value }; requestDraw(); };
   $('#clothReset').onclick = () => { sceneDraft.cloth = { ...sceneDraft.cloth, color: null }; paintBgForm(); requestDraw(); };
   $('#clothGrid').onchange = () => { sceneDraft.cloth = { ...sceneDraft.cloth, grid: $('#clothGrid').checked }; requestDraw(); };
   const mvSet = patch => { sceneDraft.move = sanitizeMove({ ...sceneDraft.move, ...patch }, S.rules.sys); paintMoveForm(); requestDraw(); };
@@ -8963,7 +8965,7 @@ function openTokMenu(id, x, y) {
       const r = el('input'); r.type = 'number'; r.min = 0.5; r.max = 30; r.step = 0.5; r.value = a.r; r.setAttribute('aria-label', 'Radius in squares');
       const c = el('input'); c.type = 'color'; c.value = isHex(a.c) ? a.c : '#5aa2ff'; c.setAttribute('aria-label', 'Colour');
       const save = () => { const cur = S.shapes.get(id); if (!cur) return; putShape(id, { ...cur, aura: { k: kind.value, r: Math.max(0.5, Math.min(30, +r.value || 1)), c: c.value } }); };
-      kind.onchange = () => { if (kind.value === 'light' && c.value === '#5aa2ff') c.value = '#ffd27a'; save(); }; r.oninput = save; c.oninput = save;
+      kind.onchange = () => { if (kind.value === 'light' && c.value === '#5aa2ff') c.value = '#ffd27a'; save(); }; r.oninput = save; c.onchange = save;
       const off = el('button', 'btn small ghost', 'Remove'); off.type = 'button'; off.onclick = () => { const cur = S.shapes.get(id); if (cur) { const { aura: _a, ...rest } = cur; putShape(id, rest); } closeTokMenu(); };
       const row = el('div', 'aurarow'); row.append(HB.el('label', 'slab', 'Kind', kind), HB.el('label', 'slab', 'Radius (squares)', r), HB.el('label', 'slab', 'Colour', c), off);
       p.append(row); save();
@@ -12732,6 +12734,10 @@ function campSk(id, title) { const t = clampStr(title || '', 60).replace(/[^\w (
 // the lobby owner's page gives an older table (or a brand new one) its campaign id
 async function ensureCampId() {
   if (CAMP.id || !isOwner() || (mode === 'shared' && !S.lobbyLoaded)) return;
+  // the lobby as the Homebase has it now: a campaign that was just written there (a save being opened) wins over
+  // what this page last heard, which can be a moment out of date
+  if (shared()) { try { const d = (await db.doc(lobbyPath()).get()).data() || {}; const c = sanitizeCamp(d.camp); if (c.id) { CAMP = c; renderCampTag(); return; } CAMP = { ...CAMP, ...c }; } catch { return; } }
+  if (CAMP.id) return;
   const id = 'c' + newId().replace(/[^\w]/g, '').slice(-10);
   await saveCamp({ id, was: S.lobby || '' }).catch(() => {});
 }
@@ -13045,9 +13051,9 @@ async function localSave(label) {
     if (!label && sig === asSig && !(keepOne && asLastAt > asLastKept)) return null;
     for (const [id, src] of pics) if (!(await store.hasPic(lobby, id))) await store.putPic(lobby, id, src);
     const picList = [...pics.keys()], size = json.length + [...pics.values()].reduce((a, s) => a + s.length, 0);
-    const info = { title: CAMP.title || '', sys: S.rules.sys, sess: SESS ? sessLabel(SESS) : '', cid: CAMP.id || '', code: S.lobby || '', was: CAMP.was || '', ...saveThumbs() };
+    const info = { title: CAMP.title || '', sys: S.rules.sys, sess: SESS ? sessLabel(SESS) : '', cid: CAMP.id || '', code: S.lobby || '', was: CAMP.was || '' };
     // "Latest", rewritten every time
-    await store.put(lobby, { k: lobby + '|latest', ts: now, label: null, live: true, size, ...info }, json, picList);
+    await store.put(lobby, { k: lobby + '|latest', ts: now, label: null, live: true, size, ...info, ...saveThumbs() }, json, picList);
     asSig = sig; asLastAt = now; paintSaveBtn();
     if (!keepOne) return lobby + '|latest';
     // and a dated or named one that stays
@@ -13077,11 +13083,11 @@ function saveThumbs() {
   const now = Date.now();
   if (now - thumbAt > 60000 || !thumbBoard) {
     thumbAt = now;
-    try { const c = document.createElement('canvas'), w = 320, h = Math.round(320 * Math.min(0.75, innerHeight / innerWidth)); c.width = w; c.height = h; c.getContext('2d').drawImage(cv, 0, 0, cv.width, cv.width * h / w, 0, 0, w, h); thumbBoard = c.toDataURL('image/jpeg', 0.7); } catch { thumbBoard = ''; }
+    try { const c = document.createElement('canvas'), w = 480, h = Math.round(480 * Math.min(0.75, innerHeight / innerWidth)); c.width = w; c.height = h; c.getContext('2d').drawImage(cv, 0, 0, cv.width, cv.width * h / w, 0, 0, w, h); thumbBoard = c.toDataURL('image/jpeg', 0.7); } catch { thumbBoard = ''; }
   }
   if (campV !== thumbLogoV) {
     thumbLogoV = campV; thumbLogo = '';
-    if (campSrc) { const im = new Image(); im.onload = () => { try { const c = document.createElement('canvas'), k = Math.min(1, 200 / Math.max(im.naturalWidth, im.naturalHeight)); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); thumbLogo = c.toDataURL('image/webp', 0.8); } catch {} }; im.src = campSrc; }
+    if (campSrc) { const im = new Image(); im.onload = () => { try { const c = document.createElement('canvas'), k = Math.min(1, 400 / Math.max(im.naturalWidth, im.naturalHeight)); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); thumbLogo = c.toDataURL('image/webp', 0.8); } catch {} }; im.src = campSrc; }
   }
   return { thumb: thumbBoard, logo: thumbLogo };
 }
@@ -13181,7 +13187,6 @@ async function latestSaveElsewhere() {
 }
 
 /* ---------------- the Critter VTT menu (the logo above the chat, or Esc), help, first start and the walkthrough ---------------- */
-const POLYCHROME = 'https://poly-chrome.cc';
 const logoSvg = cls => { const s = document.querySelector('#panel .brand .logo-svg'); const c = s ? s.cloneNode(true) : el('span', '', 'Critter VTT'); c.classList.add(cls || 'menulogo'); c.removeAttribute('id'); return c; };
 // the splash while Critter VTT starts: the logo, what it is, and that it's an early version
 let splashT0 = performance.now();
@@ -13227,11 +13232,11 @@ function openCritterMenu() {
   item('scroll-quill', 'Credits', 'Icons, fonts, sounds and game content', () => { $('#creditsBox').hidden = false; });
   card.append(grid);
   const foot = el('div', 'cmenufoot');
-  const pc = el('a', 'polylink'); pc.href = POLYCHROME; pc.target = '_blank'; pc.rel = 'noopener'; pc.innerHTML = icon('paint-brush'); pc.append('Polychrome', el('small', '', 'poly-chrome.cc'));
-  const back = el('button', 'btn primary', 'Back to the table'); back.type = 'button'; back.onclick = closeCritterMenu;
+  const made = el('span', 'hint', 'Made with love by booskers / Polychrome.');
+  const back = el('button', 'btn primary cmenuback', 'Back to the table'); back.type = 'button'; back.onclick = closeCritterMenu;
   const gh = el('a', 'polylink'); gh.href = CRITTER_GITHUB; gh.target = '_blank'; gh.rel = 'noopener'; gh.innerHTML = GITHUB_SVG; gh.append('GitHub', el('small', '', 'crittervtt'));
   gh.onclick = e => { if (desktopUpdates()) { e.preventDefault(); openGitHub(); } };
-  foot.append(pc, gh, el('span', 'grow'), el('span', 'hint', 'Esc opens and closes this menu'), back);
+  foot.append(made, gh, el('span', 'grow'), el('span', 'hint', 'Esc opens and closes this menu'), back);
   card.append(foot);
   ov.onclick = e => { if (e.target === ov) closeCritterMenu(); };
   ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); closeCritterMenu(); } };
@@ -13251,7 +13256,7 @@ function openLook() {
     const swatches = (cur, list, pick, first) => {
       const w = el('div', 'lsw'); if (first) w.append(first);
       for (const c of list) { const b = el('button'); b.type = 'button'; b.style.setProperty('--c', c); b.title = c; b.setAttribute('aria-label', c); b.setAttribute('aria-pressed', String((cur || '').toLowerCase() === c)); b.onclick = () => { pick(c); draw(); }; w.append(b); }
-      const ci = el('input'); ci.type = 'color'; ci.value = isHex(cur) ? cur : '#ff5c00'; ci.title = 'Any colour'; ci.setAttribute('aria-label', 'Any colour'); ci.oninput = () => pick(ci.value); ci.onchange = () => draw(); w.append(ci);
+      const ci = el('input'); ci.type = 'color'; ci.value = isHex(cur) ? cur : '#ff5c00'; ci.title = 'Any colour'; ci.setAttribute('aria-label', 'Any colour'); ci.onchange = () => { pick(ci.value); draw(); }; w.append(ci);   // (when the picker closes: recolouring everything on each move made it lag)
       return w;
     };
     const seg = (cur, opts, pick, label) => { const s = el('div', 'seg'); s.setAttribute('role', 'group'); s.setAttribute('aria-label', label); for (const [v, t] of opts) { const b = el('button', 'segb', t); b.type = 'button'; b.setAttribute('aria-pressed', String(cur === v)); b.onclick = () => { pick(v); draw(); }; s.append(b); } return s; };
@@ -14019,7 +14024,7 @@ function renderBuildBar() {
     const L = builder.light, sel = [...S.selIds].filter(id => (S.shapes.get(id) || {}).t === 'light');
     const apply = patch => { Object.assign(L, patch); lsSet('tt.blight', L); for (const id of sel) { const s = S.shapes.get(id); if (s) putShape(id, { ...s, ...patch }); } requestDraw(); };
     const r = el('input'); r.type = 'number'; r.min = '0.5'; r.max = '60'; r.step = '0.5'; r.value = String(L.r); r.title = 'Radius in squares'; r.onchange = () => apply({ r: Math.max(0.5, Math.min(60, +r.value || 6)) });
-    const c = el('input'); c.type = 'color'; c.value = L.c; c.title = 'Colour'; c.oninput = () => apply({ c: c.value });
+    const c = el('input'); c.type = 'color'; c.value = L.c; c.title = 'Colour'; c.onchange = () => apply({ c: c.value });
     const i = el('input'); i.type = 'range'; i.min = '10'; i.max = '100'; i.value = String(Math.round(L.i * 100)); i.title = 'Intensity'; i.oninput = () => apply({ i: +i.value / 100 });
     const fx = el('select', 'ssel'); for (const [v, t] of [['flame', 'Flickering flame'], ['pulse', 'Slow pulse'], ['none', 'Steady']]) { const o = el('option', '', t); o.value = v; fx.append(o); } fx.value = L.fx; fx.onchange = () => apply({ fx: fx.value });
     bar.append(HB.el('span', 'bset', el('span', 'hint', sel.length ? `${plural(sel.length, 'light', 'lights')}:` : 'Radius'), r, c, i, fx));
