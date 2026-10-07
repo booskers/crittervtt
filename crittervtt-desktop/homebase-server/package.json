@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "Self-hosted Homebase for Critboard: live tables over WebSockets, stored in files.",
+  "description": "Self-hosted Homebase for Critter VTT: live tables over WebSockets, stored in files.",
   "scripts": {
     "start": "node server.mjs"
   },

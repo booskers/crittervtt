@@ -10,7 +10,7 @@ import { fileURLToPath } from 'node:url';
 import { build } from 'esbuild';
 
 const here = dirname(fileURLToPath(import.meta.url));
-const src = join(here, '..', '..', 'critboard');
+const src = join(here, '..', '..', 'crittervtt');
 const out = join(here, 'www');
 
 // empty www rather than delete it, so a running "wrangler dev" watching it doesn't block the build
@@ -45,7 +45,7 @@ ${body}
 </body>
 </html>
 `;
-const html = wrap(await readFile(join(src, 'critboard.html'), 'utf8'));
+const html = wrap(await readFile(join(src, 'crittervtt.html'), 'utf8'));
 await writeFile(join(out, 'index.html'), html);
 // Critter Music Link: hears and controls a table's music from outside, with the lobby code
 await writeFile(join(out, 'music.html'), wrap(await readFile(join(here, 'music-link.html'), 'utf8')));

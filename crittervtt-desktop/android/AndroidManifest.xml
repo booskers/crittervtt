@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Critter VTT for players: the table at critter.poly-chrome.cc in a full-screen window, opening on "Join a table". -->
+<!-- package (the app id) keeps the name from before the rename: Android treats a new id as a different app, with no updates.
+     The code itself is in app.crittervtt.player. -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="app.critboard.player"
     android:versionCode="6"
@@ -20,11 +22,17 @@
         android:hardwareAccelerated="true"
         android:usesCleartextTraffic="false">
         <activity
-            android:name=".MainActivity"
+            android:name="app.crittervtt.player.MainActivity"
             android:exported="true"
             android:launchMode="singleTask"
             android:configChanges="orientation|screenSize|screenLayout|smallestScreenSize|keyboard|keyboardHidden|navigation|uiMode|density"
-            android:windowSoftInputMode="adjustResize">
+            android:windowSoftInputMode="adjustResize" />
+        <!-- the launcher icon and invite links keep the activity's name from before the rename (app.critboard.player.MainActivity),
+             so icons people put on their home screen keep working after an update -->
+        <activity-alias
+            android:name="app.critboard.player.MainActivity"
+            android:targetActivity="app.crittervtt.player.MainActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -36,6 +44,6 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="critter.poly-chrome.cc" />
             </intent-filter>
-        </activity>
+        </activity-alias>
     </application>
 </manifest>

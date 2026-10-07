@@ -15,12 +15,12 @@ const GH = 'https://github.com/booskers';
 const APPS = {
   vtt: {
     name: 'Critter VTT', repo: 'crittervtt', out: join(ROOT, 'docs'), color: '#ff5c00', accent2: '#3cc4c4',
-    logo: join(ROOT, 'critboard-desktop', 'app', 'logo-src', 'critter-vtt-logo.svg'), icon: join(ROOT, 'critboard-desktop', 'app', 'assets', 'icon.png'),
+    logo: join(ROOT, 'crittervtt-desktop', 'app', 'logo-src', 'critter-vtt-logo.svg'), icon: join(ROOT, 'crittervtt-desktop', 'app', 'assets', 'icon.png'),
     setup: 'Critter-Setup.exe', tagline: 'the free virtual tabletop', short: 'The free virtual tabletop: battle maps, 3D dice and sheets, in a browser or on Windows.'
   },
   sounds: {
-    name: 'Critter Sounds', repo: 'critter-sounds', out: join(ROOT, 'critboard-desktop', 'music', 'docs'), color: '#8800ff', accent2: '#4cc9f0',
-    logo: join(ROOT, 'critboard-desktop', 'music', 'src', 'logo.svg'), icon: join(ROOT, 'critboard-desktop', 'music', 'assets', 'icon.png'),
+    name: 'Critter Sounds', repo: 'critter-sounds', out: join(ROOT, 'crittervtt-desktop', 'music', 'docs'), color: '#8800ff', accent2: '#4cc9f0',
+    logo: join(ROOT, 'crittervtt-desktop', 'music', 'src', 'logo.svg'), icon: join(ROOT, 'crittervtt-desktop', 'music', 'assets', 'icon.png'),
     setup: 'Critter-Sounds-Setup.exe', tagline: 'music and sound, played live to your table', short: 'Music, sound pads and soundscapes, played live to your table, Discord or Fluxer.'
   },
   notes: {
@@ -177,7 +177,7 @@ function page(k) {
     <h2>Your group, your server.</h2>
     <p class="sub">Critter VTT connects through Homebase, a small server that keeps your tables and pushes every change live. Use the shared one, or run your own.</p>
     <div class="grid">${card(['server', 'On Cloudflare', 'A Worker on your own free Cloudflare account: one double-click on <code>setup-homebase.cmd</code> puts it online.'], true)}${card(['layout', 'On your computer', 'A small Node server: <code>node server.mjs --port 8787</code>. Players open its address in a browser.'], true)}${card(['lock', 'Your data', 'Tables, autosaves and uploaded music stay on your server, in a folder you can back up.'], true)}</div>
-    <p class="small" style="margin-top:20px">The full guide is in the <a href="${GH}/crittervtt/blob/main/critboard-desktop/README.md">project README</a>.</p>
+    <p class="small" style="margin-top:20px">The full guide is in the <a href="${GH}/crittervtt/blob/main/crittervtt-desktop/README.md">project README</a>.</p>
   </div>
 </section>` : '';
   const family = `
@@ -269,7 +269,7 @@ ${how}${host}${family}${download}
 }
 
 /* ---------------- write the three sites ---------------- */
-const fontDir = join(ROOT, 'critboard-desktop', 'music', 'src');
+const fontDir = join(ROOT, 'crittervtt-desktop', 'music', 'src');
 const logoSvg = k => {
   let s = readFileSync(APPS[k].logo, 'utf8');
   // the Sounds logo takes its colours from the page; on its own (in an <img>) it needs them written in

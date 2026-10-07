@@ -27,26 +27,31 @@ Critter is a virtual tabletop that opens in a browser. Share a lobby code and yo
 
 <img src="docs/img/sounds-logo.svg" alt="Critter Sounds" height="40">
 
-The companion app for whoever runs the music: playlists, sound pads and soundscapes, streamed live to every player. It has its own repository, site and downloads: **[github.com/booskers/critter-sounds](https://github.com/booskers/critter-sounds)** · [booskers.github.io/critter-sounds](https://booskers.github.io/critter-sounds/). It uses Critter's music effects (the `MUSICFX` block of `critboard.html`) and Homebase client, which its build copies in.
+The companion app for whoever runs the music: playlists, sound pads and soundscapes, streamed live to every player. It has its own repository, site and downloads: **[github.com/booskers/critter-sounds](https://github.com/booskers/critter-sounds)** · [booskers.github.io/critter-sounds](https://booskers.github.io/critter-sounds/). It uses Critter's music effects (the `MUSICFX` block of `crittervtt.html`) and Homebase client, which its build copies in.
 
 ## What's in this repository
 
 | Folder | What it is |
 |---|---|
-| [`critboard/`](critboard) | The Critter page itself (`critboard.html`) and the rules compendium data (`srd/`). |
-| [`critboard-desktop/app`](critboard-desktop/app) | The Critter Windows app (Electron). |
-| [`critboard-desktop/homebase-cloudflare`](critboard-desktop/homebase-cloudflare) | Homebase, the server, as a Cloudflare Worker (free plan). |
-| [`critboard-desktop/homebase-server`](critboard-desktop/homebase-server) | Homebase as a self-hosted Node server. |
+| [`crittervtt/`](crittervtt) | The Critter page itself (`crittervtt.html`) and the rules compendium data (`srd/`). |
+| [`crittervtt-desktop/app`](crittervtt-desktop/app) | The Critter Windows app (Electron). |
+| [`crittervtt-desktop/homebase-cloudflare`](crittervtt-desktop/homebase-cloudflare) | Homebase, the server, as a Cloudflare Worker (free plan). |
+| [`crittervtt-desktop/homebase-server`](crittervtt-desktop/homebase-server) | Homebase as a self-hosted Node server. |
 | [`docs/`](docs) | This project's website (GitHub Pages). |
 
-Folder and package names still say *critboard*, Critter's earlier name; they're kept so existing tables and installs keep working.
+Critter VTT was called *Critboard* at first. Everything is named Critter VTT now, except a few identities that existing tables, saves and installs depend on, which keep the old name on purpose:
 
-Setup, building, the Homebase protocol and the full feature notes are in **[critboard-desktop/README.md](critboard-desktop/README.md)**.
+- the app ids `app.critboard.desktop`, `app.critboard.music`, `app.critboard.notes` and Android's `app.critboard.player` (a new id would be a different app: no updates, a second install);
+- `app://critboard/`, the desktop app's own address (its browser saves and settings live there);
+- `critboard-player:` in player password hashes, the `critboard-music` database, and the Homebase Worker `critboard-homebase` (its stored tables);
+- reading old exports (`"critboard": "table-export"`) and the old `Critboard` data folders, so nothing made before the rename is lost.
+
+Setup, building, the Homebase protocol and the full feature notes are in **[crittervtt-desktop/README.md](crittervtt-desktop/README.md)**.
 
 ### Quick start
 
 ```bash
-cd critboard-desktop/app
+cd crittervtt-desktop/app
 npm install
 npm start
 ```

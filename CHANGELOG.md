@@ -1,7 +1,11 @@
 # Changelog
 
-Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
+Critter VTT (the page, `crittervtt/crittervtt.html`, and the desktop app in `crittervtt-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
+
+## Unreleased
+- In the Android app, the version of the app shows next to "Made with love" (the Critter VTT menu and Help).
+- For developers: the code says Critter VTT instead of Critboard. `critboard/critboard.html` is now `crittervtt/crittervtt.html`, `critboard-desktop/` is `crittervtt-desktop/`, and `window.CRITBOARD_DESKTOP` is `window.CRITTER_DESKTOP` (the old name still works). App ids, the desktop app's storage, password hashes and the Homebase keep their old names on purpose, so nothing existing breaks: see the README.
 
 ## 1.3.1 (website and Android, 2026-10-07)
 - On a phone, the start screens (Take a seat, Find your table) float as a card with margins that fit the screen, from small phones to large ones, and keep clear of notches. They were wider than the screen, with no margins. Every phone dialog now fits the screen's width.

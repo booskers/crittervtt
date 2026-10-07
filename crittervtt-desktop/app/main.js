@@ -132,7 +132,7 @@ function critterMenu(win) {
     { label: 'Second seat on this computer', click: () => openWindow('persist:seat2'), toolTip: 'A separate player, for testing or hot-seat play' },
     { label: 'Music Link', click: () => openWindow(undefined, 'music.html'), toolTip: 'Hear or control a table\'s music in its own window' },
     { type: 'separator' },
-    { label: 'Homebase…', click: () => { if (wc) wc.executeJavaScript('window.CRITBOARD_DESKTOP && window.CRITBOARD_DESKTOP.changeHomebase()'); } },
+    { label: 'Homebase…', click: () => { if (wc) wc.executeJavaScript('window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.changeHomebase()'); } },
     { type: 'separator' },
     { label: 'View', submenu: [
       { label: 'Reload', accelerator: 'CmdOrCtrl+R', click: () => wc && wc.reload() },
@@ -231,12 +231,12 @@ app.whenReady().then(() => {
     }, 4000));
     win.webContents.on('cb-selftest', async () => {
       const report = await win.webContents.executeJavaScript(`(async () => ({
-        title: document.title, desktop: !!window.CRITBOARD_DESKTOP, relay: (window.CRITBOARD_DESKTOP || {}).relay,
+        title: document.title, desktop: !!window.CRITTER_DESKTOP, relay: (window.CRITTER_DESKTOP || {}).relay,
         claude: !!window.claude, titleBarLink: typeof window.critterDesktop + (window.__critterBar ? ', watching the theme' : ', not watching'), board: !!document.querySelector('#board'), tools: document.querySelectorAll('#tools .tb').length,
         musicLink: await fetch('music.html').then(r => r.ok && r.text()).then(t => !!t && t.includes('Critter Music Link')).catch(() => false),
         srd: await fetch('srd/index.json').then(r => r.ok ? r.json() : null).then(j => j ? Object.keys(j.systems).join(',') : 'missing').catch(e => 'error ' + e.message),
-        homebase: window.CRITBOARD_DESKTOP ? window.CRITBOARD_DESKTOP.mode || 'not chosen' : 'missing',
-        serverHealth: window.CRITBOARD_DESKTOP && window.CRITBOARD_DESKTOP.server ? await fetch(window.CRITBOARD_DESKTOP.server + '/health').then(r => r.json()).then(j => j.ok).catch(e => 'error ' + e.message) : 'no server'
+        homebase: window.CRITTER_DESKTOP ? window.CRITTER_DESKTOP.mode || 'not chosen' : 'missing',
+        serverHealth: window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.server ? await fetch(window.CRITTER_DESKTOP.server + '/health').then(r => r.json()).then(j => j.ok).catch(e => 'error ' + e.message) : 'no server'
       }))()`);
       fs.writeFileSync(require('node:path').join(process.env.CB_SELFTEST, 'selftest.json'), JSON.stringify(report, null, 2));
       // CB_SELFTEST_JS: something to run in the page before the screenshots (e.g. switch the theme)

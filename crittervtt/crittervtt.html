@@ -8903,7 +8903,7 @@ function newCharacter() {
 }
 
 /* ---------------- drag and drop ---------------- */
-const DND = 'application/x-critboard';
+const DND = 'application/x-crittervtt';
 let dragNow = null;
 function dragPayload(ev, p) { dragNow = p; try { ev.dataTransfer.setData(DND, JSON.stringify(p)); ev.dataTransfer.setData('text/plain', p.name || ''); ev.dataTransfer.effectAllowed = 'copyMove'; } catch {} }
 addEventListener('dragend', () => { dragNow = null; document.querySelectorAll('.dropok').forEach(x => x.classList.remove('dropok')); });
@@ -13066,6 +13066,8 @@ const desktopSaves = () => window.critterDesktop && window.critterDesktop.saves;
 // the desktop app's updates (from GitHub), and the GitHub page itself
 const desktopUpdates = () => window.critterDesktop && window.critterDesktop.updates;
 // Critter VTT for Android checks GitHub for a newer app by itself (every hour at most); this asks it to look now
+// "Made with love", and in the Android app which version of it this is
+const madeWithLove = (more = '') => { const AU = androidUpdates(); return 'Made with love by booskers / Polychrome.' + more + (AU && AU.version ? ' · Critter VTT for Android ' + AU.version : ''); };
 const androidUpdates = () => { const A = window.CritterAndroid; if (!A || typeof A.checkUpdate !== 'function') return null; let v = ''; try { v = A.version() || ''; } catch {} return { check: () => A.checkUpdate(), version: v }; };
 const CRITTER_GITHUB = 'https://github.com/booskers/crittervtt';
 const GITHUB_SVG = '<svg class="gi" viewBox="0 0 24 24" aria-hidden="true" style="fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4M9 18c-4.51 2-5-2-7-2"/></svg>';
@@ -13358,11 +13360,11 @@ function openCritterMenu() {
   item('rolling-dices', 'Roll guide', 'How to write any roll', openGuide);
   item('wizard-staff', 'GM tools', 'Effects, fog, handouts, rules', () => toggleGmWin(), host);
   if (document.fullscreenEnabled) item('eye-target', document.fullscreenElement ? 'Leave full screen' : 'Full screen', 'Just the table', () => (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()).catch(() => {}));
-  item('world', 'Homebase', 'Where this app connects', () => window.CRITBOARD_DESKTOP.changeHomebase(), !!(window.CRITBOARD_DESKTOP && window.CRITBOARD_DESKTOP.changeHomebase));
+  item('world', 'Homebase', 'Where this app connects', () => window.CRITTER_DESKTOP.changeHomebase(), !!(window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.changeHomebase));
   item('scroll-quill', 'Credits', 'Icons, fonts, sounds and game content', () => { $('#creditsBox').hidden = false; });
   card.append(grid);
   const foot = el('div', 'cmenufoot');
-  const made = el('span', 'hint', 'Made with love by booskers / Polychrome.');
+  const made = el('span', 'hint', madeWithLove());
   const back = el('button', 'btn primary cmenuback', away ? 'Close' : 'Back to the table'); back.type = 'button'; back.onclick = closeCritterMenu;
   const gh = el('a', 'polylink'); gh.href = CRITTER_GITHUB; gh.target = '_blank'; gh.rel = 'noopener'; gh.innerHTML = GITHUB_SVG; gh.append('GitHub', el('small', '', 'crittervtt'));
   gh.onclick = e => { if (desktopUpdates()) { e.preventDefault(); openGitHub(); } };
@@ -13536,7 +13538,7 @@ function openHelp() {
   tourP.type = tourG.type = done.type = 'button';
   tourP.onclick = () => { ov.remove(); startTour('player'); }; tourG.onclick = () => { ov.remove(); startTour('gm'); }; done.onclick = () => ov.remove();
   card.append(h, el('div', 'sec-label', 'Keys and mouse'), tbl, more, HB.el('div', 'prow end', tourP, tourG, desktopUpdates() || androidUpdates() ? updB : null, ghB, el('span', 'grow'), done),
-    el('p', 'hint', 'Made with love by booskers / Polychrome. Open source, MIT License.'));
+    el('p', 'hint', madeWithLove(' Open source, MIT License.')));
   ov.onclick = e => { if (e.target === ov) ov.remove(); }; ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); ov.remove(); } };
   ov.append(card); document.body.append(ov); done.focus();
 }
@@ -15035,7 +15037,7 @@ function sha256(str) {
 }
 // remote link: an outside app (Critter Music Link, or your own) sends commands with the lobby code and this key
 const musNormKey = k => String(k || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
-const musOutside = () => !!(window.CRITBOARD_DESKTOP && window.CRITBOARD_DESKTOP.mode && window.CRITBOARD_DESKTOP.mode !== 'offline');
+const musOutside = () => !!(window.CRITTER_DESKTOP && window.CRITTER_DESKTOP.mode && window.CRITTER_DESKTOP.mode !== 'offline');
 function musNewKey() {
   const k = Array.from(crypto.getRandomValues(new Uint8Array(10)), v => 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'[v % 32]).join('');
   musShownKey = k; lsSet('tt.musKey.' + S.lobby, k); musWrite({ lk: sha256(k) });

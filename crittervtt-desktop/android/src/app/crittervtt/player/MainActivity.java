@@ -1,4 +1,4 @@
-package app.critboard.player;
+package app.crittervtt.player;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;

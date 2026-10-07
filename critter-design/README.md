@@ -210,7 +210,7 @@ Add `tokens.css` first, set the inputs, then alias the old names so existing rul
 - Window headers: move the close button out of the foldable group; everything else folds into ⋯ below 300px.
 - Drop the 1px borders on `.tile`, `.th`, `.btn`, `.chip`, `.connhint`, `.hint.note`; draw `select` and `input[type=checkbox]` (the sleep timer, output and "Here" controls are OS widgets today). Replace `rgba(255,255,255,x)` literals with `--hover`/`--press` so light mode works.
 
-**Critter** (`critboard/critboard.html`)
+**Critter** (`crittervtt/crittervtt.html`)
 - Game-system THEMES set `--bg/--panel/--panel-2/--ink/--muted/--line/--hover` and fonts per system. Keep that: either map `--tone-dark` from the system's `--bg` and let surfaces derive, or alias `--surface-1` → `--panel`. Systems' decorative borders and frames are identity and stay.
 - The app is renamed **Critter VTT** in visible text. The default accent becomes `#ff5c00` (today `#c9a45c` gold). `applyAccent()` keeps setting `--accent` from the player's colour; add `--accent-2` and a "Look" section in the Critter menu (Esc), the app's settings area, with colours, scheme, the font pairing and picture colour.
 - Keep the chat exactly as structured today (`renderEntryCore`: `.entry`, `.rres`, `.total`, `.rline`, `.dice`, `.die.d4…d20`); restyle it with the tokens as in `components.css`. Avatars stay flat (`.av`). Dropped dice change from faded (`opacity:.35`) to grey and struck through, which keeps the number readable.

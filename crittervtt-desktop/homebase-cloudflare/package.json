@@ -1,8 +1,8 @@
 {
-  "name": "critboard-homebase-cloudflare",
+  "name": "crittervtt-homebase-cloudflare",
   "private": true,
   "type": "module",
-  "description": "Homebase for Critboard on Cloudflare Workers and Durable Objects.",
+  "description": "Homebase for Critter VTT on Cloudflare Workers and Durable Objects.",
   "scripts": {
     "dev": "wrangler dev",
     "site": "node ../app/build.mjs",

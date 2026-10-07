@@ -194,7 +194,7 @@ li button:hover{color:var(--accent)}
     const err = $('#err'); err.textContent = '';
     code = norm($('#code').value); key = norm($('#key').value);
     if (!code) { $('#code').focus(); return; }
-    if (!window.claude) { err.textContent = 'Choose where you play first (Homebase, or your own Homebase server).'; if (window.CRITBOARD_DESKTOP) window.CRITBOARD_DESKTOP.changeHomebase(); return; }
+    if (!window.claude) { err.textContent = 'Choose where you play first (Homebase, or your own Homebase server).'; if (window.CRITTER_DESKTOP) window.CRITTER_DESKTOP.changeHomebase(); return; }
     $('#go').disabled = true; $('#go').textContent = 'Connecting…';
     try {
       db = await window.claude.use('db'); const rm = await window.claude.use('room');

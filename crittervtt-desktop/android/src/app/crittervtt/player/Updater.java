@@ -1,4 +1,4 @@
-package app.critboard.player;
+package app.crittervtt.player;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -32,7 +32,7 @@ import java.net.URL;
 class Updater {
     static final String BASE = "https://github.com/booskers/crittervtt/releases/latest/download/";
     static final String INFO = BASE + "critter-player.json", APK = BASE + "Critter-VTT-Player.apk";
-    static final String DONE = "app.critboard.player.INSTALLED";
+    static final String DONE = "app.crittervtt.player.INSTALLED";
     static final long EVERY = 60 * 60 * 1000L;   // on its own: every hour at most (and "Check for updates" any time)
 
     final Activity a;

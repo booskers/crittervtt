@@ -28,7 +28,7 @@ After that:
 
 ### Updating the live site
 
-After changing the page (`critboard/critboard.html`) or the Homebase client, run `npm run deploy` in `homebase-cloudflare`. It rebuilds `app/www` and puts it and the Worker online. It doesn't build the desktop installer.
+After changing the page (`crittervtt/crittervtt.html`) or the Homebase client, run `npm run deploy` in `homebase-cloudflare`. It rebuilds `app/www` and puts it and the Worker online. It doesn't build the desktop installer.
 
 ## Run your own Homebase server instead
 
@@ -112,7 +112,7 @@ The claude.ai artifact has the same music player, but outside apps can only conn
 
 ## Building and testing
 
-After changing `critboard/critboard.html` (the artifact) or Homebase:
+After changing `crittervtt/crittervtt.html` (the artifact) or Homebase:
 
 ```
 cd app
@@ -264,9 +264,9 @@ npm run dist
 - **Not included:** Tabletop Audio's SoundPad sounds, which its license keeps on its own site.
 
 **How it works:**
-- **Signaling:** the app joins the lobby's room with presence `{ dj: 1, ... }` and the topic `music-live`, as described in the `MUSICLIVE` block of `critboard.html`.
+- **Signaling:** the app joins the lobby's room with presence `{ dj: 1, ... }` and the topic `music-live`, as described in the `MUSICLIVE` block of `crittervtt.html`.
 - **Streaming:** it streams to each page over WebRTC (stereo Opus).
-- **Effects code:** lives only in the `MUSICFX` block of `critboard.html`; `music/build.mjs` copies it in.
+- **Effects code:** lives only in the `MUSICFX` block of `crittervtt.html`; `music/build.mjs` copies it in.
 - **Network:** players behind very strict networks may not connect, because there's no TURN relay, only STUN.
 
 **Building:** `cd music`, `npm install`, `npm run dist`. It uses `app/homebase.config.json` for its Homebase. `CBM_USERDATA=<folder>` keeps a separate library, for testing.
