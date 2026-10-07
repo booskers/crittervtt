@@ -74,9 +74,15 @@ function take(b, cost) {
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 // the keep-alive the apps send every 25 s: Cloudflare answers it without waking the hub, and it isn't billed
 const PING = '{"t":"ping"}', PONG = '{"t":"pong"}';
-// a player's presence that is kept through hibernation (name, look, scene: what others need to show them), not the
-// cursor or a stroke being drawn, which are sent again as soon as they change
-const presCore = p => { const o = {}; for (const k of ['n', 'a', 'c', 'sc', 'dj']) if (p && p[k] !== undefined) o[k] = p[k]; return o; };
+// a player's presence that is kept through hibernation: everything but what moves all the time (the cursor, a stroke
+// being drawn, a measurement, a ping), which is sent again as soon as it changes. Critter VTT keeps its name, look and
+// scene this way, Critter Sounds its name and kind in the "lan" room. (If it's big, just the name, look and scene.)
+const FLEETING = new Set(['x', 'y', 'd', 'm', 'pg']);
+const presCore = p => {
+  const o = {}; for (const [k, v] of Object.entries(p || {})) if (!FLEETING.has(k)) o[k] = v;
+  if (JSON.stringify(o).length <= 600) return o;
+  const s = {}; for (const k of ['n', 'a', 'c', 'sc', 'dj']) if (o[k] !== undefined) s[k] = o[k]; return s;
+};
 const HOUR = 3600e3;
 /* "lan": Critter Sounds finds the other Critter Sounds on the same network here. Everyone whose connection comes from the
    same network shares one room: the same public IPv4 address, the same IPv6 /64 (and, on a server in the home itself,
