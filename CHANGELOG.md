@@ -3,6 +3,31 @@
 Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
+## 1.2.0 (2026-10-07)
+**Highlights**
+- Your campaigns on the start screen: the five latest with a picture, the game system and when you last played. Click one to carry on; right-click (or its cog) to open an older save or give it a picture.
+- A new table code every evening: opening a campaign starts a fresh lobby, and leaving or quitting saves and closes it. Players, passwords and who sits where come along in the save.
+- A hands-on walkthrough for players and for GMs: try things as you go, and steps move on by themselves once you have.
+- Critter Setup, a new installer in the Critter look; updates now download only what changed.
+- Scenes: a delete button, drag to reorder, Undo (Ctrl+Z) for every scene change, and Reset the grid alignment.
+
+**Campaigns and tables**
+- Saves are named after the campaign (Documents › CritterVTT › Saves), and older saves under a lobby code join their campaign.
+- Away from a table, "Find your table" stays open: Critter VTT is used at your own table or someone else's.
+- A table from last time that's still open is saved and closed the next time you start.
+- Players see "The GM closed this table" when the GM leaves.
+
+**Writing and saving**
+- Notes save as you type, a new note too, and anything still being typed is saved before Critter VTT closes or you leave a table.
+- Closing the desktop app with unsaved changes asks whether to save first (an update saves without asking).
+
+**Accessibility**
+- A font for dyslexia (OpenDyslexic, Lexend where it can't load) in Accessibility and the Look.
+
+**Fixes**
+- "Who are you playing?" no longer pops up again when the GM's page reloads.
+- The turn order's current turn stays in its place in the list.
+
 ## 1.1.0 (2026-10-07)
 **Highlights**
 - Updates inside the desktop app: it checks GitHub when it starts (Settings › Updates turns that off), shows the most important changes, and updates with one click: a progress bar for the download, then the installer's own, and Critter VTT opens again.
