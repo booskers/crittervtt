@@ -12938,7 +12938,9 @@ function folderSaves(fs, label, open) {
     async hasPic(lobby, id) { return !!(await fs.read(`${safe(lobby)}/pictures/${safe(id)}.txt`)); },
     async putPic(lobby, id, data) { await fs.write(`${safe(lobby)}/pictures/${safe(id)}.txt`, data); },
     async getPic(lobby, id) { return fs.read(`${safe(lobby)}/pictures/${safe(id)}.txt`); },
-    async prunePics(lobby, used) { for (const f of await fs.list(`${safe(lobby)}/pictures`)) { const id = f.name.replace(/\.txt$/, ''); if (!f.dir && !used.has(id)) await fs.remove(`${safe(lobby)}/pictures/${f.name}`); } },
+    // (a picture's file has its id made file-safe, "256n.1hgdtb8" is "256n_1hgdtb8.txt": compare like with like, or every
+    // picture looks unused and goes; that wiped the pictures of every save in a folder until 1.2.4)
+    async prunePics(lobby, used) { const keep = new Set([...used].map(safe)); for (const f of await fs.list(`${safe(lobby)}/pictures`)) { const id = f.name.replace(/\.txt$/, ''); if (!f.dir && !keep.has(id)) await fs.remove(`${safe(lobby)}/pictures/${f.name}`); } },
     async lobbies() { const out = []; for (const d of await fs.list('.')) if (d.dir) { const list = await idx(d.name); const best = list.reduce((a, m) => (!a || m.ts > a.ts ? m : a), null); if (best) out.push({ ...best, lobby: best.lobby || d.name }); } return out; }
   };
 }
