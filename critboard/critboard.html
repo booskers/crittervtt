@@ -59,6 +59,8 @@ a{color:var(--accent-text)}
 /* other people's cursors */
 #cursors{position:fixed;inset:0;pointer-events:none;overflow:hidden}
 .cur{position:absolute;left:0;top:0;transition:transform 90ms linear;will-change:transform}
+/* "cur" also marks the current turn and your own seat in a list: those stay where they are */
+.turn.cur,.plopt.cur{position:static;transform:none;transition:none;will-change:auto}
 .cur .dot{position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;background:var(--c);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--c)}
 .cur .tag{position:absolute;left:10px;top:8px;white-space:nowrap;font-size:12px;font-weight:700;padding:1px 6px 2px;border-radius:4px;background:var(--c);color:var(--cink,#fff)}
 .cur.idle{opacity:.45}
