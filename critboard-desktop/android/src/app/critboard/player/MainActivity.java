@@ -132,6 +132,11 @@ public class MainActivity extends Activity {
             try { c = Color.parseColor(color); } catch (IllegalArgumentException e) { return; }
             runOnUiThread(() -> barsLike(c, light));
         }
+        // the page's "Check for updates" (the Critter VTT menu and Help)
+        @JavascriptInterface
+        public void checkUpdate() { runOnUiThread(() -> { if (updater != null) updater.check(true); }); }
+        @JavascriptInterface
+        public String version() { return updater != null ? updater.myName() : ""; }
     }
 
     // how tall the navigation bar is, in the page's pixels, for its --sab (safe area at the bottom)

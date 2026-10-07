@@ -33,7 +33,7 @@ class Updater {
     static final String BASE = "https://github.com/booskers/crittervtt/releases/latest/download/";
     static final String INFO = BASE + "critter-player.json", APK = BASE + "Critter-VTT-Player.apk";
     static final String DONE = "app.critboard.player.INSTALLED";
-    static final long EVERY = 6 * 60 * 60 * 1000L;
+    static final long EVERY = 60 * 60 * 1000L;   // on its own: every hour at most (and "Check for updates" any time)
 
     final Activity a;
     final SharedPreferences prefs;
@@ -53,19 +53,30 @@ class Updater {
         } catch (Exception e) { return Long.MAX_VALUE; }
     }
 
-    /** on start and on coming back: look for a newer version (quietly, and not more than every few hours) */
-    void check(boolean now) {
+    String myName() {
+        try { return a.getPackageManager().getPackageInfo(a.getPackageName(), 0).versionName; } catch (Exception e) { return ""; }
+    }
+
+    void say(String t) { a.runOnUiThread(() -> Toast.makeText(a, t, Toast.LENGTH_LONG).show()); }
+
+    /** on start and on coming back: look for a newer version quietly, every hour at most. By hand ("Check for updates"):
+     *  right away, a version skipped before is offered again, and it says how it went */
+    void check(boolean byHand) {
         if (waitingFor != null) { String v = waitingFor; waitingFor = null; if (canInstall()) download(v); return; }
         long last = prefs.getLong("checked", 0);
-        if (busy || (!now && System.currentTimeMillis() - last < EVERY)) return;
+        if (busy) { if (byHand) say("Already checking for updates…"); return; }
+        if (!byHand && System.currentTimeMillis() - last < EVERY) return;
         busy = true;
+        if (byHand) say("Checking for updates…");
         new Thread(() -> {
             try {
-                JSONObject j = new JSONObject(new String(fetch(INFO), "UTF-8"));
+                JSONObject j = new JSONObject(new String(fetch(INFO + "?t=" + System.currentTimeMillis()), "UTF-8"));
                 long code = j.getLong("versionCode"); String name = j.optString("versionName", "");
                 prefs.edit().putLong("checked", System.currentTimeMillis()).apply();
-                if (code > myVersion() && code != prefs.getLong("skipped", -1)) a.runOnUiThread(() -> offer(code, name));
-            } catch (Exception ignored) {   // offline, or GitHub unreachable: try again next time
+                if (code > myVersion() && (byHand || code != prefs.getLong("skipped", -1))) a.runOnUiThread(() -> offer(code, name));
+                else if (byHand) say("Critter VTT for Android " + myName() + " is up to date.");
+            } catch (Exception e) {   // offline, or GitHub unreachable: quietly try again next time
+                if (byHand) say("Couldn't check for updates. Check your connection and try again.");
             } finally { busy = false; }
         }).start();
     }
@@ -162,6 +173,8 @@ class Updater {
         c.setConnectTimeout(15000); c.setReadTimeout(30000);
         c.setInstanceFollowRedirects(true);   // GitHub sends release files on to its download host (https to https)
         c.setRequestProperty("User-Agent", "CritterPlayer");
+        c.setUseCaches(false);   // always the release's current file, never a copy kept from before
+        c.setRequestProperty("Cache-Control", "no-cache");
         if (c.getResponseCode() != 200) throw new Exception("HTTP " + c.getResponseCode());
         return c;
     }

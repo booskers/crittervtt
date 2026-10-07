@@ -13,6 +13,7 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - Drag a dialog or the menu down from its top to close it, as on iOS; a short or slow drag springs back. Dialogs have a handle on top.
 - The Critter VTT menu shows the logo on a phone again.
 - The walkthrough on a phone: in touch words, with the menu opened at the right tile for each step, and offered once you're at a table.
+- The Android app (1.2.3) has Check for updates: in the gear's settings, the Critter VTT menu and Help. It says when you're up to date, and offers a version you skipped again. On its own it now checks every hour (was every 6), always reading the release's current version.
 - The Android app (1.2.2) runs edge to edge: the table shows under the status bar and the gesture bar, with no black strips; Critter VTT keeps its own buttons clear of both.
 
 ## 1.3.0 (2026-10-07)
