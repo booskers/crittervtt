@@ -1756,20 +1756,20 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 /* the start: your campaigns, a new one, and joining by code */
 .lobbycard{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
 .camplist{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:6px 0 4px}
-.campcard{position:relative;display:grid;grid-template-rows:auto auto;gap:6px;padding:0 0 8px;border:0;border-radius:14px;background:var(--hover);color:var(--ink);text-align:left;cursor:pointer;overflow:hidden;font:inherit}
-.campcard:hover{background:color-mix(in srgb,var(--ink) 13%,transparent)}
-.campcard:focus-visible{outline:2px solid var(--accent-line);outline-offset:2px}
-.campcard .cthumb{aspect-ratio:16/10;width:100%;background:var(--panel) center/cover no-repeat;display:grid;place-items:center;color:var(--muted)}
-.campcard .cthumb svg{width:42%;height:42%;opacity:.6}
-.campcard b{padding:0 10px;font-family:var(--f-display);font-weight:var(--w-display);font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.campcard small{padding:0 10px;color:var(--muted);font-size:12px;line-height:1.3}
-.campcard .cmore{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:8px;background:rgb(0 0 0/.45);color:#fff;display:grid;place-items:center;cursor:pointer}
-.campcard .cmore:hover,.campcard .cmore:focus-visible{background:rgb(0 0 0/.7)}
-.campcard.newc{place-items:center;align-content:center;min-height:150px;padding:12px;border:2px dashed color-mix(in srgb,var(--ink) 22%,transparent);background:transparent;text-align:center}
-.campcard.newc svg{width:30px;height:30px;color:var(--accent-text)}
-.campcard.newc b{padding:0;white-space:normal}
-.campcard.newc[aria-expanded="true"]{border-color:var(--accent-line);background:var(--hover)}
-.campcard.busy{opacity:.6;pointer-events:none}
+.campitem{position:relative;display:grid;grid-template-rows:auto auto;gap:6px;padding:0 0 8px;border:0;border-radius:14px;background:var(--hover);color:var(--ink);text-align:left;cursor:pointer;overflow:hidden;font:inherit}
+.campitem:hover{background:color-mix(in srgb,var(--ink) 13%,transparent)}
+.campitem:focus-visible{outline:2px solid var(--accent-line);outline-offset:2px}
+.campitem .cthumb{aspect-ratio:16/10;width:100%;background:var(--panel) center/cover no-repeat;display:grid;place-items:center;color:var(--muted)}
+.campitem .cthumb svg{width:42%;height:42%;opacity:.6}
+.campitem b{padding:0 10px;font-family:var(--f-display);font-weight:var(--w-display);font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.campitem small{padding:0 10px;color:var(--muted);font-size:12px;line-height:1.3}
+.campitem .cmore{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:8px;background:rgb(0 0 0/.45);color:#fff;display:grid;place-items:center;cursor:pointer}
+.campitem .cmore:hover,.campitem .cmore:focus-visible{background:rgb(0 0 0/.7)}
+.campitem.newc{place-items:center;align-content:center;min-height:150px;padding:12px;border:2px dashed color-mix(in srgb,var(--ink) 22%,transparent);background:transparent;text-align:center}
+.campitem.newc svg{width:30px;height:30px;color:var(--accent-text)}
+.campitem.newc b{padding:0;white-space:normal}
+.campitem.newc[aria-expanded="true"]{border-color:var(--accent-line);background:var(--hover)}
+.campitem.busy{opacity:.6;pointer-events:none}
 .newcampbox{margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--hover)}
 .newcampbox h3{margin:0 0 8px;font-family:var(--f-display);font-weight:var(--w-display);font-size:17px}
 .joinbar{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;border-radius:14px;background:var(--hover)}
@@ -3081,6 +3081,7 @@ async function reclaimLobby(code) {
     if ((await enterLobby(code)) !== true) return false;
     for (let i = 0; i < 40 && !(S.lobbyLoaded && entsReady); i++) await new Promise(r => setTimeout(r, 150));
     await new Promise(r => setTimeout(r, 900));
+    for (let i = 0; i < 25 && CAMP.n && !campSrc; i++) await new Promise(r => setTimeout(r, 160));
     if (!CAMP.id) { await ensureCampId(); await new Promise(r => setTimeout(r, 200)); }
     await localSave('Before the lobby closed');
     leaveLobby(); await dropLobby(code); lsSet('tt.lobby', null);
@@ -4487,7 +4488,7 @@ async function renderCampList() {
   for (const c of top) if (!c.thumb && !c.logo) { try { const live = (await store.list(c.lobby)).find(m => m.live); if (live) { c.thumb = live.thumb || ''; c.logo = live.logo || ''; } } catch {} }
   if (tok !== campListTok) return;
   for (const c of top) {
-    const card = el('div', 'campcard'); card.setAttribute('role', 'listitem'); card.tabIndex = 0;
+    const card = el('div', 'campitem'); card.setAttribute('role', 'listitem'); card.tabIndex = 0;
     const pic = lsGet(campPicKey(c), '') || c.logo || c.thumb || '';
     const th = el('span', 'cthumb'); th.setAttribute('aria-hidden', 'true');
     if (pic) th.style.backgroundImage = `url("${pic}")`; else th.innerHTML = icon((THEMES[c.sys] || THEMES.generic).emblem);
@@ -4505,7 +4506,7 @@ async function renderCampList() {
     box.append(card);
   }
   // a new campaign, next to them
-  const nc = el('button', 'campcard newc'); nc.type = 'button'; nc.setAttribute('aria-expanded', String(!$('#newCampBox').hidden)); nc.setAttribute('aria-controls', 'newCampBox');
+  const nc = el('button', 'campitem newc'); nc.type = 'button'; nc.setAttribute('aria-expanded', String(!$('#newCampBox').hidden)); nc.setAttribute('aria-controls', 'newCampBox');
   nc.innerHTML = icon('quill'); nc.append(el('b', '', 'New campaign'), el('small', '', 'Pick a game system, a title and your players'));
   nc.onclick = () => { const b = $('#newCampBox'); b.hidden = !b.hidden; nc.setAttribute('aria-expanded', String(!b.hidden)); if (!b.hidden) { renderSysPicker(); setTimeout(() => { b.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); $('#newCampTitle').focus(); }, 30); } };
   const ncw = el('div'); ncw.setAttribute('role', 'listitem'); ncw.append(nc); box.append(ncw);
@@ -13053,7 +13054,7 @@ async function localSave(label) {
     const picList = [...pics.keys()], size = json.length + [...pics.values()].reduce((a, s) => a + s.length, 0);
     const info = { title: CAMP.title || '', sys: S.rules.sys, sess: SESS ? sessLabel(SESS) : '', cid: CAMP.id || '', code: S.lobby || '', was: CAMP.was || '' };
     // "Latest", rewritten every time
-    await store.put(lobby, { k: lobby + '|latest', ts: now, label: null, live: true, size, ...info, ...saveThumbs() }, json, picList);
+    await store.put(lobby, { k: lobby + '|latest', ts: now, label: null, live: true, size, ...info, ...(await saveThumbs()) }, json, picList);
     asSig = sig; asLastAt = now; paintSaveBtn();
     if (!keepOne) return lobby + '|latest';
     // and a dated or named one that stays
@@ -13078,16 +13079,21 @@ async function asPrune(store, lobby) {
   await store.prunePics(lobby, used);
 }
 // small pictures for the campaign list: the board as it looks now (at most once a minute) and the campaign's logo
-let thumbAt = 0, thumbBoard = '', thumbLogoV = null, thumbLogo = '';
-function saveThumbs() {
+let thumbAt = 0, thumbBoard = '', thumbLogoSrc = null, thumbLogo = '';
+async function saveThumbs() {
   const now = Date.now();
   if (now - thumbAt > 60000 || !thumbBoard) {
     thumbAt = now;
     try { const c = document.createElement('canvas'), w = 480, h = Math.round(480 * Math.min(0.75, innerHeight / innerWidth)); c.width = w; c.height = h; c.getContext('2d').drawImage(cv, 0, 0, cv.width, cv.width * h / w, 0, 0, w, h); thumbBoard = c.toDataURL('image/jpeg', 0.7); } catch { thumbBoard = ''; }
   }
-  if (campV !== thumbLogoV) {
-    thumbLogoV = campV; thumbLogo = '';
-    if (campSrc) { const im = new Image(); im.onload = () => { try { const c = document.createElement('canvas'), k = Math.min(1, 400 / Math.max(im.naturalWidth, im.naturalHeight)); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); thumbLogo = c.toDataURL('image/webp', 0.8); } catch {} }; im.src = campSrc; }
+  // the campaign's picture, as it is now: after a reload its version comes a moment before the picture itself, so
+  // the small copy follows the picture, and the save waits for it
+  if (campSrc !== thumbLogoSrc) {
+    thumbLogoSrc = campSrc; thumbLogo = '';
+    if (campSrc) {
+      const im = await loadImg(campSrc);
+      if (im && thumbLogoSrc === campSrc) try { const c = document.createElement('canvas'), k = Math.min(1, 400 / Math.max(im.naturalWidth, im.naturalHeight)); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); thumbLogo = c.toDataURL('image/webp', 0.8); } catch {}
+    }
   }
   return { thumb: thumbBoard, logo: thumbLogo };
 }
