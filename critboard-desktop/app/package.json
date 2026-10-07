@@ -1,7 +1,7 @@
 {
   "name": "critboard",
   "productName": "Critter",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Critter: a tabletop dice roller and battle map, as a desktop app.",
   "main": "main.js",
   "private": true,
