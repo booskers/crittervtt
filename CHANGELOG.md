@@ -3,6 +3,12 @@
 Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
+## 1.3.0 (2026-10-07)
+**Highlights**
+- Critter VTT for Android, for players: join your group's table from your phone. It opens on Join a table, and takes you back to the same table next time. Download Critter-VTT-Player.apk from this release.
+- Critter VTT can be installed from the browser (Chrome's Install app), with its own window and icon.
+- The start screen fits phone screens: it was a little wider than the screen.
+
 ## 1.2.4 (2026-10-07)
 - Pictures are kept in the saves folder again (the desktop app, or a browser with a saves folder). After every kept save, the tidy-up deleted every picture as unused, so a campaign reopened without its background maps, portraits and campaign picture. Saves in browser storage were not affected.
 
