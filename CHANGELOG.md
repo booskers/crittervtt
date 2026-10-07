@@ -3,6 +3,10 @@
 Critter VTT (the page, `critboard/critboard.html`, and the desktop app in `critboard-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
+## 1.2.1 (2026-10-07)
+- Deleting a scene works: the bin now asks "Delete this scene?" on the scene's card and waits for Delete or Keep. Before, its second click had to come within three seconds, or nothing happened.
+- The bin on Main and on the scene the players see says why it can't delete them, instead of doing nothing.
+
 ## 1.2.0 (2026-10-07)
 **Highlights**
 - Your campaigns on the start screen: the five latest with a picture, the game system and when you last played. Click one to carry on; right-click (or its cog) to open an older save or give it a picture.
