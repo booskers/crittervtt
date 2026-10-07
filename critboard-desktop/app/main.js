@@ -135,20 +135,39 @@ const SETTINGS = () => path.join(app.getPath('userData'), 'critter-settings.json
 let settingsCache = null;
 async function settings() { if (!settingsCache) { try { settingsCache = JSON.parse(await fsp.readFile(SETTINGS(), 'utf8')); } catch { settingsCache = {}; } } return settingsCache; }
 async function saveSettings(patch) { settingsCache = { ...(await settings()), ...patch }; await fsp.writeFile(SETTINGS(), JSON.stringify(settingsCache, null, 1)); }
-async function savesRoot() { const s = await settings(); return s.savesDir && require('node:fs').existsSync(s.savesDir) ? s.savesDir : null; }
+// unless the GM picked a folder of their own, saves live in Documents\CritterVTT\Saves (made when first needed);
+// saves kept in the old default (Documents\Critter Saves) move there once
+const defaultSavesDir = () => path.join(app.getPath('documents'), 'CritterVTT', 'Saves');
+const oldDefaultDir = () => path.join(app.getPath('documents'), 'Critter Saves');
+let savesMoved = false;
+async function savesRoot() {
+  const s = await settings(), fs = require('node:fs');
+  if (s.savesDir && path.resolve(s.savesDir) !== path.resolve(oldDefaultDir()) && fs.existsSync(s.savesDir)) return s.savesDir;
+  const dir = defaultSavesDir();
+  try {
+    if (!savesMoved) {
+      savesMoved = true;
+      const old = oldDefaultDir();
+      if (fs.existsSync(old) && !fs.existsSync(dir)) { await fsp.mkdir(path.dirname(dir), { recursive: true }); try { await fsp.rename(old, dir); } catch { await fsp.cp(old, dir, { recursive: true }); } }
+    }
+    await fsp.mkdir(dir, { recursive: true });
+    if (s.savesDir !== dir) await saveSettings({ savesDir: dir });
+    return dir;
+  } catch { return null; }
+}
 // a path inside the saves folder, never outside it
 async function inSaves(rel) {
   const root = await savesRoot(); if (!root || typeof rel !== 'string' || rel.length > 400 || /(^|[\\/])\.\.([\\/]|$)/.test(rel) || path.isAbsolute(rel)) return null;
   const p = path.normalize(path.join(root, rel)); return p === root || p.startsWith(root + path.sep) ? p : null;
 }
-const defaultSavesDir = () => path.join(app.getPath('documents'), 'Critter Saves');
-ipcMain.handle('saves:info', async () => { const r = await savesRoot(); return r ? { path: r, name: path.basename(r) } : { path: null, suggested: defaultSavesDir() }; });
+const savesName = dir => path.resolve(dir) === path.resolve(defaultSavesDir()) ? 'CritterVTT › Saves' : path.basename(dir);
+ipcMain.handle('saves:info', async () => { const r = await savesRoot(); return r ? { path: r, name: savesName(r) } : { path: null, suggested: defaultSavesDir() }; });
 ipcMain.handle('saves:pick', async (e, useDefault) => {
   let dir = null;
   if (useDefault) dir = defaultSavesDir();
   else { const w = winOf(e.sender); const r = await dialog.showOpenDialog(w || undefined, { title: 'Where should Critter VTT keep its saves?', defaultPath: (await savesRoot()) || defaultSavesDir(), properties: ['openDirectory', 'createDirectory', 'promptToCreate'] }); if (r.canceled || !r.filePaths[0]) return null; dir = r.filePaths[0]; }
   await fsp.mkdir(dir, { recursive: true }); await saveSettings({ savesDir: dir });
-  return { path: dir, name: path.basename(dir) };
+  return { path: dir, name: savesName(dir) };
 });
 ipcMain.handle('saves:read', async (e, rel) => { const p = await inSaves(rel); if (!p) return null; try { return await fsp.readFile(p, 'utf8'); } catch { return null; } });
 // saves are .json (pictures .txt) only: the page can't leave anything there that would run when opened
