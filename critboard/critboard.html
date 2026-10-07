@@ -1486,7 +1486,10 @@ body.mob #mMenu #tools button.on,body.mob #mMenu #tools button[aria-pressed=true
 body.mob #chatDock,body.mob > #campTag,body.mob:has(.fwin:not([hidden])) .mburger,body.mob:has(.overlay:not([hidden])) .mburger{display:none}
 body.mob #mMenu #tools button{font-family:var(--f-body)}
 /* a dialog opened from the menu (Look, Accessibility, Your seat) or from a sheet comes up over them */
+/* Export and Credits open over other dialogs (Help, the Critter VTT menu) */
+#exportBox,#creditsBox{z-index:25}
 body.mob .overlay:not(#splash):not(.cmenu){z-index:40}
+body.mob #exportBox,body.mob #creditsBox{z-index:41}
 /* sheets on a phone: dots, boxes and pips big enough for a thumb, with a little more room around each to land on */
 body.mob .sheetwin .dots{gap:7px}
 body.mob .sheetwin .dot{position:relative;width:20px;height:20px}
@@ -2053,7 +2056,7 @@ body.mob.chatoff #panel{transform:none;pointer-events:auto}
   </div>
 </div>
 
-<div id="exportBox" class="overlay" hidden style="z-index:25">
+<div id="exportBox" class="overlay" hidden>
   <div class="card">
     <h2 id="exportTitle">Your saved rolls</h2>
     <p id="exportDesc">Downloads aren't available in this view. Copy this text into a .txt file to keep it, then use Import .txt to load it again.</p>
@@ -2220,7 +2223,7 @@ body.mob.chatoff #panel{transform:none;pointer-events:auto}
   </div>
 </div>
 
-<div id="creditsBox" class="overlay" hidden style="z-index:25">
+<div id="creditsBox" class="overlay" hidden>
   <div class="card" role="dialog" aria-labelledby="creditsTitle">
     <h2 id="creditsTitle">Credits</h2>
     <div class="credits">
@@ -4534,7 +4537,8 @@ function buildOnboard() {
   $('#switchLobby').onclick = () => switchLobbyAsk();
   $('#lobbyBtn').onclick = () => { lobReveal = false; renderLobbyPop(); togglePop($('#lobbyPop'), $('#lobbyBtn')); };
 $('#saveBtn').onclick = () => saveByHand();
-{ const br = $('#panel .brand'); if (br) { br.setAttribute('role', 'button'); br.tabIndex = 0; br.title = 'The Critter VTT menu (Esc)'; br.setAttribute('aria-label', 'Open the Critter VTT menu'); br.onclick = openCritterMenu; br.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCritterMenu(); } }; } }
+{ const br = $('.ph .brand');   // (on a phone the header, with the logo, is already in the menu)
+  if (br) { br.setAttribute('role', 'button'); br.tabIndex = 0; br.title = 'The Critter VTT menu (Esc)'; br.setAttribute('aria-label', 'Open the Critter VTT menu'); br.onclick = openCritterMenu; br.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openCritterMenu(); } }; } }
   $('#copyCode').onclick = () => {
     if (!S.lobby) return;
     navigator.clipboard.writeText(S.lobby).then(() => toast('Lobby code copied. Send it to your party.'), () => toast('Copying didn\'t work here. Click the code to show it.'));
