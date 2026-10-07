@@ -1544,7 +1544,13 @@ body.mob .overlay .helpcard > .prow.end{order:5;margin-bottom:0}
 @media (hover:none){
   button,[role=button],.ctab,.tb,.ib,a,label{touch-action:manipulation;-webkit-touch-callout:none}
   #board,#tools,.chatbar,#panel .ph,.mmenu,.menu,.ctxmenu,.cmenucard,#chatTab,.mburger{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
-  img{-webkit-touch-callout:none}
+  img{-webkit-touch-callout:none;-webkit-user-drag:none}
+  /* like an app: the interface's words (buttons, labels, tabs, menus, headings) can't be selected or copied; what you
+     type, your notes and longer reading (help, rules, handouts) still can, and chat messages and notes have "Copy the text" */
+  body{-webkit-user-select:none;user-select:none}
+  input,textarea,select,[contenteditable]:not([contenteditable=false]),.nmd,.selectable{-webkit-user-select:text;user-select:text}
+  /* a touch has no hover: a button gives a little as it's pressed (scale, so turned shapes like the diamond pips keep their turn) */
+  button:active:not(:disabled),[role=button]:active,.ctab:active{scale:.96;transition:scale .06s}
   .nblk:focus-within .ngrip,.nblk:focus-within .nacts{visibility:visible}
   .nblk:focus-within .nbtrash{opacity:1}
   .nsechead .nact{opacity:.7}
