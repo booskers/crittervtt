@@ -64,5 +64,10 @@ if not os.path.exists(KS):
 pw = open(KP).read().strip()
 run(tool('apksigner'), 'sign', '--ks', KS, '--ks-key-alias', 'critter', '--ks-pass', 'pass:' + pw, '--key-pass', 'pass:' + pw, '--out', OUT, aligned)
 run(tool('apksigner'), 'verify', OUT)
-ver = re.search(r'versionName="([^"]+)"', open(os.path.join(HERE, 'AndroidManifest.xml'), encoding='utf-8').read()).group(1)
+man = open(os.path.join(HERE, 'AndroidManifest.xml'), encoding='utf-8').read()
+ver = re.search(r'versionName="([^"]+)"', man).group(1)
+# what the app's updater reads from the latest release: attach it with the APK to every Critter VTT release
+import json
+with open(os.path.join(DIST, 'critter-player.json'), 'w') as f:
+    json.dump({'versionCode': int(re.search(r'versionCode="(\d+)"', man).group(1)), 'versionName': ver}, f)
 print(f'Critter VTT for players {ver} -> {os.path.relpath(OUT, HERE)} ({os.path.getsize(OUT) // 1024} KB)')

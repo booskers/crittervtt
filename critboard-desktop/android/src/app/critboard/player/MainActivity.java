@@ -35,6 +35,7 @@ public class MainActivity extends Activity {
     WebView web;
     FrameLayout root;
     ValueCallback<Uri[]> picked;
+    Updater updater;
 
     @Override
     protected void onCreate(Bundle saved) {
@@ -103,6 +104,14 @@ public class MainActivity extends Activity {
 
         if (saved != null) web.restoreState(saved);
         else web.loadUrl(startUrl(getIntent()));
+        updater = new Updater(this);
+    }
+
+    // a newer version of the app on GitHub? (checked on opening and on coming back, every few hours at most)
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (updater != null) updater.check(false);
     }
 
     // what the page may tell the app: the table's colour, so the status and navigation bars match it (light or dark)
@@ -187,6 +196,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        if (updater != null) updater.stop();
         if (web != null) { web.stopLoading(); ((ViewGroup) web.getParent()).removeView(web); web.destroy(); }
         super.onDestroy();
     }

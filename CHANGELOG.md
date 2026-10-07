@@ -16,7 +16,8 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - The menu's board tools: even tiles, readable names, real zoom buttons. "Join a table" stays in reach at the bottom of the start screen.
 - Look, Accessibility and Your seat open over the menu, not behind it.
 - The splash fits a phone; the Accessibility guide has a section on phone gestures.
-- The Android app: the status and navigation bars take the table's colours (light or dark), it has an adaptive icon, and it follows the phone's font size (up to 130%).
+- The Android app (1.2.0): the status and navigation bars take the table's colours (light or dark), it has an adaptive icon, and it follows the phone's font size (up to 130%).
+- The Android app updates itself: when a newer version is released it offers to update, downloads it and Android asks to confirm (the first time, allow installing from Critter VTT). Install 1.2.0 by hand once; later versions arrive by themselves.
 
 ## 1.2.4 (2026-10-07)
 - Pictures are kept in the saves folder again (the desktop app, or a browser with a saves folder). After every kept save, the tidy-up deleted every picture as unused, so a campaign reopened without its background maps, portraits and campaign picture. Saves in browser storage were not affected.
