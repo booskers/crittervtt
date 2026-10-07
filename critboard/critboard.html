@@ -1754,7 +1754,7 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 .a11ycard .a11yh{margin:16px 0 4px;font-family:var(--f-display);font-weight:var(--w-display);font-size:16px}
 @media (max-width:560px){.a11yrow{grid-template-columns:1fr}}
 /* the start: your campaigns, a new one, and joining by code */
-.lobbycard{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
+.lobbycard{box-sizing:border-box;width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
 .camplist{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:6px 0 4px}
 .campitem{position:relative;display:grid;grid-template-rows:auto auto;gap:6px;padding:0 0 8px;border:0;border-radius:14px;background:var(--hover);color:var(--ink);text-align:left;cursor:pointer;overflow:hidden;font:inherit}
 .campitem:hover{background:color-mix(in srgb,var(--ink) 13%,transparent)}
@@ -1776,6 +1776,13 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 .joinbar label{font-weight:700;white-space:nowrap}
 .joinbar input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.12em;font-family:var(--f-mono)}
 @media (max-width:520px){.joinbar{flex-wrap:wrap}.joinbar label{width:100%}}
+/* Critter VTT for players: the start screen is the code field */
+html.player-app #campListLabel,html.player-app #campList,html.player-app #campListHint,html.player-app #newCampBox{display:none!important}
+html.player-app .joinbar{margin-top:6px;padding:14px}
+html.player-app #onboard{align-items:center;place-items:center}
+html.player-app .lobbycard{border-radius:18px}
+html.player-app .joinbar input{font-size:20px;padding:12px 14px}
+html.player-app .joinbar .btn{padding:12px 20px;font-size:16px}
 /* text for screen readers only */
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
 /* skip links: out of sight until the keyboard reaches them */
@@ -2788,6 +2795,10 @@ const isOwner = () => mode === 'solo' || (!!S.owner && S.owner === S.uid);
 const isHost = () => isOwner() || roleOf(S.uid) === 'co';
 const isSpectator = () => mode === 'shared' && !!S.lobby && roleOf(S.uid) === 'spectator';
 const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+// Critter VTT for players (the Android app says so in its user agent; ?app=player does the same in a browser): the start
+// is joining a table; campaigns, saves and setting up a table are a GM's, on the desktop app or the website
+const PLAYER_APP = (() => { try { return /CritterPlayer\//.test(navigator.userAgent) || new URLSearchParams(location.search).get('app') === 'player'; } catch { return false; } })();
+if (PLAYER_APP) document.documentElement.classList.add('player-app');
 const genCode = () => Array.from(crypto.getRandomValues(new Uint32Array(6)), v => CODE_CHARS[v % CODE_CHARS.length]).join('');
 const normCode = c => { const s = String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); return s.length >= 4 && s.length <= 8 ? s : null; };
 const hashCode = () => normCode(decodeURIComponent(location.hash.slice(1)));
@@ -4458,7 +4469,10 @@ $('#saveBtn').onclick = () => saveByHand();
 function showLobbyCard(cancelable) {
   $('#onboard').hidden = false; $('#onboardForm').hidden = true; $('#lobbyCard').hidden = false;
   $('#lobbyCancel').hidden = !cancelable || notAtTable(); $('#lobbyErr').hidden = true;
-  renderCampList();
+  if (PLAYER_APP) {
+    $('#lobbyIntro').textContent = 'Type the code your GM sent you. Next time, Critter VTT takes you back to the same table by itself.';
+    setTimeout(() => { const j = $('#joinCode'); if (j && !$('#lobbyCard').hidden) j.focus(); }, 60);
+  } else renderCampList();
   if (!$('#joinCode').value) $('#joinCode').value = hashCode() || '';
   renderSysPicker();
 }
@@ -4478,7 +4492,7 @@ async function campaignList() {
 const campPicKey = c => 'tt.campPic.' + (c.cid || c.lobby);
 let campListTok = 0;
 async function renderCampList() {
-  const box = $('#campList'); if (!box) return;
+  const box = $('#campList'); if (!box || PLAYER_APP) return;
   const tok = ++campListTok;
   const hint = $('#campListHint'); hint.textContent = '';
   let res = { list: [] }; try { res = await campaignList(); } catch {}
@@ -13461,7 +13475,7 @@ function firstRunSetup() {
     later.onclick = () => { finish(); toast('The walkthrough is in the Critter VTT menu whenever you want it: press Esc.'); };
     card.append(HB.el('div', 'prow end', later, other, go)); go.focus();
   };
-  step1();
+  if (PLAYER_APP) { lsSet('tt.myRole', 'player'); step3(); } else step1();
 }
 // on starting: the GM's newest save, from another table (or a table that's gone), offered to carry on with
 async function offerContinue() {
@@ -16986,6 +17000,25 @@ function mobPlace() {
   // the tools get their names under them
   if (MOB.on) document.querySelectorAll('#mMenu #tools button').forEach(x => { const t = x.title || x.getAttribute('aria-label') || ''; x.dataset.ml = clampStr(t.split(/[:(]/)[0].trim(), 22); });
 }
+window.critterBack = () => {
+  try {
+    const shown = x => x && !x.hidden && x.getClientRects().length;
+    if (shown(document.getElementById('ctxMenu'))) { closeCtx(); return true; }
+    if (tourState) { endTour(); return true; }
+    const esc = t => t.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true }));
+    const ovs = [...document.querySelectorAll('.overlay')].filter(o => shown(o) && o.id !== 'onboard' && o.id !== 'splash');
+    if (ovs.length) { const o = ovs[ovs.length - 1]; const x = o.querySelector('[data-x], .xbtn'); if (x) x.click(); else esc(o); if (shown(o)) o.hidden = true; return true; }
+    const pops = [...document.querySelectorAll('.menu')].filter(shown);
+    if (pops.length) { closePop(); pops.forEach(m => { if (shown(m)) m.hidden = true; }); return true; }
+    if (MOB.on && shown(document.getElementById('mMenu'))) { mobMenu(false); return true; }
+    // the topmost window (a sheet, the notes, the library)
+    const wins = [...document.querySelectorAll('.fwin, .sheetwin, #sceneDock')].filter(shown).sort((a, b) => (+getComputedStyle(b).zIndex || 0) - (+getComputedStyle(a).zIndex || 0));
+    if (wins.length) { const x = wins[0].querySelector('[data-x], .xbtn'); if (x) { x.click(); return true; } }
+    // the seat dialog opened from the menu goes back to the table (the start screen stays: it's where a player is)
+    if (shown(document.getElementById('onboardForm')) && S.me && S.lobby) { closeOnboard(); return true; }
+  } catch (e) { console.warn('back', e); }
+  return false;
+};
 function mobMenu(open) {
   const m = $('#mMenu'), b = $('#mBurger'); if (!m) return;
   if (open) { closeCtx && closeCtx(); mobPlace(); }

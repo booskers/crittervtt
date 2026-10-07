@@ -35,6 +35,8 @@ const wrap = body => `<!doctype html>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b0c0f">
 <script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)}; window.CRITTER_VERSION = ${JSON.stringify(version)};</script>
 <script src="homebase.js"></script>
 </head>
@@ -49,5 +51,11 @@ await writeFile(join(out, 'index.html'), html);
 await writeFile(join(out, 'music.html'), wrap(await readFile(join(here, 'music-link.html'), 'utf8')));
 await cp(join(src, 'srd'), join(out, 'srd'), { recursive: true });
 // the Critter icon for browser tabs and home screens
-for (const f of ['favicon.ico', 'favicon.png', 'apple-touch-icon.png']) await cp(join(here, 'assets', f), join(out, f));
+for (const f of ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) await cp(join(here, 'assets', f), join(out, f));
+// installable from the browser (Chrome's "Install app"): its own window and home-screen icon
+await writeFile(join(out, 'manifest.webmanifest'), JSON.stringify({
+  name: 'Critter VTT', short_name: 'Critter VTT', description: 'A free virtual tabletop: battle map, dice, sheets and rulebooks, live with your group.',
+  start_url: '/', scope: '/', display: 'standalone', background_color: '#0b0c0f', theme_color: '#0b0c0f',
+  icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }]
+}, null, 1));
 console.log(`www ready: page ${(html.length / 1024).toFixed(0)} KB, Homebase ${cfg.server ? 'at ' + cfg.server : 'not configured (the app will ask)'}`);
