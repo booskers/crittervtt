@@ -246,6 +246,18 @@ async function handle(ws, m) {
       if (m.t === 'savenow') return ack({ id: await snapshot(m.scope, String(m.label || 'Saved by hand').slice(0, 80)) });
       return ack(await restoreSave(m.scope, Number(m.id)) ? { ok: true } : { error: 'no such save' });
     }
+    // the lobby owner closes the table for good: everything of the lobby goes (documents, saves, uploaded audio).
+    // Critter VTT does this when the GM stops playing; the GM's own saves keep the campaign.
+    case 'drop': {
+      if (typeof m.scope !== 'string' || m.scope[0] !== 'L' || !validId(m.scope.slice(1))) return ack({ error: 'bad lobby' });
+      const code = m.scope.slice(1), root = (await scopeData(m.scope)).get('lobbies/' + code);
+      if (!root || root.owner !== ws.uid) return ack({ error: 'not allowed' });
+      for (const s of subs.get(m.scope) || []) send(s, { t: 'chg', scope: m.scope, p: 'lobbies/' + code, d: null });
+      clearTimeout(saveT.get(m.scope)); saveT.delete(m.scope); scopes.delete(m.scope); dirty.delete(m.scope); saveIdx.delete(m.scope);
+      await rm(fileOf(m.scope), { force: true }); await rm(saveDir(m.scope), { recursive: true, force: true });
+      try { for (const f of await readdir(AUDIO)) if (f.startsWith(code + '-')) await rm(join(AUDIO, f), { force: true }); } catch {}
+      return ack({ ok: true });
+    }
     case 'join': {
       if (!validId(m.room) || !validId(m.peer)) return;
       // a peer id belongs to the player who took it first (the same player may take it back after a reconnect)

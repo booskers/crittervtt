@@ -111,6 +111,9 @@ a{color:var(--accent-text)}
 .logo-svg{display:block;flex:none;height:30px;width:auto;aspect-ratio:1451/330;overflow:visible}
 .logo-mark{color:var(--accent)}
 .logo-word{color:var(--ink)}
+/* asked when closing the desktop app with unsaved changes */
+.quitcard{width:min(480px,calc(100vw - 32px))}
+.quitcard p{margin:6px 0 16px;color:var(--ink-2);line-height:1.5}
 /* the version under the big logos (the splash, the Critter VTT menu) */
 .splashver{margin:-6px 0 0;color:var(--sp-muted);font:600 12px/1 system-ui,'Segoe UI',sans-serif;letter-spacing:.12em}
 .status{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap;margin-left:2px}
@@ -516,15 +519,25 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .contbox{display:grid;gap:3px;padding:12px 14px;margin:8px 0;border:1px solid var(--accent-line);border-radius:10px;background:color-mix(in srgb,var(--accent) 8%,var(--panel-2))}
 #saveBtn.warn{color:#e2a23b}
 /* the walkthrough: a spotlight on one thing, a card beside it */
-.tourov{position:fixed;inset:0;z-index:70}
+.tourov{position:fixed;inset:0;z-index:70;pointer-events:none}
 .tourov.center{background:rgba(0,0,0,.55)}
 .tourspot{position:fixed;border-radius:10px;box-shadow:0 0 0 2px var(--accent-line),0 0 0 9999px rgba(0,0,0,.58);transition:left .25s,top .25s,width .25s,height .25s;pointer-events:none}
-.tourcard{position:fixed;z-index:1;padding:14px 16px;border:1px solid var(--accent-line);border-radius:12px;background:var(--panel);box-shadow:var(--shadow);display:grid;gap:6px;transition:left .25s,top .25s}
-.tourcard h3{margin:0;font-family:var(--f-display);font-weight:var(--w-display);font-size:19px}
+.tourov.trying .tourspot{box-shadow:0 0 0 3px var(--accent-line),0 0 0 9999px rgba(0,0,0,.3);animation:tourPulse 1.6s ease-in-out infinite}
+@keyframes tourPulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--accent-line) 55%,transparent),0 0 0 9999px rgba(0,0,0,.3)}}
+.tourcard{position:fixed;z-index:1;pointer-events:auto;box-sizing:border-box;overflow:auto;padding:14px 16px;border:1px solid var(--accent-line);border-radius:14px;background:var(--panel-3);box-shadow:var(--shadow);display:grid;gap:8px;transition:left .25s,top .25s}
+.tourcard h3{margin:0;font-family:var(--f-display);font-weight:var(--w-display);font-size:19px;line-height:1.2}
 .tourcard p{margin:0;color:var(--ink);line-height:1.5}
-.tourtop{display:flex;align-items:center;gap:8px}
-.tourn{font-size:12px;color:var(--muted);font-weight:700;letter-spacing:.06em}
+.tourbar{height:4px;border-radius:4px;background:var(--hover);overflow:hidden}
+.tourbar span{display:block;height:100%;background:var(--accent);border-radius:4px;transition:width .3s}
+.tourtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.toursec{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text)}
+.tourn{font-size:12px;color:var(--muted);font-weight:700}
 .tourgm{padding:1px 7px;border-radius:999px;background:var(--accent);color:var(--accent-ink,#111);font-size:12px;font-weight:800;letter-spacing:.08em}
+.tourtry{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;border-radius:10px;background:color-mix(in srgb,var(--accent) 14%,transparent);font-weight:700;line-height:1.4}
+.tourtry svg{width:18px;height:18px;flex:none;margin-top:1px;color:var(--accent-text)}
+.tourtry.ok{background:color-mix(in srgb,#4fd18b 22%,transparent)}
+.tourbtns{flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){.tourov.trying .tourspot{animation:none}}
 /* right-click menus */
 .ctxmenu{position:fixed;z-index:80;min-width:210px;max-width:300px;display:grid;gap:1px;padding:5px;animation:ctxIn .1s ease-out both}
 @keyframes ctxIn{from{opacity:0;transform:scale(.97)}}
@@ -678,12 +691,21 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .scthumb:focus-visible{outline:2px solid var(--accent-line);outline-offset:2px}
 .scbadges{position:absolute;left:6px;top:6px;display:flex;gap:4px}
 .scbadge{font-size:12px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:rgba(0,0,0,.65);color:#eee}
-.scbadge.live{background:#d24b3f;color:#fff}
+.scbadge.live{background:#c13b30;color:#fff}
 .scbadge.here{background:var(--accent);color:var(--accent-ink)}
 .scrow{display:flex;align-items:center;gap:6px;min-height:30px}
 .sctitle{flex:1;min-width:0;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:text}
 .scrow .scname{flex:1;min-width:0}
 .scacts{display:flex;align-items:center;gap:4px}
+.sccard.scdrag{cursor:grab;touch-action:pan-x}
+.sccard.dragging{cursor:grabbing}
+.sccard.dragging{opacity:.45}
+.sccard.dropbefore{box-shadow:0 -3px 0 var(--accent-line)}
+.sccard.dropafter{box-shadow:0 3px 0 var(--accent-line)}
+.scdel{width:28px;height:28px}
+.scdel svg{width:16px;height:16px}
+.scdel.armed{background:#c9353b;color:#fff}
+.scdel:disabled{opacity:.35;cursor:not-allowed}
 .scmenu{position:relative}
 .scmenu summary{list-style:none;cursor:pointer;width:28px;height:28px;display:grid;place-items:center}
 .scmenu summary::-webkit-details-marker{display:none}
@@ -1717,6 +1739,7 @@ body.chatoff:not(.mob) .buildbar{left:50%;max-width:calc(100vw - 32px)}
 html.rm *,html.rm *::before,html.rm *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
 html.nofx #fxLayer{display:none!important}
 html.nofx #board{filter:none!important}
+html.dysfont body{line-height:1.55;letter-spacing:.01em;word-spacing:.06em}
 html.hc{--muted:var(--ink-2);--line:color-mix(in srgb,var(--ink) 34%,transparent)}
 html.hc .hint{color:var(--ink-2)}
 html.hc :focus-visible{outline-width:3px!important;outline-offset:3px!important}
@@ -1728,6 +1751,30 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 .a11yrow > b{font-weight:700}
 .a11ycard .a11yh{margin:16px 0 4px;font-family:var(--f-display);font-weight:var(--w-display);font-size:16px}
 @media (max-width:560px){.a11yrow{grid-template-columns:1fr}}
+/* the start: your campaigns, a new one, and joining by code */
+.lobbycard{width:min(760px,calc(100vw - 32px));max-height:calc(100dvh - 32px);overflow:auto}
+.camplist{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:6px 0 4px}
+.campcard{position:relative;display:grid;grid-template-rows:auto auto;gap:6px;padding:0 0 8px;border:0;border-radius:14px;background:var(--hover);color:var(--ink);text-align:left;cursor:pointer;overflow:hidden;font:inherit}
+.campcard:hover{background:color-mix(in srgb,var(--ink) 13%,transparent)}
+.campcard:focus-visible{outline:2px solid var(--accent-line);outline-offset:2px}
+.campcard .cthumb{aspect-ratio:16/10;width:100%;background:var(--panel) center/cover no-repeat;display:grid;place-items:center;color:var(--muted)}
+.campcard .cthumb svg{width:42%;height:42%;opacity:.6}
+.campcard .cthumb.logo{background-size:contain;background-color:var(--panel);background-origin:content-box;padding:10px}
+.campcard b{padding:0 10px;font-family:var(--f-display);font-weight:var(--w-display);font-size:15px;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.campcard small{padding:0 10px;color:var(--muted);font-size:12px;line-height:1.3}
+.campcard .cmore{position:absolute;top:6px;right:6px;width:30px;height:30px;border:0;border-radius:8px;background:rgb(0 0 0/.45);color:#fff;display:grid;place-items:center;cursor:pointer}
+.campcard .cmore:hover,.campcard .cmore:focus-visible{background:rgb(0 0 0/.7)}
+.campcard.newc{place-items:center;align-content:center;min-height:150px;padding:12px;border:2px dashed color-mix(in srgb,var(--ink) 22%,transparent);background:transparent;text-align:center}
+.campcard.newc svg{width:30px;height:30px;color:var(--accent-text)}
+.campcard.newc b{padding:0;white-space:normal}
+.campcard.newc[aria-expanded="true"]{border-color:var(--accent-line);background:var(--hover)}
+.campcard.busy{opacity:.6;pointer-events:none}
+.newcampbox{margin:10px 0 4px;padding:12px 14px;border-radius:14px;background:var(--hover)}
+.newcampbox h3{margin:0 0 8px;font-family:var(--f-display);font-weight:var(--w-display);font-size:17px}
+.joinbar{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 12px;border-radius:14px;background:var(--hover)}
+.joinbar label{font-weight:700;white-space:nowrap}
+.joinbar input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.12em;font-family:var(--f-mono)}
+@media (max-width:520px){.joinbar{flex-wrap:wrap}.joinbar label{width:100%}}
 /* text for screen readers only */
 .sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important}
 /* skip links: out of sight until the keyboard reaches them */
@@ -1879,9 +1926,14 @@ body.mob.chatoff #panel{transform:none;pointer-events:auto}
     <div id="obErr" class="perr" hidden></div>
     <div class="prow end"><button type="button" id="obCancel" class="btn ghost" hidden>Cancel</button><button type="submit" id="obSubmit" class="btn primary">Next</button></div>
   </form>
-  <div class="card" id="lobbyCard" hidden>
+  <div class="card lobbycard" id="lobbyCard" hidden>
     <h2>Find your table</h2>
-    <p>Start a new lobby and share its code with your party, or enter the code someone sent you.</p>
+    <p id="lobbyIntro">Carry on with a campaign, start a new one, or join a table with the code your GM sent you.</p>
+    <div class="sec-label" id="campListLabel">Your campaigns</div>
+    <div id="campList" class="camplist" role="list" aria-labelledby="campListLabel"></div>
+    <p id="campListHint" class="hint"></p>
+    <section id="newCampBox" class="newcampbox" hidden aria-labelledby="newCampH">
+      <h3 id="newCampH">A new campaign</h3>
     <div class="sec-label" id="newSysLabel">Game system for a new lobby</div>
     <div id="newSysGrid" class="sysgrid" role="radiogroup" aria-labelledby="newSysLabel"></div>
     <p id="newSysHint" class="hint"></p>
@@ -1892,12 +1944,13 @@ body.mob.chatoff #panel{transform:none;pointer-events:auto}
       <label class="f" for="newPlayers">Players <span class="hint">(one name per line; people joining pick one, everyone else watches. Passwords and more in GM tools, Players)</span></label>
       <textarea id="newPlayers" rows="3" placeholder="Mara&#10;Theo&#10;Pip" spellcheck="false"></textarea>
     </div>
-    <div class="choice"><button type="button" id="createLobby" class="btn primary big">Create a new lobby</button></div>
+    <div class="choice"><button type="button" id="createLobby" class="btn primary big">Start the campaign</button></div>
     <div class="backuprow"><button type="button" id="fromBackup" class="btn small ghost"><svg class="gi" aria-hidden="true"><use href="#gi-chest"/></svg>Or start from a backup (.zip)</button><input type="file" id="backupFile" accept=".zip,.json,application/zip,application/json" hidden></div>
-    <div class="or">or join one</div>
-    <form id="joinForm" class="rollform" autocomplete="off">
-      <input id="joinCode" maxlength="8" placeholder="K7QX2M" aria-label="Lobby code" autocapitalize="characters" spellcheck="false">
-      <button type="submit" class="btn">Join</button>
+    </section>
+    <form id="joinForm" class="joinbar" autocomplete="off">
+      <label for="joinCode">Join a table</label>
+      <input id="joinCode" maxlength="8" placeholder="K7QX2M" autocapitalize="characters" spellcheck="false">
+      <button type="submit" class="btn primary">Join</button>
     </form>
     <div id="lobbyErr" class="perr" hidden></div>
     <div class="prow end"><button type="button" id="lobbyCancel" class="btn ghost" hidden>Cancel</button></div>
@@ -2393,11 +2446,13 @@ const SYSTEMS = {
 const SERIF = "Georgia, 'Times New Roman', serif", SANS = "system-ui, -apple-system, 'Segoe UI', sans-serif", MONO = "'IBM Plex Mono', ui-monospace, Consolas, monospace";
 const FONT = { d: `'Grenze', ${SERIF}`, b: `'Alegreya Sans', ${SANS}`, w: 700, sys: 'generic' };
 // the Look's font pairings (shared with Critter Sounds and Critter Notes); "Game system fonts" keeps each system's own
-const LOOK_SETS = [['Easy reading', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible Next'], ['Zalando', 'Zalando Sans Expanded', 'Zalando Sans'], ['Critter classic', 'Grenze', 'Alegreya Sans'], ['Storybook', 'Fraunces', 'Nunito'], ['Arcane', 'Cinzel', 'Alegreya Sans'], ['Inkwell', 'Young Serif', 'Figtree'], ['Pulp', 'Texturina', 'Rubik'], ['Neon', 'Unbounded', 'Onest'], ['Jolly Roger', 'Pirata One', 'Outfit'], ['Studio', 'Syne', 'Bricolage Grotesque']];
+const LOOK_SETS = [['Easy reading', 'Atkinson Hyperlegible Next', 'Atkinson Hyperlegible Next'], ['Zalando', 'Zalando Sans Expanded', 'Zalando Sans'], ['Critter classic', 'Grenze', 'Alegreya Sans'], ['Storybook', 'Fraunces', 'Nunito'], ['Arcane', 'Cinzel', 'Alegreya Sans'], ['Inkwell', 'Young Serif', 'Figtree'], ['Pulp', 'Texturina', 'Rubik'], ['Neon', 'Unbounded', 'Onest'], ['Jolly Roger', 'Pirata One', 'Outfit'], ['Studio', 'Syne', 'Bricolage Grotesque'], ['Dyslexia-friendly', 'OpenDyslexic', 'OpenDyslexic']];
 const LOOK_FACES = {
   'Atkinson Hyperlegible Next': ['Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800', 0, 750], 'Zalando Sans Expanded': ['Zalando+Sans+Expanded:wght@200..900', 0, 700], 'Zalando Sans': ['Zalando+Sans:ital,wght@0,200..900;1,200..900', 0, 750],
   'Grenze': ['Grenze:wght@400;500;600;700', 1, 700], 'Alegreya Sans': ['Alegreya+Sans:ital,wght@0,400;0,500;0,700;0,800;1,400', 0, 700], 'Fraunces': ['Fraunces:opsz,wght@9..144,300..900', 1, 650], 'Nunito': ['Nunito:wght@300..900', 0, 750],
   'Cinzel': ['Cinzel:wght@400..900', 1, 700], 'Young Serif': ['Young+Serif', 1, 400], 'Figtree': ['Figtree:wght@300..900', 0, 700], 'Texturina': ['Texturina:opsz,wght@12..72,300..900', 1, 650], 'Rubik': ['Rubik:wght@300..900', 0, 700],
+  // OpenDyslexic comes from Fontsource (jsDelivr); Lexend, made for easier reading, stands in wherever that can't load
+  'OpenDyslexic': ['Lexend:wght@300..800', 0, 700],
   'Unbounded': ['Unbounded:wght@300..900', 0, 650], 'Onest': ['Onest:wght@300..800', 0, 700], 'Pirata One': ['Pirata+One', 1, 400], 'Outfit': ['Outfit:wght@300..800', 0, 700], 'Syne': ['Syne:wght@400..800', 0, 750], 'Bricolage Grotesque': ['Bricolage+Grotesque:opsz,wght@12..96,300..800', 0, 750]
 };
 function lookFontSet(name) {
@@ -2412,8 +2467,11 @@ function applyFonts(sys) {
   if (!document.getElementById(fid)) {
     const l = document.createElement('link'); l.rel = 'stylesheet'; l.id = fid;
     l.href = 'https://fonts.googleapis.com/css2?family=' + f.q + '&display=swap'; document.head.append(l);
+    if (f.d === 'OpenDyslexic') for (const w of ['index', '700']) { const x = document.createElement('link'); x.rel = 'stylesheet'; x.href = `https://cdn.jsdelivr.net/npm/@fontsource/opendyslexic@5/${w}.css`; document.head.append(x); }
   }
-  FONT.d = `'${f.d}', ${f.ds}`; FONT.b = `'${f.b}', ${f.bs}`; FONT.w = f.w;
+  const alt = n => n === 'OpenDyslexic' ? `'OpenDyslexic', 'Lexend'` : `'${n}'`;
+  FONT.d = `${alt(f.d)}, ${f.ds}`; FONT.b = `${alt(f.b)}, ${f.bs}`; FONT.w = f.w;
+  document.documentElement.classList.toggle('dysfont', f.d === 'OpenDyslexic');
   const s = document.documentElement.style;
   s.setProperty('--f-display', FONT.d); s.setProperty('--f-body', FONT.b); s.setProperty('--w-display', String(f.w));
   s.setProperty('--f-mono', f.m ? `'${f.m}', ${MONO}` : MONO);
@@ -2880,6 +2938,7 @@ async function loadPresets() {
 /* ---------------- lobbies ---------------- */
 let lobbySubs = [], lobbyToken = 0;
 function leaveLobby() {
+  flushNotes();   // (notes being typed go to the table they were written at)
   // the lobby owner leaving ends the session that was running
   if (SESS && S.lobby && isOwner()) stopSession(true);
   lobbySubs.forEach(u => { try { u(); } catch {} }); lobbySubs = [];
@@ -2896,6 +2955,8 @@ function leaveLobby() {
   renderLog(); renderSeats(); renderCursors(); updateOwnerUI(); requestDraw(); renderChatBar(); paintHidden();
   const note = $('#chatNote'); if (note) note.hidden = true;
   clearTableLeftovers();
+  // (switching tables sets the next lobby straight away; only someone left at no table gets the start screen)
+  setTimeout(ensureAtTable, 300);
 }
 // what else a table leaves in this window: its reactions, a half-written reply, live music, open panels and dialogs
 function clearTableLeftovers() {
@@ -2929,17 +2990,101 @@ function switchLobbyAsk() {
   const what = S.lobby ? `lobby ${S.lobby}` : 'the table on this computer';
   const msg = el('div', 'nmd'); msg.innerHTML = mdHtml(`You're about to leave ${what}. When you leave, everything from it is cleared out of this window${mode === 'solo' ? ', and **a new table here replaces this one completely**' : ''}.
 
-**Save it on this computer first**, so you can always come back to it or rebuild it: a save goes to ${savesHere()}, a backup is one .zip file with everything.${S.lobby ? ' The lobby itself stays on the Homebase for the players.' : ''}`);
+**Save it on this computer first**, so you can always come back to it or rebuild it: a save goes to ${savesHere()}, a backup is one .zip file with everything.${S.lobby && isOwner() ? ' The lobby closes for everyone; your campaign stays in your saves, and next time it opens with a new code.' : S.lobby ? ' The lobby stays open for the others.' : ''}`);
   const st = el('p', 'hint swstate');
   const save = el('button', 'btn primary', 'Save, then leave'), zip = el('button', 'btn', 'Download a backup (.zip)'), go = el('button', 'btn danger swgo', 'Leave without saving'), stay = el('button', 'btn ghost', 'Stay here');
   [save, zip, go, stay].forEach(b => { b.type = 'button'; });
-  const proceed = () => { ov.remove(); showLobbyCard(true); };
-  save.onclick = async () => { save.disabled = zip.disabled = true; st.textContent = 'Saving…'; try { await saveByHand(); proceed(); } catch (e) { console.warn(e); st.textContent = 'The save didn\'t work. Try the backup file instead.'; save.disabled = zip.disabled = false; } };
+  const proceed = async () => { ov.remove(); if (mode === 'shared' && S.lobby && isOwner()) { await closeMyLobby('Left the table'); toast('The table is closed. Your campaign is in your saves.'); showLobbyCard(false); } else showLobbyCard(true); };
+  save.onclick = async () => { save.disabled = zip.disabled = true; st.textContent = 'Saving…'; try { await saveByHand(); await proceed(); } catch (e) { console.warn(e); st.textContent = 'The save didn\'t work. Try the backup file instead.'; save.disabled = zip.disabled = false; } };
   zip.onclick = async () => { zip.disabled = true; st.textContent = 'Making the backup…'; try { await exportTable(); st.textContent = 'Backup made. Leave when you\'re ready.'; go.textContent = 'Leave now'; go.classList.add('primary'); } catch (e) { console.warn(e); st.textContent = 'The backup didn\'t work.'; } zip.disabled = false; };
   go.onclick = proceed; stay.onclick = () => ov.remove();
   card.append(h, msg, st, HB.el('div', 'prow end swbtns', stay, go, zip, save));
   ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); ov.remove(); } };
   ov.append(card); document.body.append(ov); save.focus();
+}
+// A lobby lasts one evening: the lobby owner's page closes it (everything of it is wiped on the Homebase) when they leave
+// or close Critter VTT, and the next time a fresh lobby with a new code is set up from the campaign's latest save.
+// The campaign itself lives in the GM's saves; players, their passwords and who sits where travel inside them.
+async function dropLobby(code) {
+  if (!code || !db) return;
+  const hb = await window.claude?.use?.('homebase').catch(() => null);
+  try { if (hb && hb.drop) { await hb.drop(code); return; } } catch {}
+  try { await db.doc('lobbies/' + code).delete(); } catch {}   // (no Homebase, as on claude.ai: the lobby document goes, so everyone sees it closed)
+}
+// the lobby owner leaves: a last save, then the lobby closes for everyone
+async function closeMyLobby(label, o = {}) {
+  if (mode !== 'shared' || !S.lobby || !isOwner()) return;
+  const code = S.lobby;
+  // notes still being typed first (a moment for them to reach the table, since the save reads everyone's notes from there)
+  if (flushNotes()) await new Promise(r => setTimeout(r, 400));
+  if (o.save !== false) { try { await localSave(label || 'Left the table'); } catch {} }
+  sessionStorage.removeItem('tt.tabLobby'); lsSet('tt.lobby', null);
+  leaveLobby(); await dropLobby(code);
+}
+// quitting the desktop app: a last save, then the lobby closes (a browser can't tell closing from reloading, so there
+// the lobby is put away the next time the GM starts Critter VTT, see reclaimLobby, or when they press Leave lobby)
+// Before that: if the table changed since its newest save, the GM is asked whether to save it (an update closing the app saves without asking)
+if (window.critterDesktop && window.critterDesktop.onQuit) window.critterDesktop.onQuit(async info => {
+  if (flushNotes()) await new Promise(r => setTimeout(r, 400));   // notes still being typed count as changes, and get saved with the rest
+  let act = 'save', changed = false;
+  try { changed = await unsavedChanges(); } catch {}
+  if (changed && !(info && info.quiet)) { window.critterDesktop.quitWait && window.critterDesktop.quitWait(); act = await askSaveOnClose(); }
+  if (act === 'cancel') return 'cancel';
+  try {
+    if (mode === 'shared' && S.lobby && isOwner()) await closeMyLobby('Closed Critter VTT', { save: act === 'save' });
+    else if (act === 'save' && changed) await localSave('Closed Critter VTT');
+  } catch {}
+});
+// has the table changed since its newest save? The table as it is now, signed the way a save signs it, against the "Latest" save
+// (a save is made light or full, so both are tried); a save that's waiting to happen or running counts as a change
+async function unsavedChanges() {
+  if (!canLocalSave()) return false;
+  if (asFirst) return true;
+  for (let i = 0; asBusy && i < 40; i++) await new Promise(r => setTimeout(r, 100));
+  if (!SAVES) await initSaves();
+  const store = savesStore(), lobby = asLobby(), last = await store.get(lobby, lobby + '|latest').catch(() => null);
+  const sign = async light => { const data = await tableData({ light }); delete data.exportedAt; const json = JSON.stringify(asSplit(data, new Map())); return json.length + ':' + picId(json); };
+  const lastSig = last && last.json ? last.json.length + ':' + picId(last.json) : '';
+  // no save yet: any change would have started one (asFirst), so nothing has changed
+  if (!lastSig) return false;
+  return (await sign(true)) !== lastSig && (await sign(false)) !== lastSig;
+}
+// Save, Don't save or Cancel; Enter saves, Escape cancels
+function askSaveOnClose() {
+  return new Promise(res => {
+    $('#quitDlg')?.remove();
+    const ov = el('div', 'overlay'); ov.id = 'quitDlg';
+    const card = el('div', 'card quitcard'); card.setAttribute('role', 'alertdialog'); card.setAttribute('aria-modal', 'true'); card.setAttribute('aria-labelledby', 'quitT'); card.setAttribute('aria-describedby', 'quitX');
+    const h = el('h2', '', 'Save the table before closing?'); h.id = 'quitT';
+    const when = asLastAt ? new Date(asLastAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+    const p = el('p', '', `The table has changed since it was last saved${when ? ' at ' + when : ''}. Save it to ${savesHere()} first?`); p.id = 'quitX';
+    const save = el('button', 'btn primary', 'Save and close'), lose = el('button', 'btn', 'Close without saving'), stay = el('button', 'btn ghost', 'Cancel');
+    [save, lose, stay].forEach(b => { b.type = 'button'; });
+    let answered = false;
+    const done = v => { if (answered) return; answered = true; mo.disconnect(); ov.remove(); res(v); };
+    // closed some other way (the corner ✕ every dialog gets): that's Cancel
+    const mo = new MutationObserver(() => { if (!ov.isConnected) done('cancel'); });
+    save.onclick = () => done('save'); lose.onclick = () => done('discard'); stay.onclick = () => done('cancel');
+    ov.onkeydown = e => { if (e.key === 'Escape') { e.preventDefault(); done('cancel'); } };
+    ov.onclick = e => { if (e.target === ov) done('cancel'); };
+    card.append(h, p, HB.el('div', 'prow end', stay, el('span', 'grow'), lose, save));
+    ov.append(card); document.body.append(ov); mo.observe(document.body, { childList: true }); save.focus();
+  });
+}
+// last time's lobby is still open (Critter VTT was closed mid-save, or the table is from before lobbies closed):
+// open it, keep a save of it in the campaign, then close it
+async function reclaimLobby(code) {
+  try {
+    const snap = await db.doc('lobbies/' + code).get(); if (!snap.exists || (snap.data() || {}).owner !== S.uid) return false;
+    if (typeof bootStatus === 'function') bootStatus('Putting last time\'s table away…');
+    if ((await enterLobby(code)) !== true) return false;
+    for (let i = 0; i < 40 && !(S.lobbyLoaded && entsReady); i++) await new Promise(r => setTimeout(r, 150));
+    await new Promise(r => setTimeout(r, 900));
+    if (!CAMP.id) { await ensureCampId(); await new Promise(r => setTimeout(r, 200)); }
+    await localSave('Before the lobby closed');
+    leaveLobby(); await dropLobby(code); lsSet('tt.lobby', null);
+    return true;
+  } catch (e) { console.warn('reclaim', e); return false; }
 }
 // resolves true, 'missing' (no such lobby) or 'error'
 async function enterLobby(code) {
@@ -2950,12 +3095,16 @@ async function enterLobby(code) {
   if (tok !== lobbyToken) return 'error';
   if (!snap.exists) return 'missing';
   leaveLobby();
-  S.lobby = code; S.owner = (snap.data() || {}).owner || null; lsSet('tt.lobby', code);
+  S.lobby = code; S.owner = (snap.data() || {}).owner || null; lsSet('tt.lobby', code); try { sessionStorage.setItem('tt.tabLobby', code); } catch {}
   updateOwnerUI();
   const base = lobbyPath();
   S.rules = sanitizeRules((snap.data() || {}).rules) || cloneRules(DEFAULT_RULES);
   lobbySubs.push(db.doc(base).onSnapshot(s => {
-    if (!s.exists) return;
+    if (!s.exists) {
+      // the GM closed the table
+      if (S.lobby === code && S.lobbyLoaded && !isOwner()) { leaveLobby(); lsSet('tt.lobby', null); showLobbyCard(false); lobbyError('The GM closed this table. Next time, they\'ll send you a new code.'); }
+      return;
+    }
     const d = s.data() || {};
     S.owner = d.owner || null; S.roles = sanitizeRoles(d.roles); S.plist = sanitizePlist(d.plist); S.plv = +d.plv || 0; S.nv = +d.nv || 0; S.lobbyLoaded = true;
     S.rules = sanitizeRules(d.rules) || cloneRules(DEFAULT_RULES);
@@ -2964,6 +3113,7 @@ async function enterLobby(code) {
     if (TX && TX.phase === 'in') { TX.pendingBg = d.bg || null; TX.pendingScenes = [d.scene, d.scenes]; }
     else { syncBackground(sanitizeBg(d.bg)); applyScenes(d.scene, d.scenes); }
     syncCamp(d.camp); SESS = sanitizeSess(d.sess); renderCampTag();
+    if (!CAMP.id && isOwner()) setTimeout(ensureCampId, 1500);
     onIdentity(); renderQuick();
     if ($('#rulesBox') && !$('#rulesBox').hidden && !isHost()) { rulesDraft = cloneRules(S.rules); bgDraft = null; renderRulesForm(); }
   }, () => {}));
@@ -2984,7 +3134,7 @@ async function enterLobby(code) {
   // who has taken which player
   lobbySubs.push(db.collection(base + '/claims').onSnapshot(s => {
     const o = {}; s.docs.forEach(d => { const x = d.data() || {}; if (typeof x.uid === 'string') o[d.id] = { uid: x.uid, ts: +x.ts || 0 }; });
-    S.claims = o; claimsReady = true; onIdentity();
+    S.claims = o; claimsReady = true; { const w = whoOf(S.uid); if (isPid(w)) heldSeat = { lobby: S.lobby, pid: w }; } onIdentity();
   }, () => {}));
   subscribeThreads(); loadHidden(); switchChat('table'); subscribeTable(); subscribeEnts(); subscribeHandouts(); noteSubKey = '';
   lobbySubs.push(db.collection(base + '/shapes').orderBy('ts', 'desc').limit(1000).onSnapshot(s => {
@@ -3028,13 +3178,13 @@ async function createLobby(backup) {
       try { await ref.set({ owner: S.uid, ts: Date.now(), rules, plv: 1 }); } catch (e) { writeErr(e); return; }
       if (backup) baseHold = true;
       const r = await enterLobby(code);
-      if (r === true) { await restore(); await camp(); closeOnboard(); toast(backup ? `Lobby ${code} is set up from your backup. Share the code with your party.` : `Lobby ${code} is ready. Share the code with your party.`); }
+      if (r === true) { await restore(); await camp(); await ensureCampId(); closeOnboard(); $('#newCampBox').hidden = true; toast(`Your table is open with the code ${code}: send it to your players. It's new each time you start; the door button at the top shows it again.`); }
       else { baseHold = false; lobbyError('The lobby was made but could not be opened. Try joining it with code ' + code + '.'); }
       return;
     }
     lobbyError('Could not find a free code. Try again.');
   } catch { baseHold = false; lobbyError('Could not reach the table. Check your connection and try again.'); }
-  finally { btn.disabled = bb.disabled = false; btn.textContent = 'Create a new lobby'; }
+  finally { btn.disabled = bb.disabled = false; btn.textContent = 'Start the campaign'; }
 }
 async function startFromBackup(f) {
   $('#lobbyErr').hidden = true;
@@ -3061,6 +3211,11 @@ async function afterProfile() {
     if (mode === 'solo') { closeOnboard(); return; }
     const target = hashCode() || S.lobby || lsGet('tt.lobby', null);
     if (target && target === S.lobby) { closeOnboard(); return; }
+    // the GM's own lobby: kept on a reload of this same window; otherwise put away, and the GM picks a campaign
+    if (target && !hashCode()) {
+      let own = false; try { const sn = await db.doc('lobbies/' + target).get(); own = sn.exists && (sn.data() || {}).owner === S.uid; } catch {}
+      if (own && sessionStorage.getItem('tt.tabLobby') !== target) { await reclaimLobby(target); showLobbyCard(false); return; }
+    }
     if (target) {
       const r = await enterLobby(target);
       // (a moment for the table's theme and board to arrive before the splash lifts)
@@ -4204,7 +4359,19 @@ function openOnboard(editing) {
 }
 let obUi = '#ff5c00';
 const OB_UI_COLORS = ['#ff5c00', '#e8584c', '#f0a020', '#c9a45c', '#22c55e', '#3cc4c4', '#2ea8ff', '#4f7dff', '#8800ff', '#e0568f'];
-function closeOnboard() { $('#onboard').hidden = true; obTouched = false; applyAccent(S.me && S.me.color); }
+function closeOnboard() {
+  obTouched = false; applyAccent(S.me && S.me.color);
+  // nobody uses Critter VTT without being at a table: away from one, the start screen stays
+  if (notAtTable() && S.me) { showLobbyCard(false); return; }
+  $('#onboard').hidden = true;
+}
+// in shared play, someone in no lobby is at no table (playing on this computer is a table of its own)
+const notAtTable = () => mode === 'shared' && !S.lobby;
+function ensureAtTable() {
+  if (!notAtTable() || !S.me) return;
+  if ($('#onboard').hidden || $('#lobbyCard').hidden) showLobbyCard(false);
+}
+setInterval(ensureAtTable, 2000);
 function paintOnboard() {
   const ag = $('#obAvatars'); ag.textContent = '';
   // your own picture comes first; it becomes your token on the board too
@@ -4288,9 +4455,97 @@ $('#saveBtn').onclick = () => saveByHand();
 }
 function showLobbyCard(cancelable) {
   $('#onboard').hidden = false; $('#onboardForm').hidden = true; $('#lobbyCard').hidden = false;
-  $('#lobbyCancel').hidden = !cancelable; $('#lobbyErr').hidden = true;
+  $('#lobbyCancel').hidden = !cancelable || notAtTable(); $('#lobbyErr').hidden = true;
+  renderCampList();
   if (!$('#joinCode').value) $('#joinCode').value = hashCode() || '';
   renderSysPicker();
+}
+// your campaigns: the five played most recently, each from its newest save (grouped by campaign id across save names)
+async function campaignList() {
+  if (!SAVES) await initSaves();
+  const store = savesStore(); let all = [];
+  try { all = await store.lobbies(); } catch { return { store, list: [] }; }
+  const by = new Map(), add = (key, m) => { const cur = by.get(key); if (!cur || m.ts > cur.ts) by.set(key, { ...m, cid: m.cid || (cur && cur.cid) || '', folders: [...(cur ? cur.folders : []), m.lobby] }); else cur.folders.push(m.lobby); };
+  const list0 = all.filter(m => !(m.lobby === 'solo' && mode !== 'solo'));
+  // saves from before campaigns (kept under the lobby code) join the campaign that table became
+  const byCode = new Map(); for (const m of list0) if (m.cid) { if (m.code) byCode.set(m.code, m.cid); if (m.was) byCode.set(m.was, m.cid); }
+  for (const m of list0) if (m.cid) add(m.cid, m);
+  for (const m of list0) if (!m.cid) add(byCode.get(m.lobby) || 'f:' + m.lobby, m);
+  return { store, list: [...by.values()].sort((a, b) => b.ts - a.ts) };
+}
+const campPicKey = c => 'tt.campPic.' + (c.cid || c.lobby);
+let campListTok = 0;
+async function renderCampList() {
+  const box = $('#campList'); if (!box) return;
+  const tok = ++campListTok;
+  const hint = $('#campListHint'); hint.textContent = '';
+  let res = { list: [] }; try { res = await campaignList(); } catch {}
+  if (tok !== campListTok) return;
+  box.textContent = '';
+  const { store, list } = res, top = list.slice(0, 5);
+  for (const c of top) {
+    const card = el('div', 'campcard'); card.setAttribute('role', 'listitem'); card.tabIndex = 0;
+    const pic = lsGet(campPicKey(c), '') || c.logo || c.thumb || '';
+    const th = el('span', 'cthumb' + (pic && pic !== c.thumb ? ' logo' : '')); th.setAttribute('aria-hidden', 'true');
+    if (pic) th.style.backgroundImage = `url("${pic}")`; else th.innerHTML = icon((THEMES[c.sys] || THEMES.generic).emblem);
+    const when = new Date(c.ts), title = c.title || (c.cid ? 'Untitled campaign' : `Table ${c.lobby}`);
+    const sub = [SYSTEMS[c.sys] ? SYSTEMS[c.sys].name : '', c.sess, `${when.toLocaleDateString([], { day: 'numeric', month: 'short' })} ${when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`].filter(Boolean).join(' · ');
+    card.append(th, el('b', '', title), el('small', '', sub));
+    card.setAttribute('aria-label', `${title}, ${sub}. Opens the latest save. Shift F10 or the menu button for other saves.`);
+    const more = el('button', 'cmore'); more.type = 'button'; more.innerHTML = icon('cog'); more.title = 'Other saves and the picture'; more.setAttribute('aria-label', `Other saves of ${title}, and its picture`);
+    more.onclick = e => { e.stopPropagation(); const r = more.getBoundingClientRect(); campMenu(c, store, r.left, r.bottom + 4, card); };
+    card.append(more);
+    const open = () => openCampaign(c, store, null, card);
+    card.onclick = open;
+    card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); open(); } if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) { e.preventDefault(); const r = card.getBoundingClientRect(); campMenu(c, store, r.left + 20, r.top + 20, card); } };
+    card.oncontextmenu = e => { e.preventDefault(); campMenu(c, store, e.clientX, e.clientY, card); };
+    box.append(card);
+  }
+  // a new campaign, next to them
+  const nc = el('button', 'campcard newc'); nc.type = 'button'; nc.setAttribute('aria-expanded', String(!$('#newCampBox').hidden)); nc.setAttribute('aria-controls', 'newCampBox');
+  nc.innerHTML = icon('quill'); nc.append(el('b', '', 'New campaign'), el('small', '', 'Pick a game system, a title and your players'));
+  nc.onclick = () => { const b = $('#newCampBox'); b.hidden = !b.hidden; nc.setAttribute('aria-expanded', String(!b.hidden)); if (!b.hidden) { renderSysPicker(); setTimeout(() => { b.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); $('#newCampTitle').focus(); }, 30); } };
+  const ncw = el('div'); ncw.setAttribute('role', 'listitem'); ncw.append(nc); box.append(ncw);
+  $('#campListLabel').textContent = top.length ? 'Your campaigns' : 'Start your first campaign';
+  if (saveFolder.state === 'needs-permission') {
+    const b = el('button', 'btn small', `Open the saves folder ${saveFolder.name}`); b.type = 'button'; b.onclick = async () => { if (await regrantSaveFolder()) renderCampList(); };
+    hint.append('Your browser asks once more before Critter VTT can read your saves. ', b);
+  } else if (list.length > 5) hint.textContent = `${list.length - 5} older ${list.length - 5 === 1 ? 'campaign' : 'campaigns'}: in the Critter VTT menu, Rewind shows every save.`;
+  else if (!top.length) hint.textContent = 'Players: you don\'t need a campaign. Type the code your GM sent you below.';
+}
+// right-click (or the cog): pick which save to open, or set the campaign's picture
+async function campMenu(c, store, x, y, card) {
+  let saves = [];
+  for (const f of new Set(c.folders || [c.lobby])) { try { saves.push(...(await store.list(f)).map(m => ({ ...m, lobby: f }))); } catch {} }
+  saves = saves.filter(m => !c.cid || !m.cid || m.cid === c.cid).sort((a, b) => b.ts - a.ts).slice(0, 14);
+  const fmt = t => { const d = new Date(t); return `${d.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short' })}, ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`; };
+  const pick = el('input'); pick.type = 'file'; pick.accept = 'image/*';
+  pick.onchange = async () => { const f = pick.files && pick.files[0]; if (!f) return; try { const src = await imageToLogo(f); lsSet(campPicKey(c), src); renderCampList(); } catch { toast('Could not read that picture.'); } };
+  openCtx(x, y, [
+    ...saves.map(m => ({ icon: m.live ? 'cycle' : m.label ? 'quill' : 'hourglass', label: m.live ? 'Latest' : m.label || 'Saved', hint: fmt(m.ts) + (m.sess ? ' · ' + m.sess : ''), fn: () => openCampaign(c, store, m, card) })),
+    saves.length ? 'sep' : null,
+    { icon: 'mountains', label: 'Choose a picture for this campaign…', hint: 'Shown here; the campaign\'s own logo is set at the table', fn: () => pick.click() },
+    lsGet(campPicKey(c), '') ? { icon: 'trash-can', label: 'Remove that picture', fn: () => { lsSet(campPicKey(c), null); renderCampList(); } } : null
+  ], c.title || 'Saves');
+}
+// open a campaign: its newest save (or the one picked) becomes a fresh lobby with a new code
+async function openCampaign(c, store, which, card) {
+  if (card) card.classList.add('busy');
+  $('#lobbyErr').hidden = true;
+  try {
+    await ready;
+    let m = which;
+    if (!m) { const L = (await store.list(c.lobby)).sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0) || b.ts - a.ts); m = L[0]; }
+    if (!m) throw new Error('none');
+    // the campaign's lobby from last time, if it's still open: closed first (its last state is in the saves)
+    if (m.code && mode === 'shared' && db) { try { const sn = await db.doc('lobbies/' + m.code).get(); if (sn.exists && (sn.data() || {}).owner === S.uid && m.code !== S.lobby) await dropLobby(m.code); } catch {} }
+    const data = await loadLocalSave(m.k, m.lobby, store); data.critter = 'table-export';
+    const pic = lsGet(campPicKey(c), '');
+    if (pic && data.campaign && !data.campaign.image) data.campaign.image = pic;
+    if (mode === 'shared' && S.lobby && isOwner()) await closeMyLobby('Switched campaigns');
+    if (mode === 'solo') { pendingRestore = data; await restoreTable(); closeOnboard(); } else await createLobby(data);
+  } catch (e) { console.warn(e); lobbyError('That save couldn\'t be opened. Right-click the campaign for its other saves.'); }
+  finally { if (card) card.classList.remove('busy'); }
 }
 // the system a new lobby starts with; the owner can still change it later in the table rules
 let newSys = SYSTEMS[lsGet('tt.newSys', '')] ? lsGet('tt.newSys', '') : 'generic';
@@ -4740,6 +4995,7 @@ function undo() {
   else if (u.op === 'sets') u.items.forEach(it => putShape(it.id, it.before));
   else if (u.op === 'del') u.items.forEach(it => putShape(it.id, it.shape));
   else if (u.op === 'swap') { u.add.forEach(removeShape); u.del.forEach(it => putShape(it.id, it.shape)); }
+  else if (u.op === 'fn') { Promise.resolve().then(u.undo).then(() => { if (u.said) toast('Undone: ' + u.said); }).catch(writeErr); }
 }
 
 /* ---------------- board: input ---------------- */
@@ -6304,7 +6560,7 @@ async function tableData(opts) {
   };
   data.version = 2;
   data.trackers = TRK; data.turns = { ...TRN, entries: TENT };
-  data.campaign = CAMP.title || campSrc ? { title: CAMP.title, sub: CAMP.sub, image: campSrc || null } : null;
+  data.campaign = CAMP.title || campSrc || CAMP.id ? { title: CAMP.title, sub: CAMP.sub, image: campSrc || null, ...(CAMP.id ? { id: CAMP.id, sk: CAMP.sk, was: CAMP.was || '' } : {}) } : null;
   // every scene that isn't showing keeps its own background
   data.sceneBackgrounds = {};
   for (const sc of S.scenes) if (sc.id !== (S.live || 'main')) { await stashLoad(sc.id); const e = STASH.get(sc.id); if (e && e.bg) data.sceneBackgrounds[sc.id] = { ...e.bg, image: e.src || null }; }
@@ -6440,7 +6696,7 @@ async function restoreTable() {
     const src = typeof b.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(b.image) ? b.image : '';
     await stashWrite(id, sanitizeBg({ ...b, v: newId() }), src).catch(writeErr);
   }
-  if (o.campaign && typeof o.campaign === 'object') await saveCamp({ title: o.campaign.title || '', sub: o.campaign.sub || '', src: typeof o.campaign.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(o.campaign.image) ? o.campaign.image : '' }).catch(writeErr);
+  if (o.campaign && typeof o.campaign === 'object') await saveCamp({ title: o.campaign.title || '', sub: o.campaign.sub || '', ...(typeof o.campaign.id === 'string' ? { id: o.campaign.id, sk: o.campaign.sk || '', was: o.campaign.was || '' } : {}), src: typeof o.campaign.image === 'string' && /^data:image\/(jpeg|png|webp);base64,/.test(o.campaign.image) ? o.campaign.image : '' }).catch(writeErr);
   if (o.fog && typeof o.fog === 'object') { FOG = sanitizeFog(o.fog); if (shared()) db.doc(`${lobbyPath()}/state/fog`).set(FOG).catch(writeErr); else saveSoloState(); }
   if (o.randomTables && typeof o.randomTables === 'object') tablesWrite(sanitizeTables(o.randomTables).list);
   for (const h of (Array.isArray(o.handouts) ? o.handouts : []).slice(0, 60)) { const x = sanitizeHandout(String(h.id || 'h' + newId()), h); if (x) { const { id, ...doc } = x; if (shared()) db.doc(`${lobbyPath()}/handouts/${/^[\w-]{1,40}$/.test(id) ? id : 'h' + newId()}`).set(doc).catch(writeErr); else { HAND.set(id, x); const st = lsGet('tt.handouts', {}) || {}; st[id] = doc; try { lsSet('tt.handouts', st); } catch {} } } }
@@ -6599,6 +6855,8 @@ async function saveSceneSettings() {
   const d = sceneDraft, btn = $('#sceneSetSave'); btn.disabled = true;
   try {
     const cloth = { color: isHex(d.cloth && d.cloth.color) ? d.cloth.color : null, grid: !!(d.cloth && d.cloth.grid) }, move = sanitizeMove(d.move, S.rules.sys);
+    const before = S.scenes.map(x => ({ ...x })), bgBefore = bgDraft && bgDraft.dirty ? await sceneBgState(d.id) : null;
+    pushUndo({ op: 'fn', said: `the settings of ${sceneName(d.id)}`, undo: async () => { setScenes({ scenes: before.filter(x => S.scenes.some(y => y.id === x.id)) }); if (bgBefore) await setSceneBg(d.id, bgBefore); } });
     setScenes({ scenes: S.scenes.map(x => (x.id === d.id ? { ...x, cloth, move } : x)) });
     if (bgDraft && bgDraft.dirty && S.scene === d.id) await saveBackground(bgDraft);
   } catch (e) { writeErr(e); return; }
@@ -11574,7 +11832,8 @@ function renderDmPop() {
     const gl = el('label', 'sck'), gi = el('input'); gi.type = 'checkbox'; gi.checked = gmLayer; gi.onchange = () => { gmLayer = gi.checked; lsSet('tt.gmLayer', gmLayer); toast(gmLayer ? 'New drawings and tokens are only for you.' : 'New drawings and tokens are for everyone.'); };
     gl.append(gi, el('span', '', 'What I draw or place is hidden from players')); p.append(gl, el('p', 'hint pophint', 'Right-click a token to hide or show it. Hidden things look faded to you.'));
     p.append(el('div', 'sec-label', 'Map grid'), el('p', 'hint pophint', 'Drag over exactly one square of the background map, and the map is scaled so its squares match the grid.'));
-    p.append(btn('Align the grid to the map', () => { setTool('gridalign'); closePop(); toast('Drag over one square of the map.'); }));
+    p.append(HB.el('div', 'sysrow', btn('Align the grid to the map', () => { setTool('gridalign'); closePop(); toast('Drag over one square of the map.'); }),
+      Object.assign(btn('Reset the grid alignment', () => resetGridAlign(), 'ghost'), { title: (S.scenes.find(x => x.id === S.scene) || {}).align ? 'Put the map back the way it was before you aligned it' : 'Put the map back to its standard placement' })));
     return;
   }
   if (dmTab === 'tools') {
@@ -11673,20 +11932,21 @@ function plRemove(pid) {
   plFree(pid); plWrite(S.plist.filter(p => p.id !== pid));
   toast(`${pl.name} is gone. Their sheets are back with the GM.`);
 }
-async function claimPlayer(pid, pw) {
+async function claimPlayer(pid, pw, back) {
   const pl = plOf(pid); if (!pl || !shared()) return 'missing';
-  if (pl.pw && plHash(pid, pw || '') !== pl.pw) return 'wrong';
+  // (back: taking back the seat this page held a moment ago, its password already given)
+  if (pl.pw && !back && plHash(pid, pw || '') !== pl.pw) return 'wrong';
   const ts = Date.now();
   for (const [id, c] of Object.entries(S.claims)) if (c.uid === S.uid && id !== pid) { delete S.claims[id]; db.doc(`${lobbyPath()}/claims/${id}`).delete().catch(() => {}); }
   S.claims[pid] = { uid: S.uid, ts };
   try { await db.doc(`${lobbyPath()}/claims/${pid}`).set({ uid: S.uid, ts }); } catch (e) { writeErr(e); return 'error'; }
-  lsSet('tt.pl.' + S.lobby, pid);
-  onIdentity(); toast(`You're playing ${pl.name}.`);
+  lsSet('tt.pl.' + S.lobby, pid); heldSeat = { lobby: S.lobby, pid };
+  onIdentity(); if (!back) toast(`You're playing ${pl.name}.`);
   return 'ok';
 }
 function leavePlayer() {
   const pid = whoOf(S.uid); if (!isPid(pid)) return;
-  lsSet('tt.pl.' + S.lobby, null); plFree(pid); toast('You are watching now.');
+  lsSet('tt.pl.' + S.lobby, null); heldSeat = null; plFree(pid); toast('You are watching now.');
 }
 function publishMe() {
   if (!S.me) return;
@@ -11711,8 +11971,19 @@ function onIdentity() {
   maybeMigratePlayers(); maybePromptPlayer(); maybeResubNotes();
 }
 // joining: take the player you had last time if it's free and has no password, else ask
+// The players list and the claims can blink while the GM's page loads or restores the table (a claim gone for a moment):
+// ask only once they've been steady for a moment, and quietly take back the seat this page had if it's still free.
+let plPromptT = 0, heldSeat = null;
 function maybePromptPlayer() {
+  if (mode !== 'shared' || !S.lobby || !claimsReady || !S.lobbyLoaded || isOwner() || whoOf(S.uid) || $('#plPick')) { clearTimeout(plPromptT); plPromptT = 0; return; }
+  if (!plPromptT) plPromptT = setTimeout(() => { plPromptT = 0; maybePromptPlayerNow(); }, 2500);
+}
+function maybePromptPlayerNow() {
   if (mode !== 'shared' || !S.lobby || !claimsReady || !S.lobbyLoaded || isOwner() || whoOf(S.uid) || $('#plPick')) return;
+  if (heldSeat && heldSeat.lobby === S.lobby && plOf(heldSeat.pid)) {
+    const c = S.claims[heldSeat.pid];
+    if (!c || c.uid === S.uid) { claimPlayer(heldSeat.pid, '', true); return; }
+  }
   const last = lsGet('tt.pl.' + S.lobby, null), pl = plOf(last), c = pl && S.claims[pl.id];
   if (pl && !pl.pw && (!c || !S.peers.some(p => p.by === c.uid && !p.isMe))) { claimPlayer(pl.id); return; }
   const key = S.lobby + ':' + (S.plist.length > 0);
@@ -11972,6 +12243,8 @@ function sanitizeScenes(list) {
     // a scene's own table colour and token movement (without them it uses the lobby's)
     if (x.cloth && typeof x.cloth === 'object') o.cloth = { color: isHex(x.cloth.color) ? x.cloth.color : null, grid: !!x.cloth.grid };
     if (x.move && typeof x.move === 'object') o.move = sanitizeMove(x.move, (S.rules && S.rules.sys) || 'generic');
+    // how the map sat before its grid was aligned
+    if (x.align && typeof x.align === 'object') { const a = x.align, n = v => (Number.isFinite(+v) ? Math.round(+v) : 0); o.align = { mode: ['cover', 'contain', 'tile', 'board'].includes(a.mode) ? a.mode : 'cover', size: Math.max(10, Math.min(400, n(a.size) || 100)), x: n(a.x), y: n(a.y), grid: !!a.grid }; }
     return o;
   });
   if (!out.some(x => x.id === 'main')) out.unshift({ id: 'main', name: 'Main' });
@@ -12007,6 +12280,7 @@ function newScene(name) {
   if (!amGM()) return;
   if (S.scenes.length >= 24) { toast('A lobby holds up to 24 scenes.'); return; }
   const id = 's' + newId().replace(/[^\w]/g, '').slice(0, 10);
+  undoScenes('the new scene');
   setScenes({ scenes: [...S.scenes, { id, name: clampStr(name || `Scene ${S.scenes.length + 1}`, 30) }] });
   setView(id); toast(`New scene. Only you see it until you reveal it.`);
 }
@@ -12014,6 +12288,7 @@ async function duplicateScene(id) {
   if (!amGM() || S.scenes.length >= 24) return;
   const nid = 's' + newId().replace(/[^\w]/g, '').slice(0, 10), i = S.scenes.findIndex(x => x.id === id);
   const src = S.scenes[i] || {}, list = S.scenes.slice(); list.splice(i + 1, 0, { ...src, id: nid, name: clampStr(sceneName(id) + ' (copy)', 30) });
+  { const before = S.scenes.map(x => ({ ...x })); pushUndo({ op: 'fn', said: 'the copy', undo: () => { if (S.scene === nid) setView(S.live); for (const [sid, s] of [...S.shapes]) if (s.sc === nid) removeShape(sid); setScenes({ scenes: before }); } }); }
   setScenes({ scenes: list });
   for (const [, s] of [...S.shapes]) if ((s.sc || 'main') === id) putShape(newId(), { ...s, sc: nid, ts: (s.ts || Date.now()) + 1 });
   const f = FOG.scenes[id]; if (f) { FOG = sanitizeFog({ scenes: { ...FOG.scenes, [nid]: f } }); if (shared()) db.doc(`${lobbyPath()}/state/fog`).set(FOG).catch(writeErr); else saveSoloState(); }
@@ -12021,10 +12296,55 @@ async function duplicateScene(id) {
   if (bg.bg) await stashWrite(nid, { ...bg.bg, v: newId() }, bg.src || '');
   toast(`Copied ${sceneName(id)}.`);
 }
-function renameScene(id, name) { name = clampStr(name, 30).trim(); if (name) setScenes({ scenes: S.scenes.map(x => (x.id === id ? { ...x, name } : x)) }); }
-function moveScene(id, d) { const L = S.scenes.slice(), i = L.findIndex(x => x.id === id), j = i + d; if (i < 0 || j < 0 || j >= L.length) return; [L[i], L[j]] = [L[j], L[i]]; setScenes({ scenes: L }); }
-function deleteScene(id) {
+// the scene list before a change, so Ctrl+Z (Undo) can put it back
+function undoScenes(said) { const before = S.scenes.map(x => ({ ...x })); pushUndo({ op: 'fn', said, undo: () => setScenes({ scenes: before.filter(x => x.id === 'main' || S.scenes.some(y => y.id === x.id) || x.keep) }) }); }
+function renameScene(id, name) { name = clampStr(name, 30).trim(); if (name && name !== sceneName(id)) { undoScenes('renaming the scene'); setScenes({ scenes: S.scenes.map(x => (x.id === id ? { ...x, name } : x)) }); } }
+function moveScene(id, d) { const L = S.scenes.slice(), i = L.findIndex(x => x.id === id), j = i + d; if (i < 0 || j < 0 || j >= L.length) return; [L[i], L[j]] = [L[j], L[i]]; undoScenes('moving the scene'); setScenes({ scenes: L }); }
+// dragging a scene card to another place in the list
+function placeScene(id, to) {
+  const L = S.scenes.slice(), i = L.findIndex(x => x.id === id); if (i < 0) return;
+  const [it] = L.splice(i, 1); to = Math.max(0, Math.min(L.length, to > i ? to - 1 : to)); if (to === i) return;
+  L.splice(to, 0, it); undoScenes('moving the scene'); setScenes({ scenes: L });
+}
+// dragging a scene card (mouse, pen or touch): it follows the pointer after a few pixels, a line shows where it lands
+function sceneDragStart(e, card, list) {
+  if (e.button > 0 || scRename || e.target.closest('button:not(.scthumb),input,summary,details,select,a')) return;
+  const y0 = e.clientY, id = card.dataset.id; let on = false, at = null;
+  const clear = () => list.querySelectorAll('.dropbefore,.dropafter').forEach(x => x.classList.remove('dropbefore', 'dropafter'));
+  const spot = y => { const cards = [...list.querySelectorAll('.sccard')]; for (let k = 0; k < cards.length; k++) { const r = cards[k].getBoundingClientRect(); if (y < r.top + r.height / 2) return { k, card: cards[k], after: false }; } return { k: cards.length, card: cards[cards.length - 1], after: true }; };
+  const move = ev => {
+    if (ev.pointerId !== e.pointerId) return;
+    if (!on) { if (Math.abs(ev.clientY - y0) < 6) return; on = true; card.classList.add('dragging'); }
+    ev.preventDefault(); clear(); at = spot(ev.clientY); if (at.card) at.card.classList.add(at.after ? 'dropafter' : 'dropbefore');
+    const r = list.getBoundingClientRect(); if (ev.clientY < r.top + 30) list.scrollTop -= 12; else if (ev.clientY > r.bottom - 30) list.scrollTop += 12;
+  };
+  const up = ev => { if (ev.pointerId !== e.pointerId) return; removeEventListener('pointermove', move, true); removeEventListener('pointerup', up, true); removeEventListener('pointercancel', up, true); card.classList.remove('dragging'); clear(); if (on && at) { placeScene(id, at.k); card.dataset.dragged = '1'; setTimeout(() => { delete card.dataset.dragged; }, 0); } };
+  addEventListener('pointermove', move, true); addEventListener('pointerup', up, true); addEventListener('pointercancel', up, true);
+}
+// a scene's background as it is now: { bg, src }, wherever it's kept
+async function sceneBgState(id) {
+  if (!S.live || id === S.live) return { bg: S.bg ? { ...S.bg } : null, src: bgSrc || '' };
+  await stashLoad(id); const e = STASH.get(id) || {}; return { bg: e.bg ? { ...e.bg } : null, src: e.src || '' };
+}
+// put a scene's background back to { bg, src }
+async function setSceneBg(id, st) {
+  if (S.live && id !== S.live) { await stashLoad(id); return stashWrite(id, st.bg ? sanitizeBg({ ...st.bg, v: newId() }) : null, st.bg ? st.src || (STASH.get(id) || {}).src || '' : ''); }
+  const img = st.bg && st.src ? await loadImg(st.src) : null;
+  const keep = S.scene; S.scene = id;   // (saveBackground writes the scene on screen; it decides that before it waits)
+  const p = st.bg ? saveBackground(img ? { ...st.bg, src: st.src, img } : { ...st.bg }) : saveBackground({ removed: true });
+  S.scene = keep; return p;
+}
+async function deleteScene(id) {
   if (id === 'main' || id === S.live) return;
+  // everything it had, so Undo can bring it back: its place in the list, drawings and tokens, fog and background
+  const i = S.scenes.findIndex(x => x.id === id), entry = { ...S.scenes[i] }, shapes = [...S.shapes].filter(([, s]) => s.sc === id).map(([sid, s]) => ({ id: sid, shape: s }));
+  const fog = FOG.scenes[id] ? JSON.parse(JSON.stringify(FOG.scenes[id])) : null, bg = await sceneBgState(id).catch(() => ({ bg: null, src: '' }));
+  pushUndo({ op: 'fn', said: `deleting ${entry.name}`, undo: async () => {
+    const L = S.scenes.slice(); L.splice(Math.min(i, L.length), 0, entry); setScenes({ scenes: L });
+    shapes.forEach(x => putShape(x.id, x.shape));
+    if (fog) { FOG = sanitizeFog({ scenes: { ...FOG.scenes, [id]: fog } }); if (shared()) db.doc(`${lobbyPath()}/state/fog`).set(FOG).catch(writeErr); else saveSoloState(); }
+    if (bg.bg) await stashWrite(id, bg.bg, bg.src);
+  } });
   if (S.scene === id) setView(S.live);
   for (const [sid, s] of [...S.shapes]) if (s.sc === id) removeShape(sid);
   if (shared()) db.doc(`${lobbyPath()}/scenes/${id}`).delete().catch(() => {}); else localStorage.removeItem('tt.scenebg.' + id);
@@ -12324,7 +12644,7 @@ function renderScenes() {
     const live = sc.id === S.live, here = sc.id === S.scene;
     const card = el('div', 'sccard' + (live ? ' live' : '') + (here ? ' here' : ''));
     const tb = el('button', 'scthumb'); tb.type = 'button'; tb.title = here ? 'You are here' : live ? 'Go back to the players' : 'Work in this scene (the players stay where they are)';
-    tb.append(sceneThumb(sc.id)); tb.onclick = () => joinScene(sc.id);
+    tb.append(sceneThumb(sc.id)); tb.onclick = () => { if (!card.dataset.dragged) joinScene(sc.id); };
     const badges = el('span', 'scbadges');
     if (live) badges.append(el('span', 'scbadge live', 'Live'));
     if (here) badges.append(el('span', 'scbadge here', 'You'));
@@ -12348,8 +12668,16 @@ function renderScenes() {
     mi.append(b('Settings', 'Table colour, background and token movement for this scene', () => { menu.open = false; openSceneSettings(sc.id); }), b('Rename', '', () => { menu.open = false; scRename = sc.id; renderScenes(); }), b('Duplicate', '', () => { menu.open = false; duplicateScene(sc.id); }));
     if (i > 0) mi.append(b('Move up', '', () => moveScene(sc.id, -1)));
     if (i < S.scenes.length - 1) mi.append(b('Move down', '', () => moveScene(sc.id, 1)));
-    if (sc.id !== 'main' && !live) { const del = b('Delete', '', () => twoStep(del, () => deleteScene(sc.id), 'Delete for good?')); mi.append(del); }
     menu.append(mi); acts.append(menu);
+    // delete: right on the card; the first scene and the one the players see stay
+    const del = el('button', 'icon-btn scdel'); del.type = 'button'; del.innerHTML = icon('trash-can');
+    const why = sc.id === 'main' ? 'The first scene stays; rename it or clear what\'s on it instead' : live ? 'The players see this scene; reveal another one first' : '';
+    del.disabled = !!why; del.title = why || `Delete ${sc.name} (click twice; Undo brings it back)`; del.setAttribute('aria-label', why || `Delete ${sc.name}`);
+    del.onclick = () => { if (del.classList.contains('armed')) { del.classList.remove('armed'); deleteScene(sc.id); toast(`${sc.name} deleted. Undo (Ctrl+Z) brings it back.`); return; } del.classList.add('armed'); del.title = 'Click again to delete'; setTimeout(() => del.classList.remove('armed'), 3000); };
+    acts.append(del);
+    // drag the card to another place in the list
+    card.dataset.id = sc.id; card.classList.add('scdrag');
+    card.addEventListener('pointerdown', e => sceneDragStart(e, card, list));
     row.append(acts);
     card.append(tb, row); list.append(card);
   });
@@ -12375,7 +12703,22 @@ function renderRevealBar() {
 /* ---------------- the campaign: a title, a tagline and a cover picture or logo at the top right ---------------- */
 // lobby document: camp { title, sub, v, n }; the picture is in lobbies/<code>/campimg/<i> (solo: tt.camp, tt.campimg)
 let CAMP = { title: '', sub: '', v: '', n: 0 }, campSrc = '', campV = null;
-function sanitizeCamp(o) { o = o && typeof o === 'object' ? o : {}; return { title: clampStr(o.title || '', 60).trim(), sub: clampStr(o.sub || '', 90).trim(), v: typeof o.v === 'string' ? o.v.slice(0, 40) : '', n: Math.max(0, Math.min(4, Math.trunc(+o.n) || 0)) }; }
+function sanitizeCamp(o) {
+  o = o && typeof o === 'object' ? o : {};
+  // id: the campaign's lasting name for itself; sk: the name its saves go under ("The Sunken Crown (k3x9q)")
+  const id = typeof o.id === 'string' && /^c[\w-]{4,24}$/.test(o.id) ? o.id : '', sk = id && typeof o.sk === 'string' ? clampStr(o.sk, 70).replace(/[^\w ()-]/g, '').trim() : '';
+  // was: the lobby code the table had before it became a campaign (its older saves are kept under that code)
+  const was = id && typeof o.was === 'string' && /^[A-Z0-9]{4,10}$/.test(o.was) ? o.was : '';
+  return { title: clampStr(o.title || '', 60).trim(), sub: clampStr(o.sub || '', 90).trim(), v: typeof o.v === 'string' ? o.v.slice(0, 40) : '', n: Math.max(0, Math.min(4, Math.trunc(+o.n) || 0)), ...(id ? { id, sk: sk || campSk(id, o.title), ...(was ? { was } : {}) } : {}) };
+}
+// the folder name a campaign's saves go under: its title, and the end of its id so two campaigns with one title stay apart
+function campSk(id, title) { const t = clampStr(title || '', 60).replace(/[^\w ()-]/g, '').replace(/\s+/g, ' ').trim().slice(0, 48) || 'Campaign'; return `${t} (${String(id).slice(-5)})`; }
+// the lobby owner's page gives an older table (or a brand new one) its campaign id
+async function ensureCampId() {
+  if (CAMP.id || !isOwner() || (mode === 'shared' && !S.lobbyLoaded)) return;
+  const id = 'c' + newId().replace(/[^\w]/g, '').slice(-10);
+  await saveCamp({ id, was: S.lobby || '' }).catch(() => {});
+}
 async function syncCamp(c) {
   const next = sanitizeCamp(c); CAMP = next;
   if (next.v !== campV) {
@@ -12409,8 +12752,10 @@ function imageToLogo(file) {
   });
 }
 // src: a new picture (data URL), '' to remove it, undefined to keep it
-async function saveCamp({ title, sub, src }) {
-  const next = sanitizeCamp({ ...CAMP, ...(title !== undefined ? { title } : {}), ...(sub !== undefined ? { sub } : {}) });
+async function saveCamp({ title, sub, src, id, sk, was }) {
+  const next = sanitizeCamp({ ...CAMP, ...(title !== undefined ? { title } : {}), ...(sub !== undefined ? { sub } : {}), ...(id ? { id, sk: sk || '', was: was || '' } : {}) });
+  // a new title: its saves go under the new name from now on (the campaign list still keeps them together by id)
+  if (next.id && title !== undefined && !sk && clampStr(title, 60).trim() !== CAMP.title) next.sk = campSk(next.id, next.title);
   const chunks = [];
   if (src !== undefined) { next.v = newId(); for (let i = 0; i < (src || '').length; i += BG_CHUNK) chunks.push(src.slice(i, i + BG_CHUNK)); next.n = Math.min(4, chunks.length); }
   if (shared()) {
@@ -12533,7 +12878,8 @@ function asDb() {
   return asDbP;
 }
 const asStore = async (name, rw) => (await asDb()).transaction(name, rw ? 'readwrite' : 'readonly').objectStore(name);
-const asLobby = () => S.lobby || 'solo';
+// saves go under the campaign's save name (older tables: the lobby code, or 'solo' when played alone)
+const asLobby = () => (mode !== 'solo' && CAMP.sk) || S.lobby || 'solo';
 // this browser's storage
 const BROWSER_SAVES = {
   kind: 'browser', label: 'this browser',
@@ -12549,7 +12895,7 @@ const BROWSER_SAVES = {
 };
 // a saves folder, through a small file interface: read, write, list, remove
 function folderSaves(fs, label, open) {
-  const safe = s => String(s).replace(/[^\w-]/g, '_');
+  const safe = s => String(s).replace(/[^\w ()-]/g, '_').trim() || '_';
   const idx = async lobby => { try { return JSON.parse(await fs.read(`${safe(lobby)}/index.json`) || '[]'); } catch { return []; } };
   const writeIdx = (lobby, list) => fs.write(`${safe(lobby)}/index.json`, JSON.stringify(list));
   const file = (lobby, meta) => meta.live ? `${safe(lobby)}/latest.json` : `${safe(lobby)}/saves/${new Date(meta.ts).toISOString().replace(/[:.]/g, '-').slice(0, 19)}${meta.label ? ' ' + String(meta.label).replace(/[^\w ()-]/g, '').slice(0, 40) : ''}.json`;
@@ -12683,7 +13029,7 @@ async function localSave(label) {
     if (!label && sig === asSig && !(keepOne && asLastAt > asLastKept)) return null;
     for (const [id, src] of pics) if (!(await store.hasPic(lobby, id))) await store.putPic(lobby, id, src);
     const picList = [...pics.keys()], size = json.length + [...pics.values()].reduce((a, s) => a + s.length, 0);
-    const info = { title: CAMP.title || '', sys: S.rules.sys, sess: SESS ? sessLabel(SESS) : '' };
+    const info = { title: CAMP.title || '', sys: S.rules.sys, sess: SESS ? sessLabel(SESS) : '', cid: CAMP.id || '', code: S.lobby || '', was: CAMP.was || '', ...saveThumbs() };
     // "Latest", rewritten every time
     await store.put(lobby, { k: lobby + '|latest', ts: now, label: null, live: true, size, ...info }, json, picList);
     asSig = sig; asLastAt = now; paintSaveBtn();
@@ -12708,6 +13054,20 @@ async function asPrune(store, lobby) {
   const used = new Set();
   for (const m of await store.list(lobby)) { const d = await store.get(lobby, m.k); (d && d.pics || []).forEach(p => used.add(p)); }
   await store.prunePics(lobby, used);
+}
+// small pictures for the campaign list: the board as it looks now (at most once a minute) and the campaign's logo
+let thumbAt = 0, thumbBoard = '', thumbLogoV = null, thumbLogo = '';
+function saveThumbs() {
+  const now = Date.now();
+  if (now - thumbAt > 60000 || !thumbBoard) {
+    thumbAt = now;
+    try { const c = document.createElement('canvas'), w = 320, h = Math.round(320 * Math.min(0.75, innerHeight / innerWidth)); c.width = w; c.height = h; c.getContext('2d').drawImage(cv, 0, 0, cv.width, cv.width * h / w, 0, 0, w, h); thumbBoard = c.toDataURL('image/jpeg', 0.7); } catch { thumbBoard = ''; }
+  }
+  if (campV !== thumbLogoV) {
+    thumbLogoV = campV; thumbLogo = '';
+    if (campSrc) { const im = new Image(); im.onload = () => { try { const c = document.createElement('canvas'), k = Math.min(1, 200 / Math.max(im.naturalWidth, im.naturalHeight)); c.width = Math.max(1, Math.round(im.naturalWidth * k)); c.height = Math.max(1, Math.round(im.naturalHeight * k)); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); thumbLogo = c.toDataURL('image/webp', 0.8); } catch {} }; im.src = campSrc; }
+  }
+  return { thumb: thumbBoard, logo: thumbLogo };
 }
 async function loadLocalSave(k, lobby, store) {
   store = store || savesStore(); lobby = lobby || asLobby();
@@ -12953,6 +13313,12 @@ function openA11y() {
   seg('Motion', 'Less motion keeps the dice from tumbling across the screen and cuts the slides, fades and moving screen effects to a minimum. "Like my computer" follows your system\'s setting.', 'motion', [['system', 'Like my computer'], ['reduce', 'Less motion'], ['full', 'Full motion']]);
   tick('Hide screen effects on my screen', 'Rain, fire, haze, glitch and blur that the GM turns on stay off for you. Everyone else still sees them.', 'nofx');
   tick('Stronger contrast', 'Darker hints and labels, outlines round buttons and fields, and thicker focus rings.', 'contrast');
+  {
+    // the font for dyslexia: one of the Look's font sets; switching it off goes back to the set used before
+    const row = el('div', 'a11yrow'), l = el('label', 'sck'), c = el('input'); c.type = 'checkbox'; c.checked = lookPrefs().fonts === 'Dyslexia-friendly';
+    c.onchange = () => { const cur = lookPrefs().fonts; if (c.checked) { if (cur !== 'Dyslexia-friendly') lsSet('tt.fontsBefore', cur); setLook({ fonts: 'Dyslexia-friendly' }); } else setLook({ fonts: lsGet('tt.fontsBefore', '') && lsGet('tt.fontsBefore', '') !== 'Dyslexia-friendly' ? lsGet('tt.fontsBefore', '') : 'Easy reading' }); };
+    l.append(c, el('span', '', 'A font for dyslexia')); row.append(l, el('span'), el('p', 'hint', 'OpenDyslexic, with a little more space between lines and words. Its letters have heavier bottoms, so they don\'t flip or swap. Also under Look, as the font set Dyslexia-friendly.')); opts.append(row);
+  }
   seg('Chat pop-ups', 'While the chat is slid away, new messages pop up in the corner. They can stay twice as long, or until you click them.', 'toasts', [['normal', 'Normal'], ['long', 'Longer'], ['stay', 'Until clicked']]);
   tick('Read out new messages and rolls', 'For screen readers: new chat and roll results are announced as they arrive. Turn it off if it talks over the table.', 'speak');
   const more = el('div', 'nmd'); more.innerHTML = mdHtml(`### With the keyboard
@@ -13058,7 +13424,7 @@ function firstRunSetup() {
   const step3 = () => {
     card.textContent = '';
     const gm = lsGet('tt.myRole', 'player') === 'gm';
-    card.append(el('h2', '', 'A quick walkthrough?'), el('p', 'hint', gm ? 'About three minutes: everything players see, then the GM\'s side: scenes, the scene builder, fog, handouts, sessions, fights and saves.' : 'About a minute: the board, dice, your sheet, notes, whispers and music.'));
+    card.append(el('h2', '', 'A quick walkthrough?'), el('p', 'hint', gm ? 'Hands-on, about six minutes: you try everything players do, then the GM\'s side: campaigns and sessions, scenes, the scene builder, fog, handouts, fights and saves.' : 'Hands-on, about three minutes: you look around the board, roll, chat, move your token and open your sheet and notes.'));
     const go = el('button', 'btn primary', gm ? 'Show me around (GM)' : 'Show me around'), other = el('button', 'btn ghost', gm ? 'Just the player tour' : 'The GM tour instead'), later = el('button', 'btn ghost', 'Not now');
     go.type = other.type = later.type = 'button';
     go.onclick = () => { finish(); startTour(gm ? 'gm' : 'player'); };
@@ -13070,6 +13436,7 @@ function firstRunSetup() {
 }
 // on starting: the GM's newest save, from another table (or a table that's gone), offered to carry on with
 async function offerContinue() {
+  if (mode === 'shared') return;   // (with a Homebase, the campaign list on the start screen does this)
   if (lsGet('tt.setup', 0) < 1 || $('#continueDlg') || sessionStorage.getItem('tt.continueAsked')) return;
   sessionStorage.setItem('tt.continueAsked', '1');
   let best = null; try { best = await latestSaveElsewhere(); } catch {}
@@ -13108,86 +13475,133 @@ function offerTour(fromMenu) {
   $('#tourAsk')?.remove();
   const ov = el('div', 'overlay'); ov.id = 'tourAsk';
   const card = el('div', 'card'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Walkthrough');
-  const p = el('button', 'btn' + (gm ? '' : ' primary'), 'For players (1 min)'), g = el('button', 'btn' + (gm ? ' primary' : ''), 'For GMs (3 min)'), x = el('button', 'btn ghost', 'Not now');
+  const p = el('button', 'btn' + (gm ? '' : ' primary'), 'For players (about 3 min)'), g = el('button', 'btn' + (gm ? ' primary' : ''), 'For GMs (about 6 min)'), x = el('button', 'btn ghost', 'Not now');
   p.type = g.type = x.type = 'button'; p.onclick = () => { ov.remove(); startTour('player'); }; g.onclick = () => { ov.remove(); startTour('gm'); }; x.onclick = () => ov.remove();
-  card.append(el('h2', '', 'Walkthrough'), el('p', 'hint', 'The GM tour shows everything players see, then the GM\'s side.'), HB.el('div', 'prow end', x, p, g));
+  card.append(el('h2', '', 'Walkthrough'), el('p', 'hint', 'Hands-on: you try things as you go, and steps move on by themselves once you have. The GM tour shows everything players see, then the GM\'s side.'), HB.el('div', 'prow end', x, p, g));
   ov.onclick = e => { if (e.target === ov) ov.remove(); }; ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); ov.remove(); } };
   ov.append(card); document.body.append(ov); (gm ? g : p).focus();
 }
-// [what to point at, title, words, for: 'all' | 'gm', and something to do first (open a window)]
+/* the walkthrough: hands-on. Each step points at something; "Try it" steps move on by themselves once you've done it.
+   A step: { at: what to point at, sec: its part of the tour, t: title, p: words, try: what to do, done(): has it been done,
+   who: 'all' | 'gm', pre(): something to open first }. Players get the first three parts; GMs also get Running the table. */
+const myToks = () => S.order.filter(([, x]) => x.t === 'token' && onScene(x) && (x.pu === meId() || ((ENTS.get(x.ent) || {}).owner === meId() && (ENTS.get(x.ent) || {}).kind === 'char')));
+const shown = sel => { const w = document.querySelector(sel); return !!w && !w.hidden && !!w.getClientRects().length; };
 const TOUR = [
-  [null, 'Welcome to your table', 'The board fills the middle, the chat and dice are on the right, and your sheets, notes and more sit in the bar at the bottom. Next and Back move through this tour; Esc ends it.', 'all'],
-  ['#board', 'The board', 'Drag with the right mouse button (or hold Space) to look around, and zoom with Ctrl and the wheel. Hold the mouse still on a spot to ping it for everyone.', 'all'],
-  ['#tools', 'Drawing and measuring', 'Draw, write, measure lines, cones and circles. Each tool has a key: V selects, P draws, M measures. Measurements light up the tokens inside them.', 'all'],
-  ['#board', 'Moving your character', 'Drag your token: it waits where it is while you pick the spot, shows the path it will take round walls and others, then walks it. Hold Alt to drag it freely. Double-click a token to open its sheet; double-click a door to open it.', 'all'],
-  ['#quick', 'Rolling dice', 'Click dice to build a roll, then send it. Right-click a die to take one away. Big numbers come first in the chat, the dice beside them.', 'all'],
-  ['.mods', 'Modifiers and quick rolls', 'Advantage, disadvantage and your system\'s other ways of rolling are here, ready for the next roll. Beside them sit your game system\'s own quick rolls, like Daggerheart\'s duality roll.', 'all'],
-  ['#chatModes', 'Table chat and whispers', 'Talk to everyone, or whisper: a private chat between two people that no one else sees. A whisper to you shows a little notice.', 'all'],
-  ['.ctab.sheetbtn, .ctab.libbtn', 'Your character', 'Each sheet linked to you gets its own button here. Roll straight from it; build it from the Library by dragging in classes, items and spells. Equip a torch and it lights the dark around you.', 'all'],
-  ['.ctab.notesbtn', 'Notes', 'Each session is a tile. Type straight in: every paragraph is its own note. Drag rolls and messages from the chat into your notes (they keep their look), and notes into the chat. Pictures, doodles and search are at the top.', 'all'],
-  ['.ctab.musbtn', 'Music', 'Your own volume and mute for the table\'s music, and the music\'s effects on or off just for you.', 'all'],
-  ['#soundBtn', 'Settings', 'The gear: the dice sound, your seat (name, token, colour) and the look of Critter VTT.', 'all'],
-  ['#lobbyBtn', 'The lobby and leaving', 'The door: the lobby code to invite people (hidden until you click it), the players at the table, and Leave lobby.', 'all'],
-  ['#panel .brand', 'The Critter VTT menu', 'Click the logo or press Esc: save, export, help, this walkthrough again, and more.', 'all'],
-  // the GM's side
-  ['#campTag', 'Your campaign and sessions', 'The campaign\'s title sits top left. Press play to start a session with its number and name: the title shows it, a timer can run beside it, and everyone\'s notes get a section for it.', 'gm'],
-  ['#lobbyBtn', 'Players', 'Behind the door (the lobby menu) you set up the players at your table, give them passwords if you like, and make someone a co-owner who can run the table with you.', 'gm'],
-  ['#scenesBtn', 'Scenes', 'Prepare scenes on your own: players keep seeing the live one until you reveal the next, with a fade, a curtain or fire. Each scene keeps its own map, tokens and fog.', 'gm'],
-  ['.ctab.buildbtn', 'The scene builder', 'Draw walls, windows and doors; place lights with a radius, colour and flame. Walls stop movement and sight, lights throw shadows round corners, and a scene can be dark. Drawings can become walls.', 'gm'],
-  ['.ctab.gmbtn', 'GM tools', 'Screen effects, fog of war (colour, strength, or what each character can see), random tables, the table rules and rewinding to a save.', 'gm', () => {}],
-  ['.ctab.notesbtn', 'Handouts', 'In your notes, the Handouts tab: write them ahead, then show them to everyone or some players. A copy lands in their notes, marked GM. Pin one to the board and players open it with a double-click.', 'gm'],
-  ['.ctab.libbtn', 'Library and SRD', 'NPCs, monsters, items and spells: from your table or the SRD. Drag a monster onto the board or into the turn order; share an NPC to let players roll it.', 'gm'],
-  ['.ctab.turnbtn', 'Fights', 'Start a fight to open the turn order for everyone: initiative is rolled, and turns go round with a ring around whoever\'s up.', 'gm'],
-  ['#board', 'Hidden things', 'Right-click a token to hide it from players, or turn on the GM layer to draw and place things only you see.', 'gm'],
-  ['#panel .brand', 'Saves', 'Your table saves itself after every change. Save in this menu (or Ctrl+S) makes a named save; Rewind in the same menu goes back to any of them, and next time Critter VTT starts it offers to carry on.', 'gm'],
-  ['.ctab.musbtn', 'Music for the table', 'Here you get the music code for Critter Sounds, the music app: it plays live for everyone, with effects, and players set their own volume.', 'gm'],
-  [null, 'That\'s it', 'Have a good game. This walkthrough and Help are in the Critter VTT menu (Esc) whenever you need them.', 'all']
+  { at: null, sec: 'Welcome', who: 'all', t: 'Welcome to Critter VTT', p: 'A table for playing role-playing games together: a board for maps and tokens, dice everyone sees land, sheets, notes and music. This tour is hands-on: steps marked Try it move on by themselves once you\'ve done what they say. Next skips ahead any time; Esc ends the tour.' },
+  // the table
+  { at: '#board', sec: 'The table', who: 'all', t: 'Look around the board', p: 'The board is as big as you need. Drag with the right mouse button (or hold Space and drag) to move around, and Ctrl and the wheel zooms. Hold the mouse still on a spot to ping it for everyone.', try: 'Move the board a little, or zoom.', start: () => ({ x: V.x, y: V.y, z: V.z }), done: st => Math.abs(V.x - st.x) + Math.abs(V.y - st.y) > 30 || Math.abs(V.z - st.z) > 0.02 },
+  { at: '#quick', sec: 'The table', who: 'all', t: 'Build a roll', p: 'Click dice to add them to your next roll; right-click a die to take one away. You can also type rolls like 2d6+3 straight into the chat box.', try: 'Click the d20.', done: () => /d20/i.test(($('#rollInput') || {}).value || '') },
+  { at: '#rollInput', sec: 'The table', who: 'all', t: 'Roll it', p: 'Send the roll and everyone sees the dice land on the board, with the total big in the chat. Your game system\'s rules mark crits and successes.', try: 'Press Enter, or the send button.', start: () => S.log.length, done: n => S.log.length > n },
+  { at: '.mods', sec: 'The table', who: 'all', t: 'Modifiers and quick rolls', p: 'Advantage, disadvantage and your system\'s other ways of rolling apply to the next roll. Beside them are your game system\'s own quick rolls, like Daggerheart\'s duality roll.' },
+  { at: '#chatModes', sec: 'The table', who: 'all', t: 'Talk to the table', p: 'Type anything that isn\'t a roll and it\'s a message. Whispers are private chats between two people; right-click a message to react or reply.', try: 'Say hello: type a message and press Enter.', start: () => S.log.length, done: n => S.log.length > n && S.log[S.log.length - 1].k !== 'roll' },
+  { at: '#chatTab', sec: 'The table', who: 'all', t: 'More room for the board', p: 'This tab slides the chat away. New messages then pop up in the corner for a few seconds; click one, or the tab, and the chat comes back.' },
+  // your character
+  { at: '#board', sec: 'Your character', who: 'all', t: 'Move your token', p: 'Drag your token: it waits while you pick the spot, shows the path round walls, then walks it (hold Alt to drag freely). Without a mouse: Tab to the token list after the board and use the arrow keys. Double-click a token to open its sheet.', try: 'Move your token one square or more.', start: () => new Map(myToks().map(([id, x]) => [id, x.x + ',' + x.y])), done: st => myToks().some(([id, x]) => st.has(id) && st.get(id) !== x.x + ',' + x.y), skipIf: () => !myToks().length },
+  { at: '.ctab.sheetbtn', sec: 'Your character', who: 'all', t: 'Your sheet', p: 'Each sheet linked to you has a button here. Roll straight from it, level up, and build it from the Library by dragging in classes, items and spells. Equip a torch and it lights the dark around you.', try: 'Open your sheet.', done: () => !!document.querySelector('.sheetwin:not([hidden])') },
+  { at: '#tools', sec: 'Your character', who: 'all', t: 'Draw and measure', p: 'Draw, write and point things out; measure lines, cones and circles (they light up the tokens inside). Each tool has a key: V selects, P draws, M measures.', try: 'Press M, or pick the ruler, and drag on the board.', done: () => /^m/.test(S.tool || '') },
+  { at: '.ctab.notesbtn', sec: 'Your character', who: 'all', t: 'Notes', p: 'Each session gets a tile; type straight in, and every paragraph is its own note. Drag rolls and messages from the chat into your notes, and notes back into the chat. Handouts from the GM land here too.', try: 'Open your notes.', done: () => shown('#notesWin') },
+  { at: '.ctab.libbtn', sec: 'Your character', who: 'all', t: 'The Library', p: 'Items, spells, monsters and rules from your table and the SRD. Drag things onto your sheet, or onto the board.' },
+  // around the screen
+  { at: '.ctab.musbtn', sec: 'Around the screen', who: 'all', t: 'Music', p: 'Your own volume and mute for the table\'s music, and its effects on or off just for you.' },
+  { at: '#soundBtn', sec: 'Around the screen', who: 'all', t: 'Settings', p: 'The gear: dice sound, music, your seat (name, token, colour), the Look (light or dark, highlight colour, fonts) and Accessibility (less motion, stronger contrast, a font for dyslexia, keyboard help).', try: 'Open the settings.', done: () => shown('#soundPop') },
+  { at: '#lobbyBtn', sec: 'Around the screen', who: 'all', t: 'The lobby and leaving', p: 'The door: the table\'s code to invite people (hidden until you click it), who is playing whom, and Leave lobby.' },
+  { at: '#panel .brand', sec: 'Around the screen', who: 'all', t: 'The Critter VTT menu', p: 'Click the logo or press Esc: Help, this walkthrough, Accessibility, the Look, saving and more.' },
+  // running the table
+  { at: '#campTag', sec: 'Running the table', who: 'gm', t: 'Your campaign and sessions', p: 'Click the title to name the campaign and give it a picture: both show on the start screen. Press play to start a session: everyone\'s notes get a section for it, and a timer can run beside the title.' },
+  { at: '#lobbyBtn', sec: 'Running the table', who: 'gm', t: 'Players and the table\'s code', p: 'Behind the door you set up your players (with passwords if you like) and co-owners. Each time you open the campaign it gets a new code: send it to your players. Leave lobby closes the table; your campaign stays in your saves.' },
+  { at: '#scenesBtn', sec: 'Running the table', who: 'gm', t: 'Scenes', p: 'Prepare scenes on your own while the players keep seeing the live one, then reveal the next with a fade, a curtain or fire. Drag scenes to reorder them; the bin deletes one, and Undo (Ctrl+Z) brings it back.', try: 'Open the Scenes panel.', done: () => shown('#sceneDock') },
+  { at: '.ctab.gmbtn', sec: 'Running the table', who: 'gm', t: 'GM tools and scene settings', p: 'Screen effects, fog of war, random tables and the table rules. Under Map: Scene settings (each scene\'s table colour, background map and how tokens move and measure), aligning the grid to the map and resetting it.', try: 'Open the GM tools.', done: () => shown('#gmWin') },
+  { at: '.ctab.buildbtn', sec: 'Running the table', who: 'gm', t: 'The scene builder', p: 'Walls, windows and doors; lights with a radius, colour and flicker. Walls stop movement and sight, lights cast shadows round corners, and a scene can be dark so players see only what their characters do.', try: 'Open the builder (its bar appears at the top), then close it again.', start: () => builderOn(), done: was => builderOn() !== was },
+  { at: '.ctab.notesbtn', sec: 'Running the table', who: 'gm', t: 'Handouts', p: 'In your notes, the Handouts tab: write them ahead, then show them to everyone or some players. Pin one to the board and players open it with a double-click.' },
+  { at: '.ctab.libbtn', sec: 'Running the table', who: 'gm', t: 'Monsters and NPCs', p: 'Drag a monster from the Library onto the board or into the turn order; share an NPC to let players roll it. Importers bring in your own books from Foundry modules and D&D Beyond (GM tools, Tools).' },
+  { at: '.ctab.turnbtn', sec: 'Running the table', who: 'gm', t: 'Fights', p: 'Start a fight to open the turn order for everyone: initiative is rolled, turns go round, and whoever\'s up gets a ring. Trackers beside it keep clocks and counters.' },
+  { at: '#board', sec: 'Running the table', who: 'gm', t: 'Hidden things', p: 'Right-click a token to hide it from players, or switch on the GM layer (GM tools, Map) to draw and place things only you see.' },
+  { at: '#panel .brand', sec: 'Running the table', who: 'gm', t: 'Saves', p: 'Your campaign saves itself after every change, under its own name in your saves folder. Ctrl+S makes a named save; Rewind goes back to any of them. Next time, the start screen shows your campaigns: right-click one to open an older save.' },
+  { at: null, sec: 'Done', who: 'all', t: 'You\'re ready', p: 'Have a good game. Help, this walkthrough and Accessibility are in the Critter VTT menu (Esc) whenever you need them.' }
 ];
 let tourState = null;
 function startTour(kind) {
   endTour();
-  const steps = TOUR.filter(s => s[3] === 'all' || kind === 'gm').filter((s, i, a) => !(s[3] === 'all' && s[1] === 'That\'s it' && i !== a.length - 1));
-  // the last 'all' step (the ending) goes at the very end
-  const end = steps.findIndex(s => s[1] === 'That\'s it'); if (end >= 0) steps.push(steps.splice(end, 1)[0]);
+  const steps = TOUR.filter(st => st.who === 'all' || kind === 'gm');
   closeCritterMenu(); closePop();
-  const ov = el('div', 'tourov'), spot = el('div', 'tourspot'), card = el('div', 'tourcard'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-live', 'polite');
+  const ov = el('div', 'tourov'), spot = el('div', 'tourspot'), card = el('div', 'tourcard'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-live', 'polite'); card.setAttribute('aria-label', 'Walkthrough');
   ov.append(spot, card); document.body.append(ov);
-  tourState = { steps, i: 0, ov, spot, card, kind };
-  ov.addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); endTour(); } if (e.key === 'ArrowRight') tourGo(1); if (e.key === 'ArrowLeft') tourGo(-1); });
+  tourState = { steps, i: 0, ov, spot, card, kind, poll: 0, st: null, ok: false };
+  addEventListener('keydown', tourKeys, true);
   addEventListener('resize', tourPaint);
-  tourPaint();
+  tourEnter();
 }
-function endTour() { if (!tourState) return; tourState.ov.remove(); removeEventListener('resize', tourPaint); tourState = null; lsSet('tt.toured', 1); }
-function tourGo(d) { if (!tourState) return; const j = tourState.i + d; if (j < 0) return; if (j >= tourState.steps.length) { endTour(); return; } tourState.i = j; tourPaint(); }
-function tourPaint() {
+// Esc ends it, the arrow keys page through (not while typing)
+function tourKeys(e) {
+  if (!tourState) return;
+  const typing = e.target && e.target.matches && e.target.matches('input,textarea,select,[contenteditable="true"]');
+  if (e.key === 'Escape' && !typing) { e.preventDefault(); e.stopPropagation(); endTour(); }
+  else if (!typing && tourState.card.contains(e.target) && e.key === 'ArrowRight') tourGo(1);
+  else if (!typing && tourState.card.contains(e.target) && e.key === 'ArrowLeft') tourGo(-1);
+}
+function endTour() { if (!tourState) return; clearInterval(tourState.poll); tourState.ov.remove(); removeEventListener('resize', tourPaint); removeEventListener('keydown', tourKeys, true); tourState = null; lsSet('tt.toured', 1); }
+function tourGo(d) {
   const t = tourState; if (!t) return;
-  const [sel, title, text, who, pre] = t.steps[t.i]; if (pre) try { pre(); } catch {}
-  const target = sel ? [...document.querySelectorAll(sel)].find(x => { const r = x.getBoundingClientRect(); return r.width > 4 && r.height > 4 && !x.closest('[hidden]'); }) : null;
-  const pad = 6, card = t.card;
+  let j = t.i + d;
+  while (j > 0 && j < t.steps.length - 1 && t.steps[j].skipIf && t.steps[j].skipIf()) j += d < 0 ? -1 : 1;
+  if (j < 0) return; if (j >= t.steps.length) { endTour(); return; }
+  t.i = j; tourEnter();
+}
+// a new step: open what it needs, note how things are now (for its "done"), and watch for it being done
+function tourEnter() {
+  const t = tourState; if (!t) return;
+  const st = t.steps[t.i]; clearInterval(t.poll); t.ok = false;
+  if (st.pre) try { st.pre(); } catch {}
+  try { t.st = st.start ? st.start() : null; } catch { t.st = null; }
+  if (st.done) t.poll = setInterval(() => {
+    if (!tourState || tourState !== t || t.ok) return;
+    let ok = false; try { ok = !!st.done(t.st); } catch {}
+    if (!ok) return;
+    t.ok = true; tourPaint();
+    const at = t.i; setTimeout(() => { if (tourState === t && t.i === at) tourGo(1); }, reduceMotion.matches ? 2200 : 1400);
+  }, 350);
+  tourPaint(true);
+}
+function tourPaint(fresh) {
+  const t = tourState; if (!t) return;
+  const st = t.steps[t.i];
+  const target = st.at ? [...document.querySelectorAll(st.at)].find(x => { const r = x.getBoundingClientRect(); return r.width > 4 && r.height > 4 && !x.closest('[hidden]') && r.bottom > 0 && r.right > 0 && r.top < innerHeight && r.left < innerWidth; }) : null;
+  const card = t.card, M = 12, pad = 6;
+  // the part of the tour, and how far along
+  const secs = [...new Set(t.steps.map(x => x.sec))], si = secs.indexOf(st.sec);
   card.textContent = '';
-  card.append(HB.el('div', 'tourtop', el('span', 'tourn', `${t.i + 1} / ${t.steps.length}`), who === 'gm' ? el('span', 'tourgm', 'GM') : '', el('span', 'grow')), el('h3', '', title), el('p', '', text));
-  const back = el('button', 'btn small ghost', 'Back'), next = el('button', 'btn small primary', t.i === t.steps.length - 1 ? 'Done' : 'Next'), skip = el('button', 'btn small ghost', 'End the tour');
+  const bar = el('div', 'tourbar'); bar.setAttribute('aria-hidden', 'true'); const fill = el('span'); fill.style.width = Math.round((t.i + 1) / t.steps.length * 100) + '%'; bar.append(fill);
+  card.append(bar, HB.el('div', 'tourtop', el('span', 'toursec', st.sec), st.who === 'gm' ? el('span', 'tourgm', 'GM') : '', el('span', 'grow'), el('span', 'tourn', `${t.i + 1} of ${t.steps.length}`)), el('h3', '', st.t), el('p', '', st.p));
+  if (st.try) {
+    const tr = el('div', 'tourtry' + (t.ok ? ' ok' : '')); tr.innerHTML = icon(t.ok ? 'star-swirl' : 'arrow-cursor'); tr.append(el('span', '', t.ok ? 'Nicely done!' : 'Try it: ' + st.try));
+    card.append(tr);
+  }
+  const back = el('button', 'btn small ghost', 'Back'), next = el('button', 'btn small ' + (st.try && !t.ok ? '' : 'primary'), t.i === t.steps.length - 1 ? 'Finish' : st.try && !t.ok ? 'Skip this one' : 'Next'), skip = el('button', 'btn small ghost', 'End the tour');
   back.type = next.type = skip.type = 'button'; back.disabled = t.i === 0;
   back.onclick = () => tourGo(-1); next.onclick = () => tourGo(1); skip.onclick = endTour;
-  card.append(HB.el('div', 'prow end', skip, el('span', 'grow'), back, next));
+  card.append(HB.el('div', 'prow end tourbtns', skip, el('span', 'grow'), back, next));
+  t.ov.classList.toggle('trying', !!st.try);
+  // the card's size first, then where it fits: it always stays inside the window, with a margin
+  const cw = Math.min(380, innerWidth - M * 2); card.style.width = cw + 'px'; card.style.maxHeight = (innerHeight - M * 2) + 'px';
+  const ch = Math.min(card.offsetHeight || 220, innerHeight - M * 2);
   if (target) {
     let r = target.getBoundingClientRect();
     // a big thing (the board) gets a window in the middle of it rather than all of it
     if (r.width > innerWidth * 0.6 && r.height > innerHeight * 0.6) r = { left: innerWidth * 0.3, top: innerHeight * 0.3, width: innerWidth * 0.3, height: innerHeight * 0.32, right: innerWidth * 0.6, bottom: innerHeight * 0.62 };
-    Object.assign(t.spot.style, { display: 'block', left: (r.left - pad) + 'px', top: (r.top - pad) + 'px', width: (r.width + pad * 2) + 'px', height: (r.height + pad * 2) + 'px' });
-    // the card beside it, wherever there's room
-    const cw = Math.min(360, innerWidth - 24); card.style.width = cw + 'px';
-    const ch = card.offsetHeight || 200;
-    let x = r.left + r.width / 2 - cw / 2, y = r.bottom + 14;
-    if (y + ch > innerHeight - 12) y = r.top - ch - 14;
-    if (y < 12) { y = Math.max(12, Math.min(innerHeight - ch - 12, r.top)); x = r.right + 14 + cw < innerWidth ? r.right + 14 : r.left - cw - 14; }
-    Object.assign(card.style, { left: Math.max(12, Math.min(innerWidth - cw - 12, x)) + 'px', top: Math.max(12, Math.min(innerHeight - ch - 12, y)) + 'px', transform: 'none' });
+    const L = Math.max(4, r.left - pad), T = Math.max(4, r.top - pad), R = Math.min(innerWidth - 4, r.right + pad), B = Math.min(innerHeight - 4, r.bottom + pad);
+    Object.assign(t.spot.style, { display: 'block', left: L + 'px', top: T + 'px', width: Math.max(0, R - L) + 'px', height: Math.max(0, B - T) + 'px' });
+    // below, above, right, left: the first place the whole card fits; else the side with the most room
+    const cx = Math.max(M, Math.min(innerWidth - cw - M, (L + R) / 2 - cw / 2)), cy = Math.max(M, Math.min(innerHeight - ch - M, (T + B) / 2 - ch / 2));
+    const spots = [[cx, B + 12, innerHeight - B - 12 - M >= ch], [cx, T - 12 - ch, T - 12 - M >= ch], [R + 12, cy, innerWidth - R - 12 - M >= cw], [L - 12 - cw, cy, L - 12 - M >= cw]];
+    let [x, y] = (spots.find(q => q[2]) || (innerHeight - B > T ? [cx, innerHeight - ch - M] : [cx, M]));
+    x = Math.max(M, Math.min(innerWidth - cw - M, x)); y = Math.max(M, Math.min(innerHeight - ch - M, y));
+    Object.assign(card.style, { left: x + 'px', top: y + 'px', transform: 'none' });
     t.ov.classList.remove('center');
   } else {
-    t.spot.style.display = 'none'; card.style.width = Math.min(420, innerWidth - 24) + 'px';
-    Object.assign(card.style, { left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }); t.ov.classList.add('center');
+    t.spot.style.display = 'none';
+    Object.assign(card.style, { left: Math.max(M, (innerWidth - cw) / 2) + 'px', top: Math.max(M, (innerHeight - ch) / 2) + 'px', transform: 'none' }); t.ov.classList.add('center');
   }
-  next.focus();
+  if (fresh) next.focus({ preventScroll: true });
 }
 // once Critter VTT is up: the splash goes, a first start gets its setup, and a GM can carry on from their latest save
 bootSettled.then(() => hideSplash());
@@ -14153,11 +14567,24 @@ async function alignGridTo(x0, y0, x1, y1) {
   const gx = Math.round(Math.min(x0, x1) / SQ) * SQ, gy = Math.round(Math.min(y0, y1) / SQ) * SQ;
   const size = Math.max(10, Math.min(400, s2 * 100));
   if (size !== s2 * 100) toast('The map needed more scaling than allowed; it is as close as it can get.');
-  const ss = size / 100;
+  const ss = size / 100, id = S.scene, cl = viewRules().cloth || {}, own = sceneOwn(id);
+  // how the map sat before, kept with the scene so "Reset the grid alignment" can put it back later too
+  const was = (S.scenes.find(x => x.id === id) || {}).align || { mode: b.mode, size: b.size, x: b.x, y: b.y, grid: !!cl.grid };
+  const before = S.scenes.map(x => ({ ...x })), bgWas = { ...b };
+  pushUndo({ op: 'fn', said: 'the grid alignment', undo: async () => { setScenes({ scenes: before.filter(x => S.scenes.some(y => y.id === x.id)) }); await setSceneBg(id, { bg: bgWas, src: '' }); } });
   await saveBackground({ ...b, mode: 'board', size, x: Math.round(gx - px * ss), y: Math.round(gy - py * ss) });
-  const cl = viewRules().cloth || {};
-  setScenes({ scenes: S.scenes.map(x => (x.id === S.scene ? { ...x, cloth: { color: cl.color || null, grid: true } } : x)) });
-  toast('The grid now matches the map.'); requestDraw();
+  setScenes({ scenes: S.scenes.map(x => (x.id === id ? { ...x, cloth: { color: cl.color || null, grid: true }, align: was } : x)) });
+  toast('The grid now matches the map. Undo, or GM tools › Map › Reset the grid alignment, puts it back.'); requestDraw();
+}
+async function resetGridAlign() {
+  const { bg: b } = sceneBgNow(), id = S.scene, entry = S.scenes.find(x => x.id === id) || {};
+  if (!b) { toast('This scene has no background map.'); return; }
+  const was = entry.align || { mode: sanitizeBg({}).mode, size: 100, x: 0, y: 0, grid: false }, cl = viewRules().cloth || {};
+  const before = S.scenes.map(x => ({ ...x })), bgWas = { ...b };
+  pushUndo({ op: 'fn', said: 'resetting the grid alignment', undo: async () => { setScenes({ scenes: before.filter(x => S.scenes.some(y => y.id === x.id)) }); await setSceneBg(id, { bg: bgWas, src: '' }); } });
+  await saveBackground({ ...b, mode: was.mode, size: was.size, x: was.x, y: was.y });
+  setScenes({ scenes: S.scenes.map(x => { if (x.id !== id) return x; const { align, ...rest } = x; return { ...rest, cloth: { color: cl.color || null, grid: !!was.grid } }; }) });
+  toast(entry.align ? 'The map is back the way it was before you aligned it.' : 'The map is back to its standard placement.'); requestDraw();
 }
 
 /* ---------------- ambience: sound beds made on the spot, set by the lobby owner, heard by everyone ---------------- */
@@ -15420,8 +15847,16 @@ function blockTa(n, sec, text) {
   const ta = el('textarea', 'nblkta'); ta.value = text || ''; ta.rows = 1; ta.maxLength = 8000; ta.spellcheck = true;
   ta.placeholder = n ? '' : 'Write… (Enter starts a new note, Shift+Enter a new line)'; ta.setAttribute('aria-label', n ? 'Note' : 'New note');
   ta.dataset.sec = sec.key;
+  // typing saves itself a moment after it stops (a new note becomes a note of its own then); one timer, nothing written
+  // while the text is the same, and anything still waiting goes out at once when the app closes or the table changes
   let saveT = 0;
-  ta.oninput = () => { growTa(ta); if (!n) nGhost = ta.value; else { clearTimeout(saveT); saveT = setTimeout(() => quietSave(n.id, ta.value), 900); } };
+  const flush = () => {
+    clearTimeout(saveT); saveT = 0; if (nPending === flush) nPending = null;
+    if (!ta.isConnected && !n) return;
+    if (!n) { if (ta.value.trim()) { n = ghostToNote(ta, sec); ta.setAttribute('aria-label', 'Note'); ta.placeholder = ''; } }
+    else quietSave(n.id, ta.value);
+  };
+  ta.oninput = () => { growTa(ta); if (!n) nGhost = ta.value; clearTimeout(saveT); nPending = flush; saveT = setTimeout(flush, n ? 900 : 1500); };
   ta.onkeydown = e => {
     const v = ta.value, a = ta.selectionStart, z = ta.selectionEnd;
     if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey && !e.isComposing) {
@@ -15451,6 +15886,19 @@ function blockTa(n, sec, text) {
   ta.onblur = () => { if (nRendering) return; setTimeout(() => { const w = winEl('notesWin'); if (w && w.contains(w.ownerDocument.activeElement) && w.ownerDocument.activeElement.classList.contains('nblkta')) return; commitEdit(); nEdit = null; renderNotes(true); }, 0); };
   return ta;
 }
+// the new-note block, saved as it is (paragraphs are split when the writer moves on); the block keeps editing that note
+function ghostToNote(ta, sec) {
+  const s2 = myBook().find(x => x.key === sec.key) || sec, after = s2.notes.length ? s2.notes[s2.notes.length - 1].id : null, id = newNoteId();
+  const made = notePut(id, { owner: meId(), kind: 'note', sess: sec.key, text: ta.value, pos: posIn(s2, after), ts: Date.now() });
+  if (!made) return null;
+  nGhost = ''; nEdit = { id, sec: sec.key, caret: ta.selectionStart };
+  return NOTES.get(id) || made;
+}
+// note typing that hasn't been saved yet goes out now
+var nPending = null;
+function flushNotes() { const f = nPending; if (!f) return false; try { f(); } catch (e) { console.warn('notes', e); } return true; }
+addEventListener('visibilitychange', () => { if (document.hidden) flushNotes(); });
+addEventListener('pagehide', flushNotes);
 function quietSave(id, text) { const n = NOTES.get(id); if (n && n.text !== text && text.trim()) notePut(id, { ...n, text, ets: Date.now(), ...(n.dm && n.src ? { pe: true } : {}) }); }
 function startEdit(id, secKey, caret) { commitEdit(); if (id.startsWith('new:')) nGhost = nGhost && nEdit && nEdit.id === id ? nGhost : ''; nEdit = { id, sec: secKey, caret }; renderNotes(true); }
 // what's in the block being written goes into the notes: split into paragraphs, an emptied note goes away. Returns the notes it touched.

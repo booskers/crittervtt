@@ -305,6 +305,21 @@ export class Hub extends DurableObject {
         if (m.t === 'savenow') return ack({ id: await this.snapshot(m.scope, String(m.label || 'Saved by hand').slice(0, 80)) });
         return ack(await this.restore(m.scope, Number(m.id)) ? { ok: true } : { error: 'no such save' });
       }
+      // the lobby owner closes the table for good: everything of the lobby goes (documents, saves, pictures, uploaded audio).
+      // Critter VTT does this when the GM stops playing; the GM's own saves keep the campaign.
+      case 'drop': {
+        if (typeof m.scope !== 'string' || m.scope[0] !== 'L' || !validId(m.scope.slice(1))) return ack({ error: 'bad lobby' });
+        const code = m.scope.slice(1), root = this.scopeData(m.scope).get('lobbies/' + code);
+        if (!root || root.owner !== ws.uid) return ack({ error: 'not allowed' });
+        for (const s of this.subs.get(m.scope) || []) this.send(s, { t: 'chg', scope: m.scope, p: 'lobbies/' + code, d: null });
+        this.sql.exec('DELETE FROM docs WHERE k > ? AND k < ?', m.scope + SEP, m.scope + '');
+        this.sql.exec('DELETE FROM blobs WHERE k > ? AND k < ?', m.scope + SEP, m.scope + '');
+        this.sql.exec('DELETE FROM saves WHERE scope = ?', m.scope);
+        this.sql.exec('DELETE FROM dirty WHERE scope = ?', m.scope); this.dirty.delete(m.scope);
+        this.sql.exec('DELETE FROM audio WHERE id LIKE ?', code + '-%');
+        this.scopes.delete(m.scope); this.sizes.delete(m.scope);
+        return ack({ ok: true });
+      }
       case 'join': {
         if (!validId(m.room) || !validId(m.peer)) return;
         // a peer id belongs to the player who took it first (the same player may take it back after a reconnect)

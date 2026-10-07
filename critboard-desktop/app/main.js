@@ -41,9 +41,11 @@ const THEME_JS = `(() => {
 const partitions = new Set(), wins = new Map();   // BaseWindow -> { bar, page }
 // updates from the GitHub releases (updater.js): the window in front carries the pop-up; every window closes before the installer takes over
 const frontWin = () => { const f = BaseWindow.getFocusedWindow(); return f && wins.has(f) ? f : [...wins.keys()][0] || null; };
-const updates = require('./updater')({ owner: 'booskers', repo: 'crittervtt', name: 'Critter VTT', parent: frontWin,
+const updates = require('./updater')({ owner: 'booskers', repo: 'crittervtt', name: 'Critter VTT', appId: 'app.critboard.desktop', parent: frontWin,
   page: () => { const w = frontWin(); return w && wins.get(w) ? wins.get(w).page.webContents : null; },
-  beforeInstall: () => Promise.all([...wins.keys()].map(w => new Promise(res => { if (w.isDestroyed()) return res(); w.once('closed', res); w.close(); }))) });
+  beforeInstall: () => { quietClose = true; return Promise.all([...wins.keys()].map(w => new Promise(res => { if (w.isDestroyed()) return res(); w.once('closed', res); w.close(); }))); } });
+// set while an update closes the windows: the pages save without asking
+let quietClose = false;
 function openWindow(partition, page) {
   const ses = partition ? session.fromPartition(partition) : session.defaultSession;
   if (!partitions.has(partition || 'default')) { partitions.add(partition || 'default'); serveFiles(ses); }
@@ -73,6 +75,25 @@ function openWindow(partition, page) {
   bar.webContents.on('did-finish-load', () => { state(); win.show(); });
   wins.set(win, { bar, page: view });
   win.on('closed', () => { wins.delete(win); for (const v of [bar, view]) if (!v.webContents.isDestroyed()) v.webContents.close(); });
+  // closing: the page gets a moment (at most 5 s) to save and close the GM's lobby, which lasts one evening
+  // If the table changed since its last save, the page asks first (Save, Don't save, Cancel): while it asks ('app:quit-wait')
+  // there's no time limit, Cancel ('app:quit-cancel') keeps the window open, and a page that has crashed doesn't hold it up.
+  // An update closing the windows (quietClose) saves without asking.
+  let closing = false;
+  win.on('close', e => {
+    if (closing || view.webContents.isDestroyed()) return;
+    e.preventDefault(); closing = true;
+    const vw = view.webContents;
+    const off = () => { ipcMain.removeListener('app:quit-ok', ok); ipcMain.removeListener('app:quit-wait', wait); ipcMain.removeListener('app:quit-cancel', cancel); vw.removeListener('render-process-gone', done); clearTimeout(t); };
+    function done() { off(); if (!win.isDestroyed()) win.close(); }
+    const ok = ev => { if (ev.sender === vw) done(); };
+    const wait = ev => { if (ev.sender === vw) clearTimeout(t); };
+    const cancel = ev => { if (ev.sender === vw) { off(); closing = false; } };
+    let t = setTimeout(done, 5000);
+    ipcMain.on('app:quit-ok', ok); ipcMain.on('app:quit-wait', wait); ipcMain.on('app:quit-cancel', cancel);
+    vw.once('render-process-gone', done);
+    vw.send('app:quitting', { quiet: quietClose });
+  });
 
   const wc = view.webContents;
   // CB_DEV_URL=<http://localhost:8787/>: load the page from a test server instead of the built www (for trying changes without a build)
