@@ -17,6 +17,8 @@ const out = join(here, 'www');
 await mkdir(out, { recursive: true });
 for (const f of await readdir(out)) await rm(join(out, f), { recursive: true, force: true });
 
+// the version shows under the logo (the page reads window.CRITTER_VERSION; the claude.ai copy has none and shows nothing)
+const version = JSON.parse(await readFile(join(here, 'package.json'), 'utf8')).version;
 const cfgFile = join(here, 'homebase.config.json');
 const cfg = existsSync(cfgFile) ? JSON.parse(await readFile(cfgFile, 'utf8')) : {};
 if (process.env.HOMEBASE_SERVER !== undefined) cfg.server = process.env.HOMEBASE_SERVER;
@@ -33,7 +35,7 @@ const wrap = body => `<!doctype html>
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="favicon.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)};</script>
+<script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)}; window.CRITTER_VERSION = ${JSON.stringify(version)};</script>
 <script src="homebase.js"></script>
 </head>
 <body>

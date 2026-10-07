@@ -111,6 +111,8 @@ a{color:var(--accent-text)}
 .logo-svg{display:block;flex:none;height:30px;width:auto;aspect-ratio:1451/330;overflow:visible}
 .logo-mark{color:var(--accent)}
 .logo-word{color:var(--ink)}
+/* the version under the big logos (the splash, the Critter VTT menu) */
+.splashver{margin:-6px 0 0;color:var(--sp-muted);font:600 12px/1 system-ui,'Segoe UI',sans-serif;letter-spacing:.12em}
 .status{font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap;margin-left:2px}
 .status::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
 .status.live::before{background:var(--good)}
@@ -12814,6 +12816,8 @@ function hideSplash() {
   setTimeout(() => { s.classList.add('out'); setTimeout(() => { s.remove(); splashGoneAt = performance.now(); }, 600); }, Math.max(0, 1400 - (performance.now() - splashT0)));
 }
 setTimeout(hideSplash, 8000);   // never in the way for long, whatever happens while it loads
+// the version under the splash's big logo (set by the app's and the site's build; the claude.ai copy has none)
+(() => { const v = window.CRITTER_VERSION, sub = document.querySelector('#splash .splashsub'); if (v && sub) sub.after(el('p', 'splashver', 'Version ' + v)); })();
 function critterMenuOpen() { return !!document.getElementById('critterMenu'); }
 function closeCritterMenu() { const m = document.getElementById('critterMenu'); if (m) { m.classList.add('out'); setTimeout(() => m.remove(), 160); } }
 function openCritterMenu() {
@@ -12822,7 +12826,7 @@ function openCritterMenu() {
   const ov = el('div', 'overlay cmenu'); ov.id = 'critterMenu';
   const card = el('div', 'card cmenucard'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-label', 'Critter VTT menu');
   const head = el('div', 'cmenuhead'); head.append(logoSvg('menulogo'), el('span', 'alpha', 'Alpha'));
-  card.append(head, el('p', 'cmenusub', 'Open source Virtual Table Top System'));
+  card.append(head, el('p', 'cmenusub', 'Open source Virtual Table Top System' + (window.CRITTER_VERSION ? ' · Version ' + window.CRITTER_VERSION : '')));
   const grid = el('div', 'cmenugrid');
   const host = isHost(), lobby = mode === 'shared' && !!S.lobby;
   const item = (ic, label, hint, fn, show = true) => { if (!show) return; const b = el('button', 'cmitem'); b.type = 'button'; b.innerHTML = icon(ic); b.append(HB.el('span', '', el('b', '', label), el('small', '', hint))); b.onclick = () => { closeCritterMenu(); fn(); }; grid.append(b); };
