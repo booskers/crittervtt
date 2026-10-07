@@ -8,7 +8,7 @@
   "scripts": {
     "build-www": "node build.mjs",
     "start": "node build.mjs && electron .",
-    "dist": "node build.mjs && electron-builder --win nsis"
+    "dist": "node build.mjs && electron-builder --win dir && node installer/pack.mjs"
   },
   "build": {
     "appId": "app.critboard.desktop",
@@ -28,16 +28,8 @@
       "output": "dist"
     },
     "win": {
-      "target": "nsis",
+      "target": "dir",
       "icon": "build/icon.ico"
-    },
-    "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
-      "shortcutName": "Critter VTT",
-      "installerIcon": "build/icon.ico",
-      "uninstallerIcon": "build/icon.ico",
-      "artifactName": "Critter-Setup.${ext}"
     },
     "publish": [
       {
@@ -46,6 +38,16 @@
         "repo": "crittervtt"
       }
     ]
+  },
+  "critterSetup": {
+    "name": "Critter VTT",
+    "accent": "#ff5c00",
+    "description": "Critter VTT: a tabletop dice roller and battle map, as a desktop app.",
+    "dataDirs": [
+      "Critboard",
+      "Critter"
+    ],
+    "artifactName": "Critter-Setup"
   },
   "devDependencies": {
     "electron": "^44.5.1",
