@@ -37,7 +37,7 @@
   color-scheme:dark;
 }
 [hidden]{display:none!important}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;overflow:hidden;margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.4;overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 button,input,select,textarea{font:inherit;color:inherit}
 button{cursor:pointer}
@@ -478,6 +478,8 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .splashbar span{display:block;width:40%;height:100%;background:var(--sp-acc);animation:splashBar 1.1s ease-in-out infinite}
 @keyframes splashBar{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
 @media (prefers-reduced-motion:reduce){.splashin,.splashbar span{animation:none}}
+/* a phone: the Alpha badge under the logo instead of beside it, and the tagline on one line where it fits */
+@media (max-width:520px){.splashmark{flex-direction:column;align-items:center;gap:10px}.splashmark .alpha{margin-top:0}.splashsub{font-size:11px;letter-spacing:.12em}}
 /* the logo above the chat opens the Critter VTT menu */
 #panel .brand[role=button]{cursor:pointer;border-radius:8px;transition:filter .15s}
 #panel .brand[role=button]:hover{filter:brightness(1.15)}
@@ -1463,13 +1465,59 @@ body.mob #mMenu #tools,body.mob #mMenu #chatBar{position:static;inset:auto;trans
 body.mob #mMenu #tools .sep,body.mob #mMenu #chatBar .sep{display:none}
 body.mob #mMenu #tools .zoomstep{display:flex}
 body.mob #mMenu #tools button,body.mob #mMenu #chatBar .ctab{width:auto;height:auto;min-height:70px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;border:1px solid var(--line);border-radius:14px;padding:10px 6px;background:var(--panel-2);color:var(--ink)}
-body.mob #mMenu #tools button::after{content:attr(data-ml);font-size:12px;color:var(--muted);text-align:center;line-height:1.2}
+body.mob #mMenu #tools button::after{content:attr(data-ml);font-size:12.5px;font-weight:600;color:var(--ink);text-align:center;line-height:1.2}
+/* the tiles: one height per row, the tool names in the same type as the ones above, the "more" corner and the ink colour
+   up top where they don't run into the names, and the zoom steps as real glyphs */
+body.mob #mMenu #tools,body.mob #mMenu #chatBar{grid-auto-rows:1fr}
+body.mob #mMenu #tools .tb.grp::after{position:static;border:0;opacity:1}
+body.mob #mMenu #tools .tb.grp::before{content:'';position:absolute;right:8px;top:8px;border:3px solid transparent;border-right-color:currentColor;border-top-color:currentColor;opacity:.5}
+body.mob #mMenu #tools .tb.grp .inkdot{left:9px;top:9px;bottom:auto}
+body.mob #mMenu #tools .zoom{position:relative;font:600 22px/24px var(--f-body);color:var(--ink)}
+body.mob #mMenu #tools #zoomPct{font-size:15px;font-variant-numeric:tabular-nums}
 body.mob #mMenu #tools button .gi,body.mob #mMenu #chatBar .ctab .gi{width:24px;height:24px}
 body.mob #mMenu #chatBar .ctab .nm{display:block;font-size:12.5px;text-align:center;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 body.mob #mMenu #tools button.on,body.mob #mMenu #tools button[aria-pressed=true]{border-color:var(--accent-line);box-shadow:inset 0 0 0 1px var(--accent-line)}
 body.mob #chatDock,body.mob > #campTag,body.mob:has(.fwin:not([hidden])) .mburger,body.mob:has(.overlay:not([hidden])) .mburger{display:none}
 body.mob #mMenu #tools button{font-family:var(--f-body)}
+/* a dialog opened from the menu (Look, Accessibility, Your seat) or from a sheet comes up over them */
+body.mob .overlay:not(#splash):not(.cmenu){z-index:40}
+/* sheets on a phone: dots, boxes and pips big enough for a thumb, with a little more room around each to land on */
+body.mob .sheetwin .dots{gap:7px}
+body.mob .sheetwin .dot{position:relative;width:20px;height:20px}
+body.mob .sheetwin .dot::after{content:'';position:absolute;inset:-5px}
+body.mob .sheetwin .dots.xp .dot,body.mob .sheetwin .sys-blades .bl-act .dot,body.mob .sheetwin .sys-v5 .v5-row .dot{width:18px;height:18px}
+body.mob .sheetwin .dots.diamond .dot{width:17px;height:17px;margin:3px}
+body.mob .sheetwin .dots.chip .dot,body.mob .sheetwin .dots.clock .dot{width:24px;height:24px}
+body.mob .sheetwin input[type=checkbox],body.mob .sheetwin input[type=radio]{width:20px;height:20px}
+body.mob .sheetwin .skn.rollable{min-height:30px}
+body.mob .sheetwin .pdot{position:relative;width:18px;height:18px}
+body.mob .sheetwin .pdot::after{content:'';position:absolute;inset:-5px}
+body.mob .sheetwin .so.pv,body.mob .sheetwin .so.bigout{min-height:28px}
+body.mob .sheetwin .rollbtn,body.mob .sheetwin .sldel{min-height:32px;min-width:32px}
+body.mob .sheetwin .sys-coc .coc-sk{grid-template-columns:22px minmax(0,1fr) 5ch 5.6ch;padding:5px 0}
+body.mob .sheetwin .sys-shadowrun .sr-att .sf{min-width:34px}
+body.mob .sheetwin .sr-derived .pfrow{grid-template-columns:minmax(4ch,max-content) minmax(0,1fr) auto auto}
+body.mob .sheetwin .sr-derived .pv{white-space:nowrap}
+/* the sheet's tool row stays one row: who plays it shrinks, the level-up button and the gear keep their size */
+body.mob .sheettools .wacts{flex:1;flex-wrap:nowrap;align-items:center;gap:6px;min-width:0}
+body.mob .sheettools .assignsel{flex:1 1 auto;min-width:0;max-width:none;min-height:36px}
+body.mob .sheettools .wacts>.btn,body.mob .sheettools .wacts>.icon-btn{flex:none;white-space:nowrap;min-height:36px}
+body.mob .sheettools .wacts>.icon-btn{min-width:36px}
+/* thumb-sized controls on a phone (at least 36–44px tall) */
+body.mob .cmode{min-height:36px;padding-inline:12px}
+body.mob #mMenu .mmback{min-width:44px;min-height:44px}
+body.mob #mMenu #campTag .camptx{padding-block:10px}
+body.mob #mMenu #campTag .sessbtn{min-width:40px;min-height:40px}
+body.mob #rollInput,body.mob #rollForm button{min-height:44px}
+body.mob #sheetGrab{min-height:36px}
+/* the panel's swipe is ours, not the browser's (the log keeps scrolling when it's open) */
+body.mob #panel.peek,body.mob #panel .roller{touch-action:none}
 body.mob .menu{z-index:46}
+/* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
+body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
+body.mob .menu > button:has(> small){flex-wrap:wrap;row-gap:2px}
+body.mob .menu > button > small{flex-basis:100%}
+body.mob .menu > button{min-height:44px}
 body.mob .ctxmenu{z-index:60}
 /* the chat log hides behind an arrow above the dice */
 body.mob .grab{height:30px}
@@ -1776,6 +1824,8 @@ html.hc .btn,html.hc .chip,html.hc .ctab,html.hc .segb,html.hc input,html.hc sel
 .joinbar label{font-weight:700;white-space:nowrap}
 .joinbar input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.12em;font-family:var(--f-mono)}
 @media (max-width:520px){.joinbar{flex-wrap:wrap}.joinbar label{width:100%}}
+/* on a phone the code field stays in reach at the bottom of the card while the campaigns scroll */
+body.mob .lobbycard .joinbar{position:sticky;bottom:-20px;z-index:2;margin-bottom:-20px;border-radius:14px 14px 0 0;background:var(--panel-3);box-shadow:0 -8px 20px -10px rgb(0 0 0/.5)}
 /* Critter VTT for players: the start screen is the code field */
 html.player-app #campListLabel,html.player-app #campList,html.player-app #campListHint,html.player-app #newCampBox{display:none!important}
 html.player-app .joinbar{margin-top:6px;padding:14px}
@@ -3637,7 +3687,7 @@ function renderLog() {
   const oldest = S.log.length >= LOG_MAX ? +S.log[0].ts || 0 : 0;
   const notes = soundNotesOn() ? (S.soundlog || []).filter(x => x.ts >= oldest) : [];
   if (!S.log.length && !notes.length) {
-    const e = el('div', 'empty'); e.innerHTML = icon('rolling-dices'); e.append(el('div', '', 'No rolls yet. Tap dice below to build a roll, then send it. Right-click a die to take one away.'));
+    const e = el('div', 'empty'); e.innerHTML = icon('rolling-dices'); e.append(el('div', '', 'No rolls yet. Tap dice below to build a roll, then send it. ' + (document.body.classList.contains('mob') ? 'Long-press a die to take one away; swipe the panel down to tuck it away.' : 'Right-click a die to take one away.')));
     box.append(e); return;
   }
   let ni = 0;
@@ -4592,6 +4642,12 @@ function readTheme() {
   let p = readTheme.probe;
   if (!p) { p = readTheme.probe = document.createElement('i'); p.setAttribute('aria-hidden', 'true'); p.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden;pointer-events:none'; document.body.append(p); }
   for (const k of ['bg', 'grid', 'grid-major', 'ink', 'accent', 'accent-2', 'muted']) { p.style.color = `var(--${k})`; T[k] = cssHex(getComputedStyle(p).color); }
+  // the phone's own bars (the browser's, or the Android app's) take the table's colour, light or dark
+  try {
+    let m = document.querySelector('meta[name="theme-color"]'); if (!m) { m = document.createElement('meta'); m.name = 'theme-color'; document.head.append(m); }
+    if (m.content !== T.bg) m.content = T.bg;
+    if (window.CritterAndroid && T.bg) window.CritterAndroid.theme(T.bg, document.documentElement.dataset.theme === 'light');
+  } catch {}
   requestDraw();
 }
 function resize() {
@@ -5158,13 +5214,17 @@ function drawMeasure(raw, col, lit) {
 cv.addEventListener('pointerdown', e => { if (e.button === 2) rcDown = { x: e.clientX, y: e.clientY }; }, true);
 cv.addEventListener('contextmenu', e => {
   e.preventDefault();
+  if (lastPointerTouch) return;   // a long press on a touch screen: the hold in pointerdown has it
   if (rcDown && Math.hypot(e.clientX - rcDown.x, e.clientY - rcDown.y) > 6) { rcDown = null; return; }
   rcDown = null;
-  const id = topHit(toWorld(e.clientX, e.clientY), 4 / V.z);
-  if (id && S.shapes.get(id).t === 'token') openTokMenu(id, e.clientX, e.clientY);
+  boardMenuAt(e.clientX, e.clientY, topHit(toWorld(e.clientX, e.clientY), 4 / V.z));
+});
+// the menu of what's on the board at a spot: a right-click, or a long press on a touch screen
+function boardMenuAt(cx, cy, id) {
+  if (id && S.shapes.get(id).t === 'token') openTokMenu(id, cx, cy);
   else if (id) {
     const s = S.shapes.get(id), mine = mayTouch(s), drawing = ['pen', 'line', 'arrow', 'rect', 'ellipse'].includes(s.t);
-    openCtx(e.clientX, e.clientY, [
+    openCtx(cx, cy, [
       s.t === 'note' && { label: 'Read it', icon: 'open-book', fn: () => openBoardNote(s) },
       s.t === 'text' && mine && { label: 'Edit the text', icon: 'pencil', fn: () => openTextEditor(null, id) },
       (drawing || s.t === 'text') && !isSpectator() && { label: 'Copy into my notes', icon: 'quill', fn: () => { const r = cv.getBoundingClientRect(); const n = winEl('notesWin'); if (!n || n.hidden) openNotes('mine'); boardToNotes([id], -1, -1); } },
@@ -5174,8 +5234,10 @@ cv.addEventListener('contextmenu', e => {
       mine && 'sep', mine && { label: 'Delete', icon: 'trash-can', danger: true, fn: () => { removeShape(id); pushUndo({ op: 'del', items: [{ id, shape: s }] }); } }
     ]);
   }
-});
+}
+let lastPointerTouch = false;
 cv.addEventListener('pointerdown', e => {
+  lastPointerTouch = e.pointerType === 'touch';
   if (act && act.kind === 'text') { commitText(); return; }
   try { cv.setPointerCapture(e.pointerId); } catch {}
   pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -5193,10 +5255,15 @@ cv.addEventListener('pointerdown', e => {
   clearTimeout(pingTimer); pingAt = null;
   if (e.button === 0 && (tool === 'select' || tool === 'hand') && !spaceDown) {
     pingAt = { x: e.clientX, y: e.clientY, w, pull: e.shiftKey };
+    const touch = e.pointerType === 'touch';
     pingTimer = setTimeout(() => {
       if (!pingAt) return;
       if (act && ['pan', 'marquee', 'lasso', 'move'].includes(act.kind)) { act = null; cv.classList.remove('panning'); }
-      doPing(pingAt.w, pingAt.pull); pingAt = null;
+      // on a touch screen, holding a token (or a note, a door, a drawing) opens its menu, as a right-click does; holding the board pings
+      const hold = touch && topHit(pingAt.w, 6 / V.z);
+      if (hold) { boardMenuAt(pingAt.x, pingAt.y, hold); if (navigator.vibrate) try { navigator.vibrate(12); } catch {} }
+      else doPing(pingAt.w, pingAt.pull);
+      pingAt = null;
     }, 600);
   }
   if (tool === 'hand') pan();
@@ -5589,7 +5656,7 @@ function buildTools() {
   const zi = el('button', 'zoom zoomstep', '+'); zi.type = 'button'; zi.title = 'Zoom in'; zi.setAttribute('aria-label', 'Zoom in'); zi.onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, 1.25);
   const zm = el('button', 'zoom zoomstep', '−'); zm.type = 'button'; zm.title = 'Zoom out'; zm.setAttribute('aria-label', 'Zoom out'); zm.onclick = () => zoomAt(innerWidth / 2, innerHeight / 2, 0.8);
   nav.append(zi, zp, zm, sep());
-  const exp = iconBtn('export', 'Export the board as an image', () => togglePop($('#imgMenu'), exp)); exp.setAttribute('aria-expanded', 'false'); nav.append(exp);
+  const exp = iconBtn('export', 'Export the board as an image', () => togglePop($('#imgMenu'), exp)); exp.id = 'boardImgBtn'; exp.setAttribute('aria-expanded', 'false'); nav.append(exp);
   const clr = iconBtn('trash', 'Clear the board: pick drawings, tokens, walls, lights, fog… (lobby owner and co-owners)', () => clearBoard());
   clr.id = 'clearBtn'; clr.hidden = true;
   nav.append(clr);
@@ -13371,6 +13438,13 @@ function openA11y() {
 - **Esc** opens the Critter VTT menu. **Ctrl + Z** undoes on the board. The drawing tools have letter keys: see Help.
 - Windows (sheets, notes, library) close with their ✕ button; their size and place are kept.
 
+### On a phone
+- **The menu** (☰, top left) holds the tools, sheets, notes and the Library; each opens as a full page. **Swipe sideways** on a page, or use Android's back gesture, to go back a step.
+- **The dice panel**: tap dice to build a roll, **long-press** a die to take one away. **Swipe the panel up** for the roll log and the table, **down** to tuck them away.
+- **The board**: drag with one finger, **pinch** to zoom and move with two. **Long-press** a token for its menu.
+- **Text size**: the Android app follows your phone's font size (Settings › Display), up to 130%. In a browser, use its own text size setting.
+- With TalkBack, the menu, the pages and the token list read like the rest of Critter VTT; double-tap to press.
+
 ### With a screen reader
 - New chat messages and roll results are read out as they arrive (switch it off above).
 - The board itself is a picture; the token list after it says each token's name and square, and the result of each move.
@@ -16973,6 +17047,8 @@ function buildEntWins() {
 /* ---------------- phones: the board, the dice and the chat box; everything else behind the burger ---------------- */
 // On a phone the tool rail, the bottom bar, the panel's header and the campaign title move into a full-screen menu.
 // Windows open as full-screen pages; a swipe left or right (or the back arrow) closes one and goes back a step.
+// tool names that don't fit a tile, said shorter
+const MOB_LABELS = { zoomPct: 'Reset zoom', boardImgBtn: 'Export image' };
 const MOB = { on: false, homes: new Map(), fromMenu: false };
 const MOB_PARTS = () => ({ head: $('#panel .ph') || ($('#mMenu [data-k=head] .ph')), camp: $('#campTag'), bar: $('#chatBar'), tools: $('#tools') });
 function mobBuild() {
@@ -16998,7 +17074,7 @@ function mobPlace() {
     else if (MOB.homes.has(k)) { const [p, nx] = MOB.homes.get(k); p.insertBefore(node, nx && nx.parentNode === p ? nx : null); MOB.homes.delete(k); }
   }
   // the tools get their names under them
-  if (MOB.on) document.querySelectorAll('#mMenu #tools button').forEach(x => { const t = x.title || x.getAttribute('aria-label') || ''; x.dataset.ml = clampStr(t.split(/[:(]/)[0].trim(), 22); });
+  if (MOB.on) document.querySelectorAll('#mMenu #tools button').forEach(x => { const t = x.title || x.getAttribute('aria-label') || ''; x.dataset.ml = MOB_LABELS[x.id] || clampStr(t.split(/[:(]/)[0].trim(), 22); });
 }
 window.critterBack = () => {
   try {
@@ -17046,6 +17122,8 @@ function mobAfterClose() { setTimeout(() => { if (MOB.on && MOB.fromMenu && !mob
     s = null; if (!MOB.on) return;
     const w = e.target.closest('.fwin, #mMenu'); if (!w) return;
     if (e.target.closest('input,textarea,select,canvas,[draggable=true],.dots,.crgrid,.nbook,[contenteditable]')) return;
+    // a row that scrolls sideways (tabs, wide tables) keeps its swipe
+    for (let n = e.target; n && n !== w; n = n.parentElement) if (n.scrollWidth > n.clientWidth + 2 && /auto|scroll/.test(getComputedStyle(n).overflowX)) return;
     s = { w, x: e.clientX, y: e.clientY, t: Date.now() };
   }, true);
   document.addEventListener('pointerup', e => {
@@ -17079,6 +17157,22 @@ function setSheet(open) {
     if (Math.abs(dy) > 24) { setSheet(dy < 0); moved = true; y0 = null; }
   });
   g.addEventListener('pointerup', () => { if (y0 !== null && !moved) setSheet($('#panel').classList.contains('peek')); y0 = null; });
+  // on a phone the whole panel takes the swipe: up shows the log and table, down tucks them away (the log itself still
+  // scrolls, and the fields and sliders keep their own drags); a tap on a die after a swipe doesn't roll it
+  const p = $('#panel'); let sw = null, swiped = false;
+  p.addEventListener('pointerdown', e => {
+    sw = null; if (!phone.matches || e.target.closest('#sheetGrab,input,textarea,select,[contenteditable],input[type=range]')) return;
+    if (e.target.closest('#log') && !p.classList.contains('peek')) return;
+    sw = { x: e.clientX, y: e.clientY };
+  });
+  p.addEventListener('pointermove', e => {
+    if (!sw) return;
+    const dx = e.clientX - sw.x, dy = e.clientY - sw.y;
+    if (Math.abs(dy) > 36 && Math.abs(dy) > Math.abs(dx) * 1.5) { const open = dy < 0; if (open === p.classList.contains('peek')) { setSheet(open); swiped = true; } sw = null; }
+  });
+  p.addEventListener('pointerup', () => { sw = null; setTimeout(() => { swiped = false; }, 0); });
+  p.addEventListener('pointercancel', () => { sw = null; swiped = false; });
+  p.addEventListener('click', e => { if (swiped) { e.stopPropagation(); e.preventDefault(); swiped = false; } }, true);
   phone.addEventListener('change', () => { setSheet(!phone.matches); mobLayout(phone.matches); resizeFx(); });
   setSheet(!phone.matches);
   mobLayout(phone.matches);

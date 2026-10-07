@@ -9,6 +9,15 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - Critter VTT can be installed from the browser (Chrome's Install app), with its own window and icon.
 - The start screen fits phone screens: it was a little wider than the screen.
 
+**On phones** (the website and the Android app)
+- Swipe the dice panel up for the roll log and the table, and down to tuck them away, anywhere on the panel and not only on its handle.
+- Hold a finger on a token, a note, a door or a drawing for its menu (as a right-click does); holding the empty board still pings. Menus fit the screen, with each explanation under its item.
+- Bigger touch targets: the dots, boxes and pips on every game system's sheets, the chat modes, the roll box and the menu buttons. The sheet's top row (who plays it, level up, the gear) stays on one line.
+- The menu's board tools: even tiles, readable names, real zoom buttons. "Join a table" stays in reach at the bottom of the start screen.
+- Look, Accessibility and Your seat open over the menu, not behind it.
+- The splash fits a phone; the Accessibility guide has a section on phone gestures.
+- The Android app: the status and navigation bars take the table's colours (light or dark), it has an adaptive icon, and it follows the phone's font size (up to 130%).
+
 ## 1.2.4 (2026-10-07)
 - Pictures are kept in the saves folder again (the desktop app, or a browser with a saves folder). After every kept save, the tidy-up deleted every picture as unused, so a campaign reopened without its background maps, portraits and campaign picture. Saves in browser storage were not affected.
 

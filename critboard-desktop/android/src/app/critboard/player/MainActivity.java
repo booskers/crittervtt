@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.webkit.CookieManager;
+import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
@@ -32,6 +33,7 @@ public class MainActivity extends Activity {
     static final int PICK = 41;
 
     WebView web;
+    FrameLayout root;
     ValueCallback<Uri[]> picked;
 
     @Override
@@ -39,7 +41,7 @@ public class MainActivity extends Activity {
         super.onCreate(saved);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);   // the table stays visible while you play
 
-        FrameLayout root = new FrameLayout(this);
+        root = new FrameLayout(this);
         root.setBackgroundColor(Color.rgb(11, 12, 15));
         web = new WebView(this);
         web.setBackgroundColor(Color.rgb(11, 12, 15));
@@ -67,9 +69,11 @@ public class MainActivity extends Activity {
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         s.setAllowFileAccess(false);
         s.setSupportZoom(false);
-        s.setTextZoom(100);                             // (Critter VTT has its own text size settings)
+        // the phone's font size (Settings › Display), up to 130% so the table's panels still hold their text
+        s.setTextZoom(Math.max(100, Math.min(130, Math.round(getResources().getConfiguration().fontScale * 100))));
         s.setUserAgentString(s.getUserAgentString() + " CritterPlayer/1.0");
         CookieManager.getInstance().setAcceptCookie(true);
+        web.addJavascriptInterface(new Bridge(), "CritterAndroid");
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -99,6 +103,32 @@ public class MainActivity extends Activity {
 
         if (saved != null) web.restoreState(saved);
         else web.loadUrl(startUrl(getIntent()));
+    }
+
+    // what the page may tell the app: the table's colour, so the status and navigation bars match it (light or dark)
+    class Bridge {
+        @JavascriptInterface
+        public void theme(String color, boolean light) {
+            final int c;
+            try { c = Color.parseColor(color); } catch (IllegalArgumentException e) { return; }
+            runOnUiThread(() -> barsLike(c, light));
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    void barsLike(int color, boolean light) {
+        root.setBackgroundColor(color);   // behind the see-through bars (Android 15 draws apps under them)
+        web.setBackgroundColor(color);
+        getWindow().setStatusBarColor(color);
+        getWindow().setNavigationBarColor(color);
+        if (Build.VERSION.SDK_INT >= 30) {
+            int f = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+            getWindow().getInsetsController().setSystemBarsAppearance(light ? f : 0, f);
+        } else {
+            View d = getWindow().getDecorView(); int v = d.getSystemUiVisibility();
+            int f = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            d.setSystemUiVisibility(light ? v | f : v & ~f);
+        }
     }
 
     // an invite link (critter.poly-chrome.cc/#K7QX2M) opens its table; anything else opens the start
