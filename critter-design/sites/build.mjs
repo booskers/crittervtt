@@ -103,7 +103,7 @@ const PAGES = {
   },
   sounds: {
     title: 'Critter Sounds', desc: 'Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter VTT, or in a Discord or Fluxer voice channel. On Windows, or in your browser.',
-    nav: [['#features', 'Features'], ['#scapes', 'Soundscapes'], ['#library', 'Library'], ['#phone', 'Phone'], ['#nearby', 'Nearby'], ['#download', 'Download']],
+    nav: [['#features', 'Features'], ['#scapes', 'Soundscapes'], ['#phone', 'Phone'], ['#nearby', 'Nearby'], ['#download', 'Download'], ['#iphone', 'iPhone & Android']],
     h1: 'The soundtrack to your game, <em>played live.</em>',
     lede: 'Music, sound effects and ambience for your tabletop game, played from your computer to everyone at the table: in Critter VTT, or in a Discord or Fluxer voice channel.',
     ctas: [['primary', 'down', 'Download for Windows', dl('sounds')], ['', 'play', 'Open in your browser', 'https://sounds.crittervtt.com']],
@@ -120,13 +120,13 @@ const PAGES = {
         body: ticks([['Tabletop Audio', 'with about 520 ten-minute ambiences and pieces of music.'], ['Incompetech', 'with about 1,440 pieces by Kevin MacLeod.'], ['Openverse and Freesound', 'for sound effects, each with its license.'], ['YouTube', 'search, keeping only the sound, for what you may use.']]) },
       { id: 'phone', eyebrow: 'In your browser', h2: 'Run the music from a phone or tablet.', sub: 'Critter Sounds also runs in a browser at <a href="https://sounds.crittervtt.com">sounds.crittervtt.com</a>. On a phone it works like an app: sections at the bottom, a player that slides up, and the swipes you know from your iPhone.', phone: true,
         media: shot('sounds-phone.jpg', 'Critter Sounds on a phone: Now playing shows The Drowned Tower from the Dungeon crawl playlist, with its cover art, the position, the play controls and the volumes', 1170, 2532),
-        body: ticks([['Like an app', 'on iPhone and iPad: add it to your Home Screen from Safari’s Share menu, and it opens full screen.'], ['Swipes', 'down to close the player, from the edge to go back, and on a track to play it next or add it to the queue. Every swipe has a button too.'], ['Your sounds stay yours', 'in your browser, on your device. Nothing is uploaded.'], ['On a tablet', 'playlists sit beside their tracks, with the player along the bottom.'], ['What needs Windows', 'saving sounds, YouTube, the voice-chat bots and rendering loops say so, and come back while you control the desktop app.']]) },
+        body: ticks([['Like an app', 'on iPhone and iPad: add it to your Home Screen from Safari’s Share menu (<a href="#iphone">how</a>), and it opens full screen. On Android, there’s an app.'], ['Swipes', 'down to close the player, from the edge to go back, and on a track to play it next or add it to the queue. Every swipe has a button too.'], ['Your sounds stay yours', 'in your browser, on your device. Nothing is uploaded.'], ['On a tablet', 'playlists sit beside their tracks, with the player along the bottom.'], ['What needs Windows', 'saving sounds, YouTube, the voice-chat bots and rendering loops say so, and come back while you control the desktop app.']]) },
       { id: 'nearby', eyebrow: 'Nearby', h2: 'Control the desktop from your phone.', sub: 'Critter Sounds finds the others on your network. Ask from a phone, a tablet or another computer to control the desktop app: it shows who’s asking and a code to compare, and nothing happens until someone there presses <b>Allow</b>.', phone: true,
         media: shot('sounds-nearby.jpg', 'A phone controlling Critter Sounds on the Game room PC: the sound pads, with Heavy rain on roof playing and The Drowned Tower in the mini player', 1170, 2532),
         body: ticks([['Your library, over there', 'the phone shows the computer’s playlists, pads and soundscapes, and plays them on the computer.'], ['Downloads stay on the computer', 'save from the online library or YouTube, and the files land on the desktop, never on the phone.'], ['Only on your network', 'after the handshake the two talk directly, never through the internet.'], ['A pairing code', 'for when a device doesn’t show up by itself.']]) }
     ],
     cards: [['layout', 'Your layout, your way', 'A canvas of windows you split, dock and resize, with ready layouts for playing and preparing.'], ['log', 'Session log', 'Every track, pad and scene is logged with its time, and shows as small notes in Critter VTT’s chat.'], ['wave', 'Never louder', 'Effects are loudness-matched, so they never make the music louder. Any player can turn them off.'], ['mic', 'Voice channels', 'A bot of your own joins Discord or Fluxer and plays the table’s mix, effects included.'], ['update', 'Updates itself', 'New versions install from inside the app, with what changed.'], ['eye', 'Guided from the start', 'A short setup, a quick and a full tour, and a guided first soundscape.']],
-    how: true
+    how: true, iphone: true
   },
   notes: {
     title: 'Critter Notes', desc: 'Critter Notes is a notebook for game masters: plan sessions, write the world, draw maps, boards and mind maps, and send it all to your Critter VTT table.',
@@ -183,7 +183,20 @@ function page(k) {
 </section>` : '';
   // iPhones get no app file: players add the players' version of the site to the home screen, where it opens full screen like an app
   const PLAY = 'https://live.crittervtt.com/?app=player';
-  const iphone = P.iphone ? `
+  // Critter Sounds: the same on iPhones (the web version on the home screen), and an app of its own for Android
+  const SOUNDS_WEB = 'https://sounds.crittervtt.com', SOUNDS_APK = `${GH}/critter-sounds/releases/latest/download/Critter-Sounds.apk`;
+  const iphone = P.iphone && k === 'sounds' ? `
+<section id="iphone">
+  <div class="wrap">
+    <span class="eyebrow">iPhone, iPad and Android</span>
+    <h2>Put Critter Sounds on your home screen.</h2>
+    <p class="sub">There’s nothing to download from the App Store. Safari adds Critter Sounds to your home screen, and it opens full screen with its own icon, like an app. It updates by itself whenever Critter Sounds does. On Android, there’s an app.</p>
+    <div class="grid">${card(['globe', '1. Open it in Safari', 'On your iPhone or iPad, open <a href="' + SOUNDS_WEB + '"><b>sounds.crittervtt.com</b></a>.'])}${card(['share', '2. Tap Share', 'The square with the arrow, at the bottom of Safari (on an iPad, at the top). Then scroll down a little.'])}${card(['plus', '3. Add to Home Screen', 'Leave <b>Open as Web App</b> on, then tap <b>Add</b>. Critter Sounds is now on your home screen.'])}</div>
+    <div class="ctas" style="margin-top:24px"><a class="btn primary" href="${SOUNDS_WEB}">${ic('play')} Open sounds.crittervtt.com</a><a class="btn" href="${SOUNDS_APK}">${ic('android')} Critter Sounds for Android</a></div>
+    <p class="small" style="margin-top:20px"><b>Sounds you add on a phone</b> stay on that phone, in the app. To play your computer’s music from the phone, open <b>Nearby</b> and control the desktop app.</p>
+    <p class="small" style="margin-top:12px"><b>On Android</b>, allow your browser to install apps when it asks (the app isn’t on Google Play yet). It updates itself from then on.</p>
+  </div>
+</section>` : P.iphone ? `
 <section id="iphone">
   <div class="wrap">
     <span class="eyebrow">iPhone and iPad</span>
@@ -231,13 +244,16 @@ function page(k) {
       ${k === 'vtt' ? `<div class="dlcard">
         <h3>Android, for players</h3><p>Join your group's table from your phone: type the code, and Critter VTT takes you back to that table next time.</p><div class="row"><a class="btn" href="${GH}/crittervtt/releases/latest/download/Critter-VTT-Player.apk">${ic('android')} Critter VTT for Android</a></div>
       </div>
+      ` : k === 'sounds' ? `<div class="dlcard">
+        <h3>Android</h3><p>Critter Sounds as an app on your phone or tablet: run the music from it, or control the desktop app on your network.</p><div class="row"><a class="btn" href="${SOUNDS_APK}">${ic('android')} Critter Sounds for Android</a></div>
+      </div>
       ` : ''}<div class="dlcard">
         ${k === 'vtt' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones.</p><div class="row"><a class="btn" href="https://live.crittervtt.com">${ic('play')} Open live.crittervtt.com</a></div>`
           : k === 'sounds' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones, and controls the desktop app on your network.</p><div class="row"><a class="btn" href="https://sounds.crittervtt.com">${ic('play')} Open sounds.crittervtt.com</a></div>`
           : `<h3>Plays with Critter VTT</h3><p>${k === 'sounds' ? 'The virtual tabletop it plays to: free, in a browser or on Windows.' : 'The virtual tabletop your notes go to: free, in a browser or on Windows.'}</p><div class="row"><a class="btn" href="${site('vtt')}">${ic('dice')} Get Critter VTT</a></div>`}
       </div>
     </div>
-    <p class="small" style="margin-top:20px">The installer isn’t code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>.${k === 'vtt' ? ' On Android, allow your browser to install apps when it asks (the app isn’t on Google Play yet).' : ''} Every version and what changed is on the <a href="${GH}/${A.repo}/releases">Releases page</a>.</p>
+    <p class="small" style="margin-top:20px">The installer isn’t code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>.${k === 'vtt' || k === 'sounds' ? ' On Android, allow your browser to install apps when it asks (the app isn’t on Google Play yet).' : ''} Every version and what changed is on the <a href="${GH}/${A.repo}/releases">Releases page</a>.</p>
   </div>
 </section>`;
   const [hf, halt, hw, hh, hcap] = P.hero;
