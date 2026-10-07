@@ -36,6 +36,7 @@ public class MainActivity extends Activity {
     FrameLayout root;
     ValueCallback<Uri[]> picked;
     Updater updater;
+    int navPx, topPx;
 
     @Override
     protected void onCreate(Bundle saved) {
@@ -49,16 +50,23 @@ public class MainActivity extends Activity {
         root.addView(web, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(root);
 
-        // Android 15 draws apps under the status and navigation bars: keep the table clear of them (and of the keyboard)
+        // the table runs edge to edge, under the status bar and the navigation bar (the gesture handle), which float over
+        // it in its colours. The page keeps its own buttons clear of them from --sat and --sab; a notch at the side and the
+        // keyboard still push the table in
+        edgeToEdge();
         root.setOnApplyWindowInsetsListener((v, insets) -> {
-            int l, t, r, b;
+            int l, t, r, nav, ime;
             if (Build.VERSION.SDK_INT >= 30) {
-                android.graphics.Insets i = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
-                l = i.left; t = i.top; r = i.right; b = i.bottom;
+                android.graphics.Insets i = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout());
+                l = i.left; t = i.top; r = i.right; nav = i.bottom;
+                ime = insets.getInsets(WindowInsets.Type.ime()).bottom;
             } else {
-                l = insets.getSystemWindowInsetLeft(); t = insets.getSystemWindowInsetTop(); r = insets.getSystemWindowInsetRight(); b = insets.getSystemWindowInsetBottom();
+                l = insets.getSystemWindowInsetLeft(); t = insets.getSystemWindowInsetTop(); r = insets.getSystemWindowInsetRight();
+                int b = insets.getSystemWindowInsetBottom(); nav = Math.min(b, insets.getStableInsetBottom()); ime = b > nav ? b : 0;
             }
-            v.setPadding(l, t, r, b);
+            v.setPadding(l, 0, r, ime);
+            topPx = t; navPx = ime > 0 ? 0 : nav;
+            sendInsets();
             return insets;
         });
 
@@ -84,6 +92,8 @@ public class MainActivity extends Activity {
                 open(u);                                       // everything else (GitHub, credits, help) in the browser
                 return true;
             }
+            @Override
+            public void onPageFinished(WebView view, String url) { sendInsets(); }
             @Override
             public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError err) {
                 if (req.isForMainFrame()) offline();
@@ -124,17 +134,34 @@ public class MainActivity extends Activity {
         }
     }
 
+    // how tall the navigation bar is, in the page's pixels, for its --sab (safe area at the bottom)
+    void sendInsets() {
+        if (web == null) return;
+        float dp = getResources().getDisplayMetrics().density;
+        web.evaluateJavascript("(function(s){s.setProperty('--sab','" + Math.round(navPx / dp) + "px');s.setProperty('--sat','" + Math.round(topPx / dp) + "px')})(document.documentElement.style)", null);
+    }
+
+    @SuppressWarnings("deprecation")
+    void edgeToEdge() {
+        if (Build.VERSION.SDK_INT >= 30) getWindow().setDecorFitsSystemWindows(false);
+        else getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN);
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
+        if (Build.VERSION.SDK_INT >= 28) getWindow().getAttributes().layoutInDisplayCutoutMode = WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES;
+        if (Build.VERSION.SDK_INT >= 29) { getWindow().setNavigationBarContrastEnforced(false); getWindow().setStatusBarContrastEnforced(false); }
+    }
+
     @SuppressWarnings("deprecation")
     void barsLike(int color, boolean light) {
         root.setBackgroundColor(color);   // behind the see-through bars (Android 15 draws apps under them)
         web.setBackgroundColor(color);
-        getWindow().setStatusBarColor(color);
-        getWindow().setNavigationBarColor(color);
+        getWindow().setStatusBarColor(Color.TRANSPARENT);       // the table shows through under the clock and icons
+        getWindow().setNavigationBarColor(Color.TRANSPARENT);   // the table shows through under the gesture handle
         if (Build.VERSION.SDK_INT >= 30) {
             int f = android.view.WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | android.view.WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
             getWindow().getInsetsController().setSystemBarsAppearance(light ? f : 0, f);
         } else {
-            View d = getWindow().getDecorView(); int v = d.getSystemUiVisibility();
+            View d = getWindow().getDecorView(); int v = d.getSystemUiVisibility() | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN;
             int f = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
             d.setSystemUiVisibility(light ? v | f : v & ~f);
         }

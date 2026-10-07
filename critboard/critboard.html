@@ -103,7 +103,7 @@ a{color:var(--accent-text)}
 #textEdit{position:fixed;z-index:5;min-width:40px;border:1px dashed var(--accent);background:transparent;outline:none;resize:none;overflow:hidden;padding:0;margin:0;line-height:1.2;font-family:var(--f-body);font-weight:500;white-space:pre}
 
 /* dice panel */
-#panel{position:fixed;right:12px;top:calc(12px + var(--sat,env(safe-area-inset-top,0px)));bottom:calc(12px + env(safe-area-inset-bottom,0px));width:380px;display:flex;flex-direction:column;border-radius:8px;overflow:hidden;z-index:5}
+#panel{position:fixed;right:12px;top:calc(12px + var(--sat,env(safe-area-inset-top,0px)));bottom:calc(12px + var(--sab,env(safe-area-inset-bottom,0px)));width:380px;display:flex;flex-direction:column;border-radius:8px;overflow:hidden;z-index:5}
 .grab{display:none}
 .ph{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:max(12px,var(--deco-clear-y,0px)) max(12px,var(--deco-clear,0px)) 10px max(18px,var(--deco-clear,0px));border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:8px;min-width:0}
@@ -209,7 +209,7 @@ button.seat:hover{border-color:var(--accent-line)}
 .aurarow{display:grid;gap:6px;padding:4px 6px;min-width:240px}
 .aurarow .slab{display:grid;gap:3px;font-size:12px;color:var(--muted)}
 .encwin{left:calc(50% - 200px);top:calc(60px + var(--sat,env(safe-area-inset-top,0px)));width:min(420px,calc(100vw - 32px));height:min(620px,calc(100vh - 120px))}
-.muswin{left:24px;bottom:calc(76px + env(safe-area-inset-bottom,0px));width:min(380px,calc(100vw - 32px));max-height:min(560px,calc(100vh - 140px))}
+.muswin{left:24px;bottom:calc(76px + var(--sab,env(safe-area-inset-bottom,0px)));width:min(380px,calc(100vw - 32px));max-height:min(560px,calc(100vh - 140px))}
 .musnow{display:grid;gap:4px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel-2)}
 .mustitle{font-weight:700;font-size:15px;overflow-wrap:anywhere}
 .mlvnow{margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
@@ -292,7 +292,7 @@ body.scenes-open .camptag.camptag{left:344px;max-width:min(560px,max(150px,calc(
 .cmodex{display:grid;place-items:center;width:24px;min-height:28px;border:1px solid var(--line);border-left:0;border-radius:0 6px 6px 0;background:transparent;color:var(--muted);cursor:pointer;padding:0}
 .cmodex .gi{width:12px;height:12px}
 .cmodex:hover{color:var(--ink);background:var(--hover)}
-.wnote{position:fixed;right:404px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:30;display:flex;align-items:center;gap:10px;max-width:320px;padding:10px 14px;border:1px solid var(--accent-line);border-radius:10px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;text-align:left;font:inherit}
+.wnote{position:fixed;right:404px;bottom:calc(84px + var(--sab,env(safe-area-inset-bottom,0px)));z-index:30;display:flex;align-items:center;gap:10px;max-width:320px;padding:10px 14px;border:1px solid var(--accent-line);border-radius:10px;background:var(--panel);color:var(--ink);box-shadow:var(--shadow);cursor:pointer;text-align:left;font:inherit}
 .wnote[hidden]{display:none}
 .wnote.in{animation:wnin .35s cubic-bezier(.2,1.4,.4,1)}
 @keyframes wnin{from{transform:translateY(16px) scale(.96);opacity:0}}
@@ -683,7 +683,7 @@ mark.nhit{background:color-mix(in srgb,var(--accent) 45%,transparent);color:inhe
 .entry .meta .byline::before{content:"· "}
 .entry.assheet>.av{box-shadow:0 0 0 2px var(--accent-line)}
 /* scenes: the dock beside the tool rail, the reveal bar at the top, and the transitions */
-.scenedock{position:fixed;left:72px;top:calc(12px + var(--sat,env(safe-area-inset-top,0px)));bottom:calc(12px + env(safe-area-inset-bottom,0px));width:256px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);z-index:6;overflow:hidden}
+.scenedock{position:fixed;left:72px;top:calc(12px + var(--sat,env(safe-area-inset-top,0px)));bottom:calc(12px + var(--sab,env(safe-area-inset-bottom,0px)));width:256px;display:flex;flex-direction:column;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow);z-index:6;overflow:hidden}
 .scenedock[hidden]{display:none}
 .sclist{flex:1;overflow:auto;padding:8px;display:grid;gap:10px;align-content:start}
 .sccard{display:grid;gap:4px;border-radius:8px;padding:4px;border:1px solid transparent}
@@ -978,7 +978,7 @@ input:focus,select:focus{border-color:var(--accent-line);outline:none;box-shadow
 .gcode:hover{border-color:var(--accent-line)}
 #guideList{display:grid;gap:14px;max-height:52vh;overflow-y:auto;padding-right:4px}
 
-#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(20px + var(--sab,env(safe-area-inset-bottom,0px)));transform:translateX(-50%);z-index:30;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:8px;font-weight:600;font-size:14px;box-shadow:var(--shadow);max-width:calc(100% - 32px);text-align:center}
 
 #stylePop{width:min(300px,calc(100vw - 20px))}
 .brushrow{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:2px 4px 6px}
@@ -996,7 +996,7 @@ input:focus,select:focus{border-color:var(--accent-line);outline:none;box-shadow
 .sysrow input[type=checkbox]{accent-color:var(--accent);width:17px;height:17px}
 .sysrow input[type=color]{width:34px;height:28px;border:1px solid var(--line);border-radius:6px;background:transparent;padding:2px;cursor:pointer}
 /* chat switcher: its own floating bar over the board */
-.chatdock{position:fixed;left:72px;right:404px;bottom:calc(12px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;pointer-events:none;z-index:5}
+.chatdock{position:fixed;left:72px;right:404px;bottom:calc(12px + var(--sab,env(safe-area-inset-bottom,0px)));display:flex;justify-content:center;pointer-events:none;z-index:5}
 .chatbar{pointer-events:auto;display:flex;gap:4px;padding:5px;max-width:100%;overflow-x:auto;scrollbar-width:none;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:var(--shadow)}
 .chatbar::-webkit-scrollbar{display:none}
 .chatbar.compact .ctab .nm{display:none}
@@ -1374,7 +1374,7 @@ input.tval{width:100%;padding:2px;font-size:13px}
   #tools{left:8px;right:8px;top:calc(8px + var(--sat,env(safe-area-inset-top,0px)));transform:none;flex-direction:row;max-height:none;padding:4px 6px;border-radius:8px;overflow-x:auto;overflow-y:hidden}
   #tools .sep{width:1px;height:24px;margin:0 3px}
   #tools .zoomstep{display:none}
-  #panel{left:0;right:0;bottom:0;top:auto;width:auto;height:min(78dvh,680px);border-radius:14px 14px 0 0;border-bottom:0;padding-bottom:env(safe-area-inset-bottom,0px);transition:height .25s ease}
+  #panel{left:0;right:0;bottom:0;top:auto;width:auto;height:min(78dvh,680px);border-radius:14px 14px 0 0;border-bottom:0;padding-bottom:var(--sab,env(safe-area-inset-bottom,0px));transition:height .25s ease}
   #panel.peek{height:auto}
   #panel.peek .table,#panel.peek .log,#panel.peek .sysquick,#panel.peek .mods,#panel.peek .presets,#panel.peek .credit{display:none}
   .sheetwin{left:0;right:0;top:0;bottom:0;width:auto;border-radius:0;z-index:18;border:0}
@@ -1386,10 +1386,10 @@ input.tval{width:100%;padding:2px;font-size:13px}
   .grab span{width:44px;height:5px;border-radius:99px;background:var(--line)}
   .ph{padding-top:2px}
   .overlay{place-items:end center;padding:0}
-  .overlay .card{box-sizing:border-box;width:100%;border-radius:14px 14px 0 0;max-height:92dvh;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+  .overlay .card{box-sizing:border-box;width:100%;border-radius:14px 14px 0 0;max-height:92dvh;padding:20px 16px calc(20px + var(--sab,env(safe-area-inset-bottom,0px)))}
   /* the start (Take a seat, Find your table) floats as a card with a gutter round it that grows with the screen and
      keeps clear of notches and rounded corners; the title scales with the width */
-  #onboard{place-items:center;box-sizing:border-box;padding:max(clamp(10px,3.5vw,24px),env(safe-area-inset-top,0px)) max(clamp(10px,3.5vw,24px),env(safe-area-inset-right,0px)) max(clamp(10px,3.5vw,24px),env(safe-area-inset-bottom,0px)) max(clamp(10px,3.5vw,24px),env(safe-area-inset-left,0px))}
+  #onboard{place-items:center;box-sizing:border-box;padding:max(clamp(10px,3.5vw,24px),var(--sat,env(safe-area-inset-top,0px))) max(clamp(10px,3.5vw,24px),env(safe-area-inset-right,0px)) max(clamp(10px,3.5vw,24px),var(--sab,env(safe-area-inset-bottom,0px))) max(clamp(10px,3.5vw,24px),env(safe-area-inset-left,0px))}
   #onboard .card{box-sizing:border-box;grid-template-columns:minmax(0,1fr);width:100%;max-width:520px;max-height:100%;border-radius:18px;padding:20px clamp(14px,4.5vw,22px);gap:clamp(10px,3vw,14px)}
   #onboard .card h2{font-size:clamp(24px,7.5vw,32px)}
   #onboard .card > p{font-size:clamp(13.5px,3.9vw,15px)}
@@ -1462,7 +1462,7 @@ body.mob .mmenu:not([hidden]){display:flex;flex-direction:column;position:fixed;
 body.mob .mmhead{display:flex;align-items:center;gap:6px;padding:calc(8px + var(--sat,env(safe-area-inset-top,0px))) 8px 6px;border-bottom:1px solid var(--line)}
 body.mob .mmhead [data-k=head]{flex:1;min-width:0}
 body.mob .mmhead .ph{border:0;padding:0;background:none}
-body.mob .mmbody{flex:1;overflow:auto;padding:12px 12px calc(28px + env(safe-area-inset-bottom,0px));display:grid;gap:10px;align-content:start}
+body.mob .mmbody{flex:1;overflow:auto;padding:12px 12px calc(28px + var(--sab,env(safe-area-inset-bottom,0px)));display:grid;gap:10px;align-content:start}
 body.mob .mmbody .sec-label{margin-top:4px}
 body.mob #mMenu #campTag{position:static;inset:auto;max-width:none;transform:none;justify-content:flex-start;text-align:left;padding:4px 0;z-index:auto}
 body.mob #mMenu #campTag .campsub{display:block}
@@ -1528,6 +1528,10 @@ body.mob #onboard .obbar{display:flex;justify-content:space-between;align-items:
 .obburger{display:grid;gap:3.5px;width:18px}.obburger span{display:block;height:2px;border-radius:2px;background:currentColor}
 /* Next stays in reach at the bottom of Take a seat while the tokens scroll */
 body.mob #onboardForm > .prow.end{position:sticky;bottom:-20px;z-index:2;margin:0 calc(-1 * clamp(14px,4.5vw,22px)) -20px;padding:12px clamp(14px,4.5vw,22px) 16px;background:linear-gradient(transparent,var(--panel-3) 30%)}
+/* dialog sheets on a phone: a handle on top (drag it down to close), and the buttons at the bottom stay in view */
+body.mob .overlay:not(#onboard):not(#splash) > .card::before{content:'';display:block;justify-self:center;align-self:start;width:40px;height:5px;border-radius:99px;background:var(--line);margin:-10px auto 0;flex:none}
+body.mob .overlay:not(#onboard) .card > :last-child:is(.prow,.ractions,.pactions,[class*=foot]),body.mob .overlay .helpcard > .prow.end{position:sticky;bottom:calc(-20px - var(--sab,env(safe-area-inset-bottom,0px)));z-index:3;margin:0 -16px calc(-20px - var(--sab,env(safe-area-inset-bottom,0px)));padding:12px 16px calc(14px + var(--sab,env(safe-area-inset-bottom,0px)));background:var(--panel-3);border-top:1px solid var(--line);box-shadow:0 -8px 18px -12px rgb(0 0 0/.55)}
+body.mob .overlay .helpcard > .prow.end{order:5;margin-bottom:0}
 body.mob .menu{z-index:46}
 /* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
 body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
@@ -1577,7 +1581,7 @@ body.mob .fwin .fwhead :is(.xbtn,[data-x],[data-act=close])::before{content:'';w
 .ciplist li.bad{color:var(--fumble);white-space:normal}
 .ciplist li.skip{color:var(--muted)}
 @media (prefers-reduced-motion:reduce){.ciprog.busy .cipdot,.cipbar.indet>span{animation:none}.cipbar.indet>span{left:0;width:100%!important;opacity:.5}}
-@media (max-width:760px){.cifoot{bottom:calc(-20px - env(safe-area-inset-bottom,0px));margin:0 -16px calc(-20px - env(safe-area-inset-bottom,0px));padding:10px 16px calc(14px + env(safe-area-inset-bottom,0px))}}
+@media (max-width:760px){.cifoot{bottom:calc(-20px - var(--sab,env(safe-area-inset-bottom,0px)));margin:0 -16px calc(-20px - var(--sab,env(safe-area-inset-bottom,0px)));padding:10px 16px calc(14px + var(--sab,env(safe-area-inset-bottom,0px)))}}
 
 .libwarn{border:1.5px solid var(--mixed);background:var(--mixed-bg);border-radius:10px;padding:10px 12px;display:grid;gap:8px;margin-bottom:8px}
 .libwarn p{margin:0;font-size:13px}
@@ -1871,7 +1875,7 @@ html.player-app .joinbar .btn{padding:12px 20px;font-size:16px}
 body:has(#revealBar:not([hidden])) .buildbar{top:calc(64px + var(--sat,env(safe-area-inset-top,0px)))}
 body.mob .buildbar{top:calc(62px + var(--sat,env(safe-area-inset-top,0px)))}
 body.mob:has(#revealBar:not([hidden])) .buildbar{top:calc(116px + var(--sat,env(safe-area-inset-top,0px)))}
-#chatToasts{position:fixed;right:30px;bottom:calc(72px + env(safe-area-inset-bottom,0px));z-index:7;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
+#chatToasts{position:fixed;right:30px;bottom:calc(72px + var(--sab,env(safe-area-inset-bottom,0px)));z-index:7;display:flex;flex-direction:column;align-items:flex-end;gap:8px;pointer-events:none}
 .ctoast{pointer-events:auto;width:min(368px,calc(100vw - 60px));padding:2px 4px;border-radius:14px;background:color-mix(in oklab,var(--panel) 72%,transparent);-webkit-backdrop-filter:blur(12px) saturate(1.2);backdrop-filter:blur(12px) saturate(1.2);box-shadow:var(--shadow-2);color:var(--ink);text-align:left;cursor:pointer;animation:ctoastIn .25s ease backwards}
 html[data-theme=light] .ctoast{background:color-mix(in oklab,var(--panel) 80%,transparent)}
 .ctoast:hover{background:color-mix(in oklab,var(--panel) 88%,transparent)}
@@ -13299,7 +13303,7 @@ async function latestSaveElsewhere() {
 }
 
 /* ---------------- the Critter VTT menu (the logo above the chat, or Esc), help, first start and the walkthrough ---------------- */
-const logoSvg = cls => { const s = document.querySelector('#panel .brand .logo-svg'); const c = s ? s.cloneNode(true) : el('span', '', 'Critter VTT'); c.classList.add(cls || 'menulogo'); c.removeAttribute('id'); return c; };
+const logoSvg = cls => { const s = document.querySelector('.brand .logo-svg'); const c = s ? s.cloneNode(true) : el('span', '', 'Critter VTT'); c.classList.add(cls || 'menulogo'); c.removeAttribute('id'); return c; };
 // the splash while Critter VTT starts: the logo, what it is, and that it's an early version
 let splashT0 = performance.now();
 function hideSplash() {
@@ -13536,7 +13540,7 @@ function firstRunSetup() {
   const step1 = () => {
     card.textContent = '';
     const h = el('h2', '', 'Welcome to Critter VTT'); h.id = 'setupT';
-    card.append(HB.el('div', 'setuplogo', logoSvg('menulogo'), el('span', 'alpha', 'Alpha')), h, el('p', 'hint', 'A couple of things before you start. You can change both later in the Critter VTT menu (Esc).'), el('div', 'sec-label', 'How will you mostly play?'));
+    card.append(HB.el('div', 'setuplogo', logoSvg('menulogo'), el('span', 'alpha', 'Alpha')), h, el('p', 'hint', 'A couple of things before you start. You can change both later in the Critter VTT menu' + (MOB.on ? '.' : ' (Esc).') + ''), el('div', 'sec-label', 'How will you mostly play?'));
     const row = el('div', 'setupchoices');
     const pick = (ic, t, s, role) => { const b = el('button', 'setupchoice'); b.type = 'button'; b.innerHTML = icon(ic); b.append(el('b', '', t), el('small', '', s)); b.onclick = () => { lsSet('tt.myRole', role); role === 'gm' ? step2() : step3(); }; row.append(b); };
     pick('wizard-staff', 'I run games', 'Game master: build scenes, run the table, keep the saves', 'gm');
@@ -13571,7 +13575,7 @@ function firstRunSetup() {
     go.type = other.type = later.type = 'button';
     go.onclick = () => { finish(); startTour(gm ? 'gm' : 'player'); };
     other.onclick = () => { finish(); startTour(gm ? 'player' : 'gm'); };
-    later.onclick = () => { finish(); toast('The walkthrough is in the Critter VTT menu whenever you want it: press Esc.'); };
+    later.onclick = () => { finish(); toast(MOB.on ? 'The walkthrough is in the Critter VTT menu whenever you want it: tap the logo at the top of the menu.' : 'The walkthrough is in the Critter VTT menu whenever you want it: press Esc.'); };
     card.append(HB.el('div', 'prow end', later, other, go)); go.focus();
   };
   if (PLAYER_APP) { lsSet('tt.myRole', 'player'); step3(); } else step1();
@@ -13661,10 +13665,46 @@ const TOUR = [
   { at: '#panel .brand', sec: 'Running the table', who: 'gm', t: 'Saves', p: 'Your campaign saves itself after every change, under its own name in your saves folder. Ctrl+S makes a named save; Rewind goes back to any of them. Next time, the start screen shows your campaigns: right-click one to open an older save.' },
   { at: null, sec: 'Done', who: 'all', t: 'You\'re ready', p: 'Have a good game. Help, this walkthrough and Accessibility are in the Critter VTT menu (Esc) whenever you need them.' }
 ];
+// the walkthrough on a phone: the same steps in touch words; what lives in the menu (☰) is shown there, opened for it
+const TOUR_MOB = {
+  'Welcome to Critter VTT': { p: 'A table for playing role-playing games together: a board for maps and tokens, dice everyone sees land, sheets, notes and music. This tour is hands-on: steps marked Try it move on by themselves once you\'ve done what they say. Next skips ahead any time, and End the tour stops it.' },
+  'Look around the board': { p: 'The board is as big as you need. Drag with one finger to move around, and pinch with two to zoom. Hold a finger still on an empty spot to ping it for everyone.' },
+  'Build a roll': { p: 'Tap dice to add them to your next roll; long-press a die to take one away. You can also type rolls like 2d6+3 straight into the chat box.', try: 'Tap the d20.' },
+  'Roll it': { try: 'Tap the send button.' },
+  'Modifiers and quick rolls': { p: 'Swipe the dice panel up (or tap its handle) for the roll log and these: advantage, disadvantage and your system\'s other ways of rolling apply to the next roll, beside your system\'s own quick rolls. Swipe it down to tuck it away.', pre: () => setSheet(true) },
+  'Talk to the table': { p: 'Type anything that isn\'t a roll and it\'s a message. Whispers are private chats between two people; long-press a message to react or reply.', pre: () => setSheet(false) },
+  'More room for the board': { skip: true },
+  'Move your token': { p: 'Drag your token with a finger: it waits while you pick the spot, shows the path round walls, then walks it. Hold a finger on a token for its menu, with its sheet and more.' },
+  'Your sheet': { p: 'The menu (☰, top left) has a tile for each sheet linked to you. Roll straight from it, level up, and build it from the Library. Swipe sideways, or use Back, to close it again.', try: 'Open your sheet from the menu.' },
+  'Draw and measure': { p: 'Under On the board in the menu: select, draw, and measure lines, cones and circles (they light up the tokens inside). Tap a tool, then drag on the board.', try: 'Pick Measure, then drag on the board.' },
+  'Notes': { p: 'Each session gets a tile; type straight in, and every paragraph is its own note. Handouts from the GM land here too.', try: 'Open your notes from the menu.' },
+  'The Library': { p: 'Items, spells, monsters and rules from your table and the SRD, to build your sheet with.' },
+  'Settings': { p: 'The gear at the top of the menu: dice sound, music, your seat (name, token, colour), the Look and Accessibility (less motion, stronger contrast, a font for dyslexia).' },
+  'The lobby and leaving': { p: 'The door at the top of the menu: the table\'s code to invite people, who is playing whom, and Leave lobby.' },
+  'The Critter VTT menu': { at: '#mMenu .brand', p: 'Tap the Critter VTT logo at the top of the menu: Help, this walkthrough, Accessibility, the Look and more. Back (or a swipe down on a dialog) closes what\'s open, one step at a time.' },
+  'Hidden things': { p: 'Hold a finger on a token for its menu and hide it from players, or switch on the GM layer (GM tools, Map) to draw and place things only you see.' },
+  'Saves': { at: '#mMenu .brand', p: 'Your campaign saves itself after every change, under its own name. Save in the Critter VTT menu makes a named save; Rewind goes back to any of them. Next time, the start screen shows your campaigns: long-press one to open an older save.' },
+  'You\'re ready': { pre: () => { MOB.fromMenu = false; mobMenu(false); }, p: 'Have a good game. Help, this walkthrough and Accessibility are in the Critter VTT menu (the logo at the top of ☰) whenever you need them.' }
+};
+const touchWords = x => String(x || '').replace(/Right-click/g, 'Long-press').replace(/right-click/g, 'long-press').replace(/Double-click/g, 'Double-tap').replace(/double-click/g, 'double-tap').replace(/Click/g, 'Tap').replace(/click/g, 'tap').replace(/ \(Ctrl\+Z\)/g, '');
+function tourForPhone(st) {
+  const o = TOUR_MOB[st.t] || {}, m = { ...st, p: touchWords(st.p), ...(st.try ? { try: touchWords(st.try) } : {}), ...o };
+  if (m.at === '#panel .brand') m.at = '#mMenu .brand';
+  const own = o.pre || st.pre;
+  // what's in the menu: close the page that's open and open the menu on it; the board and dice: the menu steps aside
+  m.pre = () => {
+    const menu = $('#mMenu'), inMenu = !!(m.at && menu && menu.querySelector(m.at.replace(/^#mMenu\s+/, '')));
+    if (inMenu) { document.querySelectorAll('.fwin').forEach(w => { if (!w.hidden && w.offsetParent !== null) mobBack(w); }); MOB.fromMenu = false; mobMenu(true); }
+    else if (m.at) { MOB.fromMenu = false; mobMenu(false); }
+    if (own) own();
+    if (inMenu) setTimeout(() => { const x = menu.querySelector(m.at.replace(/^#mMenu\s+/, '')); if (x) x.scrollIntoView({ block: 'nearest' }); tourPaint(); }, 80);
+  };
+  return m;
+}
 let tourState = null;
 function startTour(kind) {
   endTour();
-  const steps = TOUR.filter(st => st.who === 'all' || kind === 'gm');
+  const steps = TOUR.filter(st => st.who === 'all' || kind === 'gm').map(st => MOB.on ? tourForPhone(st) : st).filter(st => !st.skip);
   closeCritterMenu(); closePop();
   const ov = el('div', 'tourov'), spot = el('div', 'tourspot'), card = el('div', 'tourcard'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-live', 'polite'); card.setAttribute('aria-label', 'Walkthrough');
   ov.append(spot, card); document.body.append(ov);
@@ -13729,7 +13769,10 @@ function tourPaint(fresh) {
   if (target) {
     let r = target.getBoundingClientRect();
     // a big thing (the board) gets a window in the middle of it rather than all of it
-    if (r.width > innerWidth * 0.6 && r.height > innerHeight * 0.6) r = { left: innerWidth * 0.3, top: innerHeight * 0.3, width: innerWidth * 0.3, height: innerHeight * 0.32, right: innerWidth * 0.6, bottom: innerHeight * 0.62 };
+    if (r.width > innerWidth * 0.6 && r.height > innerHeight * 0.6) r = MOB.on
+      // (on a phone, a band near the top, so the card fits under it)
+      ? { left: 16, top: 76, width: innerWidth - 32, height: innerHeight * 0.24, right: innerWidth - 16, bottom: 76 + innerHeight * 0.24 }
+      : { left: innerWidth * 0.3, top: innerHeight * 0.3, width: innerWidth * 0.3, height: innerHeight * 0.32, right: innerWidth * 0.6, bottom: innerHeight * 0.62 };
     const L = Math.max(4, r.left - pad), T = Math.max(4, r.top - pad), R = Math.min(innerWidth - 4, r.right + pad), B = Math.min(innerHeight - 4, r.bottom + pad);
     Object.assign(t.spot.style, { display: 'block', left: L + 'px', top: T + 'px', width: Math.max(0, R - L) + 'px', height: Math.max(0, B - T) + 'px' });
     // below, above, right, left: the first place the whole card fits; else the side with the most room
@@ -17101,6 +17144,13 @@ function mobPlace() {
   // the tools get their names under them
   if (MOB.on) document.querySelectorAll('#mMenu #tools button').forEach(x => { const t = x.title || x.getAttribute('aria-label') || ''; x.dataset.ml = MOB_LABELS[x.id] || clampStr(t.split(/[:(]/)[0].trim(), 22); });
 }
+// close a dialog the way its own close does: its ✕, else Escape, else just hide it
+function closeOverlay(o) {
+  if (o.id === 'critterMenu') { closeCritterMenu(); return; }
+  const x = o.querySelector('[data-x], .xbtn');
+  if (x) x.click(); else o.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true }));
+  if (o.isConnected && !o.hidden && o.getClientRects().length) o.hidden = true;
+}
 window.critterBack = () => {
   try {
     const shown = x => x && !x.hidden && x.getClientRects().length;
@@ -17109,7 +17159,7 @@ window.critterBack = () => {
     if (critterMenuOpen()) { closeCritterMenu(); return true; }   // (an Escape would also reach the start screen under it)
     const esc = t => t.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', bubbles: true, cancelable: true }));
     const ovs = [...document.querySelectorAll('.overlay')].filter(o => shown(o) && o.id !== 'onboard' && o.id !== 'splash');
-    if (ovs.length) { const o = ovs[ovs.length - 1]; const x = o.querySelector('[data-x], .xbtn'); if (x) x.click(); else esc(o); if (shown(o)) o.hidden = true; return true; }
+    if (ovs.length) { closeOverlay(ovs[ovs.length - 1]); return true; }
     const pops = [...document.querySelectorAll('.menu')].filter(shown);
     if (pops.length) { closePop(); pops.forEach(m => { if (shown(m)) m.hidden = true; }); return true; }
     if (MOB.on && shown(document.getElementById('mMenu'))) { mobMenu(false); return true; }
@@ -17167,6 +17217,51 @@ function mobAfterClose() { setTimeout(() => { if (MOB.on && MOB.fromMenu && !mob
   // a page closed by its own button goes back to the menu it was opened from
   document.addEventListener('click', e => { if (MOB.on && e.target.closest('.fwin .fwhead .xbtn, .fwin .fwhead [data-x], .fwin .fwhead [data-act=close]')) mobAfterClose(); }, true);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && MOB.on && !$('#mMenu').hidden) { e.stopPropagation(); mobMenu(false); } }, true);
+})();
+// a dialog opens at its top, even when its focus goes to a button at the bottom (the browser scrolls to that)
+(() => {
+  const top = o => { const f = () => { o.scrollTop = 0; o.querySelectorAll('.card').forEach(c => { c.scrollTop = 0; }); }; f(); requestAnimationFrame(f); setTimeout(f, 90); };
+  const watch = o => new MutationObserver(() => { if (!o.hidden) top(o); }).observe(o, { attributes: true, attributeFilter: ['hidden'] });
+  document.querySelectorAll('.overlay').forEach(watch);
+  new MutationObserver(ms => { for (const m of ms) for (const n of m.addedNodes) if (n.nodeType === 1 && n.classList.contains('overlay')) { top(n); watch(n); } }).observe(document.body, { childList: true });
+})();
+// phones: a dialog sheet (or the menu) closes with a drag down from its top, as on iOS; a short or slow drag springs back
+(() => {
+  let d = null;
+  const sheetAt = t => {
+    const m = t.closest('#mMenu');
+    if (m) return t.closest('.mmhead') ? { el: m, scroller: m.querySelector('.mmbody'), close: () => { MOB.fromMenu = false; mobMenu(false); } } : null;
+    const card = t.closest('.overlay:not(#onboard):not(#splash) > .card'); if (!card) return null;
+    if (t.getBoundingClientRect && card.scrollTop > 0) return null;
+    return { el: card, scroller: card, close: () => closeOverlay(card.parentElement), top: card.getBoundingClientRect().top };
+  };
+  addEventListener('touchstart', e => {
+    d = null; if (!MOB.on || e.touches.length !== 1) return;
+    const t = e.target; if (t.closest('input,textarea,select,[contenteditable],input[type=range]')) return;
+    const s = sheetAt(t); if (!s) return;
+    const y = e.touches[0].clientY;
+    // the top part of a dialog (its first 72px, the handle and title); the menu's head
+    if (s.top !== undefined && y - s.top > 72) return;
+    d = { ...s, y, t: Date.now(), dy: 0, moved: false };
+  }, { passive: true, capture: true });
+  addEventListener('touchmove', e => {
+    if (!d) return;
+    const dy = e.touches[0].clientY - d.y;
+    if (!d.moved && dy < 8) { if (dy < -8) d = null; return; }
+    d.moved = true; d.dy = Math.max(0, dy); e.preventDefault();
+    d.el.style.transition = 'none'; d.el.style.transform = `translateY(${d.dy}px)`;
+  }, { passive: false, capture: true });
+  const end = () => {
+    if (!d) return; const { el: x, dy, t, moved, close } = d; d = null; if (!moved) return;
+    const fast = dy / Math.max(1, Date.now() - t) > 0.45;
+    x.style.transition = 'transform .2s ease';
+    if (dy > Math.min(150, x.offsetHeight * 0.3) || (fast && dy > 36)) {
+      x.style.transform = `translateY(${Math.max(x.offsetHeight, 200)}px)`;
+      setTimeout(() => { close(); x.style.transform = ''; x.style.transition = ''; }, 190);
+    } else { x.style.transform = ''; setTimeout(() => { x.style.transition = ''; }, 220); }
+  };
+  addEventListener('touchend', end, { capture: true });
+  addEventListener('touchcancel', end, { capture: true });
 })();
 /* phones: the dice panel is a bottom sheet. Peeking keeps the dice and roll box in reach; open shows the log and table */
 const phone = matchMedia('(max-width: 760px)');

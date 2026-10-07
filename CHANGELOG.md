@@ -9,6 +9,11 @@ Critter Sounds keeps its own changelog in the critter-sounds repository.
 - Next stays in reach at the bottom of Take a seat.
 - Android's back swipe goes back a step instead of leaving: it closes what's open (a menu, the settings, a dialog, a sheet), and Find your table goes back to Take a seat. With nothing left to go back to, the app says "Swipe back again to leave Critter VTT" (Android app 1.2.1).
 - Your seat, opened on the start screen, no longer jumps back to Find your table after a second or two.
+- Dialogs and menus open at their top on a phone (they opened scrolled to the bottom, where their focus went). Their buttons at the bottom stay in view while the rest scrolls.
+- Drag a dialog or the menu down from its top to close it, as on iOS; a short or slow drag springs back. Dialogs have a handle on top.
+- The Critter VTT menu shows the logo on a phone again.
+- The walkthrough on a phone: in touch words, with the menu opened at the right tile for each step, and offered once you're at a table.
+- The Android app (1.2.2) runs edge to edge: the table shows under the status bar and the gesture bar, with no black strips; Critter VTT keeps its own buttons clear of both.
 
 ## 1.3.0 (2026-10-07)
 **Highlights**
