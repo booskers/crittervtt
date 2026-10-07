@@ -42,6 +42,9 @@ const I = {
   wall: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v6M15 10v5M9 15v5"/>',
   rewind: '<path d="M3 12a9 9 0 109-9 9.75 9.75 0 00-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
   phone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+  android: '<rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/>',
+  campaign: '<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>',
+  tour: '<path d="M9 18l6-6-6-6"/><circle cx="12" cy="12" r="10"/>',
   server: '<rect x="3" y="3" width="18" height="7" rx="2"/><rect x="3" y="14" width="18" height="7" rx="2"/><path d="M7 6.5h.01M7 17.5h.01"/>',
   users: '<path d="M17 20v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2"/><circle cx="10" cy="7" r="4"/><path d="M21 20v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8"/>',
   eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
@@ -78,7 +81,7 @@ const PAGES = {
     title: 'Critter VTT', desc: 'A free virtual tabletop: battle maps, 3D dice, character sheets and rulebooks, shared live with your group in a browser or on Windows.',
     nav: [['#play', 'Features'], ['#sheets', 'Sheets'], ['#host', 'Host it'], ['#download', 'Download'], ['#iphone', 'iPhone']],
     h1: 'Your table, <em>ready to play.</em>',
-    lede: 'Critter VTT is a free virtual tabletop. Share a lobby code and your group sits down at the same battle map, with the same dice, sheets and rulebooks, and every roll as it happens.',
+    lede: 'Critter VTT is a free virtual tabletop. Open your campaign, send your group the table’s code, and everyone sits down at the same battle map, with the same dice, sheets and rulebooks, and every roll as it happens.',
     ctas: [['primary', 'play', 'Play in your browser', 'https://live.crittervtt.com'], ['', 'down', 'Download for Windows', dl('vtt')]],
     note: 'Free and open source. Nothing to install to play in a browser.',
     hero: ['vtt-hero.jpg', 'A battle in Critter VTT: the dungeon map with character and monster tokens, a fireball measured over three goblins, 3D dice rolling, the turn order and a busy chat', 3200, 1920, 'Round one in the crypt: Seraphine’s Fireball rolls 8d6 in her colour while the GM rolls the goblins’ saves. The turn order, live cursors and the 20 ft radius are all shared.'],
@@ -93,9 +96,9 @@ const PAGES = {
         body: ticks([['Compendium', 'for D&amp;D 5e, Pathfinder 2e, Daggerheart, Blades in the Dark and Fate.'], ['Eleven game systems', 'with their own dice rules, from plain dice to Call of Cthulhu, Powered by the Apocalypse, Vampire and Shadowrun.'], ['Your own books', 'imported for your private games, kept in your browser or shared with the table.']]) },
       { id: 'phone', eyebrow: 'Anywhere', h2: 'Play from a phone.', sub: 'Critter VTT runs in any modern browser. On a phone, the board fills the screen and the dice and chat slide up from the bottom.', phone: true,
         media: shot('vtt-phone.jpg', 'Critter VTT on a phone, showing the board and the dice tray in Seraphine’s green', 1170, 2532),
-        body: ticks([['No install', 'for players: open the link and type the lobby code.'], ['The Windows app', 'adds a saves folder on your computer and updates itself.'], ['Accessible', 'with keyboard control of tokens, screen reader labels and an accessibility menu.']]) }
+        body: ticks([['No install', 'for players: open the link and type the table’s code.'], ['The Windows app', 'keeps your campaigns in a saves folder on your computer and updates itself.'], ['Accessible', 'with keyboard control of tokens, screen reader labels, a font for dyslexia and an accessibility menu.']]) }
     ],
-    cards: [['wall', 'Scene builder', 'Walls, doors, windows and lights, with fog of war that the GM reveals as the party explores.'], ['rewind', 'Rewind the table', 'The server saves every ten minutes while you play. Rewind a lost evening, and undo the rewind too.'], ['users', 'Players and seats', 'The owner sets up the players; each person claims theirs with a name, token and colour.'], ['clock', 'Trackers and clocks', 'Progress clocks and trackers the whole table can see.'], ['music', 'Music at the table', 'Critter Sounds streams to every player. Each player keeps their own volume.'], ['eye', 'GM tools', 'Hidden rolls, a GM layer, an encounter builder, random tables and scenes prepared in advance.']],
+    cards: [['wall', 'Scene builder', 'Walls, doors, windows and lights, with fog of war that the GM reveals as the party explores.'], ['rewind', 'Rewind the table', 'Your campaign saves itself on your computer as you play. Rewind to any save, and undo the rewind too.'], ['users', 'Players and seats', 'The owner sets up the players; each person claims theirs with a name, token and colour.'], ['clock', 'Trackers and clocks', 'Progress clocks and trackers the whole table can see.'], ['music', 'Music at the table', 'Critter Sounds streams to every player. Each player keeps their own volume.'], ['eye', 'GM tools', 'Hidden rolls, a GM layer, an encounter builder, random tables and scenes prepared in advance.'], ['campaign', 'Campaigns', 'Your latest campaigns wait on the start screen. Each evening opens with a fresh table code, and the campaign stays in your saves.'], ['tour', 'A tour you can try', 'A hands-on walkthrough for players and GMs: roll, chat and move your token as you go.']],
     host: true, iphone: true
   },
   sounds: {
@@ -225,13 +228,16 @@ function page(k) {
         <p>${k === 'vtt' ? 'The Windows app, with its own window, a saves folder on your computer, and updates from inside the app.' : k === 'sounds' ? 'For whoever runs the music. Plays from your computer to the table, Discord or Fluxer, and updates itself.' : 'For game masters. Your campaigns stay on your computer as plain files, and the app updates itself.'}</p>
         <div class="row"><a class="btn primary" href="${dl(k)}">${ic('down')} ${A.name} for Windows</a></div>
       </div>
-      <div class="dlcard">
+      ${k === 'vtt' ? `<div class="dlcard">
+        <h3>Android, for players</h3><p>Join your group's table from your phone: type the code, and Critter VTT takes you back to that table next time.</p><div class="row"><a class="btn" href="${GH}/crittervtt/releases/latest/download/Critter-VTT-Player.apk">${ic('android')} Critter VTT for Android</a></div>
+      </div>
+      ` : ''}<div class="dlcard">
         ${k === 'vtt' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones.</p><div class="row"><a class="btn" href="https://live.crittervtt.com">${ic('play')} Open live.crittervtt.com</a></div>`
           : k === 'sounds' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones, and controls the desktop app on your network.</p><div class="row"><a class="btn" href="https://sounds.crittervtt.com">${ic('play')} Open sounds.crittervtt.com</a></div>`
           : `<h3>Plays with Critter VTT</h3><p>${k === 'sounds' ? 'The virtual tabletop it plays to: free, in a browser or on Windows.' : 'The virtual tabletop your notes go to: free, in a browser or on Windows.'}</p><div class="row"><a class="btn" href="${site('vtt')}">${ic('dice')} Get Critter VTT</a></div>`}
       </div>
     </div>
-    <p class="small" style="margin-top:20px">The installer isn’t code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>. Every version and what changed is on the <a href="${GH}/${A.repo}/releases">Releases page</a>.</p>
+    <p class="small" style="margin-top:20px">The installer isn’t code-signed yet, so Windows SmartScreen may warn the first time: choose <b>More info › Run anyway</b>.${k === 'vtt' ? ' On Android, allow your browser to install apps when it asks (the app isn’t on Google Play yet).' : ''} Every version and what changed is on the <a href="${GH}/${A.repo}/releases">Releases page</a>.</p>
   </div>
 </section>`;
   const [hf, halt, hw, hh, hcap] = P.hero;
