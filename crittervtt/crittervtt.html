@@ -99,6 +99,7 @@ a{color:var(--accent-text)}
 .wb[aria-pressed="true"]{border-color:var(--accent-line);background:var(--accent-soft)}
 .togglerow{display:flex;align-items:center;gap:8px;padding:4px 6px;font-weight:700;font-size:14px}
 .togglerow input{accent-color:var(--accent);width:18px;height:18px}
+.buzzsw{position:fixed;left:-40px;top:0;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none}
 
 #textEdit{position:fixed;z-index:5;min-width:40px;border:1px dashed var(--accent);background:transparent;outline:none;resize:none;overflow:hidden;padding:0;margin:0;line-height:1.2;font-family:var(--f-body);font-weight:500;white-space:pre}
 
@@ -2875,6 +2876,8 @@ const CODE_CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 // is joining a table; campaigns, saves and setting up a table are a GM's, on the desktop app or the website
 const PLAYER_APP = (() => { try { return /CritterPlayer\//.test(navigator.userAgent) || new URLSearchParams(location.search).get('app') === 'player'; } catch { return false; } })();
 if (PLAYER_APP) document.documentElement.classList.add('player-app');
+// added to an iPhone's home screen from here, the icon opens the players' version again
+if (PLAYER_APP) { const mf = document.querySelector('link[rel="manifest"]'); if (mf) mf.href = 'manifest-player.webmanifest'; }
 const genCode = () => Array.from(crypto.getRandomValues(new Uint32Array(6)), v => CODE_CHARS[v % CODE_CHARS.length]).join('');
 const normCode = c => { const s = String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); return s.length >= 4 && s.length <= 8 ? s : null; };
 const hashCode = () => normCode(decodeURIComponent(location.hash.slice(1)));
@@ -5790,6 +5793,12 @@ function paintSettingsPop() {
   const p = $('#soundPop'); p.querySelector('.setlinks')?.remove();
   const box = el('div', 'setlinks');
   const go = (ic, t, sub, fn) => { const b = el('button', 'menuitem'); b.type = 'button'; b.innerHTML = icon(ic); b.append(HB.el('span', 'mtx', el('b', '', t), el('small', 'hint', sub))); b.onclick = () => { closePop(); fn(); }; box.append(b); };
+  if (coarse.matches) {
+    box.append(el('div', 'sec-label', 'Dice feel'));
+    const tog = (key, text) => { const row = el('label', 'togglerow'), c = el('input'); c.type = 'checkbox'; c.checked = !!FEEL[key]; c.onchange = () => setFeel({ [key]: c.checked }); row.append(c, el('span', '', text)); box.append(row); };
+    tog('buzz', 'Buzz when your dice hit the table');
+    if (window.DeviceMotionEvent) tog('motion', 'Tilt the phone to steer the dice, toss it to make them jump');
+  }
   box.append(el('div', 'sec-label', 'You'));
   go('person', 'Your seat', 'Name, token and colour', () => openOnboard(true));
   go('palette', 'Look', 'Light or dark, highlight colour, fonts', () => openLook());
@@ -5882,6 +5891,74 @@ function tick(now) {
   }
 }
 
+/* ---------------- dice you can feel (phones): a buzz when your dice hit the table; tilt the phone and the dice roll downhill,
+   toss it up and they jump. Only the look and feel: every result is decided before the dice are thrown. ---------------- */
+const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const coarse = matchMedia('(pointer: coarse)');
+const motionAsks = !!(window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function');
+// motion starts on, except on iPhones and iPads, where the person turns it on in Settings and iOS asks them first
+let FEEL = { buzz: true, motion: !IOS, ...(lsGet('tt.feel', {}) || {}) };
+let buzzSwitch = null, lastBuzz = 0;
+function buzz(strength) {
+  if (!FEEL.buzz || !coarse.matches || document.hidden) return;
+  const now = performance.now(); if (now - lastBuzz < 70) return; lastBuzz = now;
+  if (navigator.vibrate) { try { navigator.vibrate(Math.round(6 + strength * 24)); } catch {} return; }
+  if (!IOS) return;
+  // Safari has no vibration, but since iOS 18 a switch flipped in the page gives one tap of the Taptic Engine;
+  // never while typing, since the switch would take the keyboard's focus
+  const a = document.activeElement;
+  if (a && (a.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName))) return;
+  if (!buzzSwitch) {
+    buzzSwitch = el('label', 'buzzsw'); buzzSwitch.setAttribute('aria-hidden', 'true');
+    const c = el('input'); c.type = 'checkbox'; c.setAttribute('switch', ''); c.tabIndex = -1;
+    buzzSwitch.append(c); document.body.append(buzzSwitch);
+  }
+  buzzSwitch.click(); buzzSwitch.firstChild.blur();
+  if (a && a !== document.body && a.focus) a.focus({ preventScroll: true });
+}
+const tilt = { x: 0, y: 0, z: 0, ok: false }; // gravity as the phone reports it, smoothed
+let motionOn = false, lastToss = 0;
+function onMotion(e) {
+  const g = e.accelerationIncludingGravity;
+  if (!g || g.x == null) return;
+  if (!tilt.ok) Object.assign(tilt, { x: g.x, y: g.y, z: g.z, ok: true });
+  tilt.x += (g.x - tilt.x) * 0.12; tilt.y += (g.y - tilt.y) * 0.12; tilt.z += (g.z - tilt.z) * 0.12;
+  // a quick lift: the push along "up" (iOS flips the sign of both readings, so their product is the same everywhere)
+  const a = e.acceleration, gl = Math.hypot(tilt.x, tilt.y, tilt.z) || 1;
+  const up = a && a.x != null ? (a.x * tilt.x + a.y * tilt.y + a.z * tilt.z) / gl : Math.hypot(g.x, g.y, g.z) - gl;
+  if (up > 7 && performance.now() - lastToss > 450) { lastToss = performance.now(); toss3D(Math.min(1, (up - 7) / 14)); }
+}
+// which way the table slopes on screen (x right, y down), as the sine of the tilt; nothing when the phone is near level
+function slope() {
+  if (!motionOn || !tilt.ok) return null;
+  const s = IOS ? 1 : -1, ang = ((screen.orientation && screen.orientation.angle) ?? window.orientation ?? 0) * Math.PI / 180;
+  const dx = s * tilt.x / 9.81, du = s * tilt.y / 9.81; // downhill in the phone's own directions (x right, u up the screen)
+  const x = dx * Math.cos(ang) - du * Math.sin(ang), y = -(dx * Math.sin(ang) + du * Math.cos(ang));
+  const c = v => Math.max(-1, Math.min(1, v));
+  return Math.hypot(x, y) < 0.12 ? null : { x: c(x), y: c(y) };
+}
+function motionListen() {
+  if (!(FEEL.motion && coarse.matches && window.DeviceMotionEvent)) {
+    if (motionOn) removeEventListener('devicemotion', onMotion);
+    motionOn = false; tilt.ok = false; return;
+  }
+  if (motionOn) return;
+  const go = () => { if (!motionOn) { motionOn = true; addEventListener('devicemotion', onMotion); } };
+  // only iOS has to be asked (Android sends motion without asking, even where Chrome also has the question)
+  if (!(motionAsks && IOS)) return go();
+  // iOS answers only from a tap: if this isn't one, the next tap anywhere asks
+  DeviceMotionEvent.requestPermission().then(r => {
+    if (r === 'granted') go();
+    else { FEEL = { ...FEEL, motion: false }; lsSet('tt.feel', FEEL); toast('Motion isn’t allowed for this page, so the dice won’t follow the phone. You can allow it in the browser’s settings for this site.'); }
+  }).catch(() => addEventListener('click', motionListen, { once: true, capture: true }));
+}
+function setFeel(patch) {
+  FEEL = { ...FEEL, ...patch }; lsSet('tt.feel', FEEL);
+  if (patch.buzz) { lastBuzz = 0; buzz(0.8); }
+  if ('motion' in patch) motionListen();
+}
+motionListen();
+
 /* which physical dice a roll shows: d100 is a tens die plus a units die */
 const KINDS_3D = ['d3', 'd4', 'd6', 'd8', 'd10', 'd12', 'd20', 'tens', 'units', 'fate'];
 function visualDice(entry) {
@@ -5916,7 +5993,8 @@ function animateRoll(entry, prof, onLand) {
   if (!dice.length || document.hidden || reduceMotion.matches) { finish(null); return; }
   setTimeout(() => finish(null), 12000); // never hold the log hostage to a stalled animation
   if (init3D() && dice.every(d => KINDS_3D.includes(d.kind))) {
-    try { start3D(dice, prof, entry, finish); return; } catch (e) { console.warn('3D dice unavailable', e); }
+    // your own rolls come with onLand (they go to the log when they land); only those buzz your phone
+    try { start3D(dice, prof, entry, finish, !!onLand); return; } catch (e) { console.warn('3D dice unavailable', e); }
   }
   start2D(dice, prof, entry, finish);
 }
@@ -6142,7 +6220,10 @@ function simulateWave(F, wave) {
     const b = new CANNON.Body({ mass: 0, material: mD }); b.addShape(s.type.shape);
     b.position.set(s.p[0], s.p[1], s.p[2]); b.quaternion.set(s.q[0], s.q[1], s.q[2], s.q[3]); world.addBody(b);
   }
-  const n = wave.length, bodies = [], events = [], fromLeft = Math.random() < 0.5, dir = fromLeft ? 1 : -1;
+  // a tilted phone: the dice are thrown from the high side and drift downhill (the screen's y is the table's z)
+  const T = slope();
+  if (T) world.gravity.set(T.x * GRAVITY * 0.3, -GRAVITY, T.y * GRAVITY * 0.3);
+  const n = wave.length, bodies = [], events = [], fromLeft = T && Math.abs(T.x) > 0.15 ? T.x > 0 : Math.random() < 0.5, dir = fromLeft ? 1 : -1;
   const push = Math.max(0.75, Math.min(1.35, (x1 - x0) / 24)), zc = (z0 + z1) / 2 + (Math.random() - 0.5) * (z1 - z0) * 0.3;
   let frame = 0;
   wave.forEach((d, i) => {
@@ -6155,7 +6236,7 @@ function simulateWave(F, wave) {
       Math.max(z0 + 1.6, Math.min(z1 - 1.6, zc + (row - Math.min(3, n - 1) / 2) * 2.9))
     );
     b.quaternion.setFromEuler(Math.random() * 6.3, Math.random() * 6.3, Math.random() * 6.3);
-    b.velocity.set(dir * (17 + Math.random() * 11) * push, 2 + Math.random() * 5, (Math.random() - 0.5) * 12);
+    b.velocity.set(dir * (17 + Math.random() * 11) * push, 2 + Math.random() * 5, (Math.random() - 0.5) * 12 + (T ? T.y * 14 : 0));
     b.angularVelocity.set((Math.random() - 0.5) * 42, (Math.random() - 0.5) * 42, (Math.random() - 0.5) * 42);
     b.addEventListener('collide', e => { const v = Math.abs(e.contact.getImpactVelocityAlongNormal()); if (v > 1.2) events.push([frame, v]); });
     world.addBody(b); bodies.push(b);
@@ -6178,12 +6259,12 @@ function simulateWave(F, wave) {
   }
   return { frames, events, bodies };
 }
-function start3D(dice, prof, entry, finish) {
+function start3D(dice, prof, entry, finish, mine) {
   const color = isHex(prof.color) ? prof.color : '#7a8597';
   dice.forEach(d => { d.type = dieType(d.kind); });
   const waves = [];
   dice.forEach(d => (waves[d.wave] = waves[d.wave] || []).push(d));
-  flights3D.push({ prof, entry, finish, color, A: rollArea(), waves: waves.filter(Boolean), wi: -1, statics: [], live: [], state: 'pause', t: 0 });
+  flights3D.push({ prof, entry, finish, color, mine, A: rollArea(), waves: waves.filter(Boolean), wi: -1, statics: [], live: [], state: 'pause', t: 0 });
   startFx();
 }
 function beginWave(F) {
@@ -6225,7 +6306,9 @@ function step3D(dt) {
         d.mesh.quaternion.copy(qa).slerp(qb, a);
       });
       const ev = F.sim.events;
-      while (F.ei < ev.length && ev[F.ei][0] <= i0) F.ei++;
+      let hit = 0;
+      while (F.ei < ev.length && ev[F.ei][0] <= i0) { hit = Math.max(hit, ev[F.ei][1]); F.ei++; }
+      if (F.mine && hit > 4) buzz(Math.min(1, hit / 30));
       if (pos >= fr.length - 1) {
         const last = fr[fr.length - 1];
         F.cur.forEach((d, k) => { if (d.flag !== 'R') { const o = k * 7; F.statics.push({ type: d.type, p: [last[o], last[o + 1], last[o + 2]], q: [last[o + 3], last[o + 4], last[o + 5], last[o + 6]] }); } });
@@ -6233,16 +6316,45 @@ function step3D(dt) {
         else { F.state = 'landed'; F.t = 0; F.finish(screenInfo(F)); }
       }
     } else if (F.state === 'landed') {
+      if (F.live.some(m => m.hop)) F.t = Math.min(F.t, 1.85); // dice in the air from a toss don't fade yet
       if (F.t > 1.9) { const o = Math.max(0, 1 - (F.t - 1.9) / 0.5); F.live.forEach(m => { if (!m.fading) setOpacity(m.mesh, o * (m.d.kept ? 1 : 0.4)); }); }
       else F.live.forEach(m => { if (!m.d.kept && !m.fading && !m.dim) { m.dim = true; setOpacity(m.mesh, 0.4); } });
       if (F.t > 2.4) { F.live.forEach(m => disposeMesh(m.mesh)); flights3D.splice(fi, 1); continue; }
     }
-    for (const m of F.live) if (m.fading) {
-      m.fading += dt; setOpacity(m.mesh, Math.max(0, 1 - m.fading / 0.35));
-      if (m.fading > 0.35 && m.mesh.parent) D3.scene.remove(m.mesh);
+    for (const m of F.live) {
+      if (m.hop) hopStep(F, m, dt);
+      if (m.fading) {
+        m.fading += dt; setOpacity(m.mesh, Math.max(0, 1 - m.fading / 0.35));
+        if (m.fading > 0.35 && m.mesh.parent) D3.scene.remove(m.mesh);
+      }
     }
   }
   if (any) D3.r.render(D3.scene, D3.cam);
+}
+// tossing the phone: every die on screen jumps and turns exactly once around, so it lands showing the same face
+function toss3D(power) {
+  if (!D3.ok || reduceMotion.matches) return;
+  for (const F of flights3D) for (const m of F.live) if (m.mesh.parent && !m.fading && !m.hop) {
+    const ax = new THREE.Vector3(Math.random() - 0.5, 0, Math.random() - 0.5);
+    if (ax.lengthSq() < 1e-4) ax.set(1, 0, 0);
+    m.hop = { t: 0, dur: 0.42 + power * 0.2, h: (1.2 + power * 2.8) * (0.8 + Math.random() * 0.4), ax: ax.normalize(), spin: Math.random() < 0.5 ? 1 : -1, mine: F.mine, p: null, q: null };
+  }
+  startFx();
+}
+const qh = window.THREE ? new THREE.Quaternion() : null;
+function hopStep(F, m, dt) {
+  const h = m.hop, mesh = m.mesh;
+  // dice still being thrown get their place from the recording every frame; the others keep where the jump started
+  if (!(F.state === 'play' && F.cur.includes(m.d))) {
+    if (!h.p) { h.p = mesh.position.clone(); h.q = mesh.quaternion.clone(); }
+    mesh.position.copy(h.p); mesh.quaternion.copy(h.q);
+  } else h.p = null;
+  h.t += dt;
+  const k = h.t / h.dur;
+  if (k >= 1) { m.hop = null; if (h.mine) buzz(0.5); return; }
+  const e = k * k * (3 - 2 * k);
+  mesh.position.y += h.h * 4 * k * (1 - k);
+  mesh.quaternion.premultiply(qh.setFromAxisAngle(h.ax, h.spin * 2 * Math.PI * e));
 }
 
 /* ---------------- flat fallback when WebGL isn't available ---------------- */

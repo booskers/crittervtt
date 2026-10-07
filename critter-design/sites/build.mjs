@@ -62,7 +62,9 @@ const I = {
   lock: '<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/>',
   table: '<path d="M3 3h18v18H3zM3 9h18M3 15h18M9 3v18"/>',
   play: '<path d="M6 4l14 8-14 8z"/>',
-  down: '<path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/>'
+  down: '<path d="M12 4v11m0 0l-5-5m5 5l5-5M4 20h16"/>',
+  share: '<path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>',
+  plus: '<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/>'
 };
 const ic = n => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${I[n]}</svg>`;
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -74,7 +76,7 @@ const shot = (file, alt, w, h, caption) => `<figure class="media"><img src="img/
 const PAGES = {
   vtt: {
     title: 'Critter VTT', desc: 'A free virtual tabletop: battle maps, 3D dice, character sheets and rulebooks, shared live with your group in a browser or on Windows.',
-    nav: [['#play', 'Features'], ['#sheets', 'Sheets'], ['#host', 'Host it'], ['#download', 'Download']],
+    nav: [['#play', 'Features'], ['#sheets', 'Sheets'], ['#host', 'Host it'], ['#download', 'Download'], ['#iphone', 'iPhone']],
     h1: 'Your table, <em>ready to play.</em>',
     lede: 'Critter VTT is a free virtual tabletop. Share a lobby code and your group sits down at the same battle map, with the same dice, sheets and rulebooks, and every roll as it happens.',
     ctas: [['primary', 'play', 'Play in your browser', 'https://critter.poly-chrome.cc'], ['', 'down', 'Download for Windows', dl('vtt')]],
@@ -94,7 +96,7 @@ const PAGES = {
         body: ticks([['No install', 'for players: open the link and type the lobby code.'], ['The Windows app', 'adds a saves folder on your computer and updates itself.'], ['Accessible', 'with keyboard control of tokens, screen reader labels and an accessibility menu.']]) }
     ],
     cards: [['wall', 'Scene builder', 'Walls, doors, windows and lights, with fog of war that the GM reveals as the party explores.'], ['rewind', 'Rewind the table', 'The server saves every ten minutes while you play. Rewind a lost evening, and undo the rewind too.'], ['users', 'Players and seats', 'The owner sets up the players; each person claims theirs with a name, token and colour.'], ['clock', 'Trackers and clocks', 'Progress clocks and trackers the whole table can see.'], ['music', 'Music at the table', 'Critter Sounds streams to every player. Each player keeps their own volume.'], ['eye', 'GM tools', 'Hidden rolls, a GM layer, an encounter builder, random tables and scenes prepared in advance.']],
-    host: true
+    host: true, iphone: true
   },
   sounds: {
     title: 'Critter Sounds', desc: 'Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter VTT, or in a Discord or Fluxer voice channel.',
@@ -168,6 +170,21 @@ function page(k) {
     <h2>One code, and the table hears it.</h2>
     <p class="sub">In Critter VTT, the lobby owner opens <b>Music</b> and copies the table’s music code. Paste it into Critter Sounds and press <b>Connect</b>. Only an app with the right key can play to your table, and each player sets their own volume.</p>
     <div class="grid">${card(['link', '1. Open your table', 'Start a lobby in <a href="' + site('vtt') + '">Critter VTT</a> and open <b>Music</b> in the bottom bar.'])}${card(['send', '2. Paste the code', 'It looks like <code>ABCDEF-KEY12-34567</code>: the lobby, then the key.'])}${card(['play', '3. Play', 'Tracks, pads and soundscapes reach every player with their credits.'])}</div>
+  </div>
+</section>` : '';
+  // iPhones get no app file: players add the players' version of the site to the home screen, where it opens full screen like an app
+  const PLAY = 'https://critter.poly-chrome.cc/?app=player';
+  const iphone = P.iphone ? `
+<section id="iphone">
+  <div class="wrap">
+    <span class="eyebrow">iPhone and iPad</span>
+    <h2>Put Critter VTT on your home screen.</h2>
+    <p class="sub">There’s nothing to download from the App Store. Safari adds Critter VTT to your home screen, and it opens full screen with its own icon, like an app. It updates by itself whenever Critter VTT does.</p>
+    <div class="grid">${card(['globe', '1. Open it in Safari', 'On your iPhone, open <a href="' + PLAY + '"><b>critter.poly-chrome.cc/?app=player</b></a>: the players’ version, which opens on <b>Join a table</b>.'])}${card(['share', '2. Tap Share', 'The square with the arrow, at the bottom of Safari (on an iPad, at the top). Then scroll down a little.'])}${card(['plus', '3. Add to Home Screen', 'Leave <b>Open as Web App</b> on, then tap <b>Add</b>. Critter VTT is now on your home screen.'])}</div>
+    <div class="ctas" style="margin-top:24px"><a class="btn primary" href="${PLAY}">${ic('play')} Open the players’ version</a></div>
+    <p class="small" style="margin-top:20px"><b>Dice you can feel:</b> on iOS 18 or later, your phone taps when your dice hit the table. To steer the dice by tilting the phone, and make them jump when you toss it up, open <b>Settings</b> (the gear) › <b>Dice feel</b> and allow motion. The results are never affected.</p>
+    <p class="small" style="margin-top:12px"><b>Running the game from an iPad?</b> Add <a href="https://critter.poly-chrome.cc">critter.poly-chrome.cc</a> the same way to get everything the game master needs.</p>
+    <p class="small" style="margin-top:12px"><b>On Android?</b> Get <a href="${GH}/crittervtt/releases/latest/download/Critter-VTT-Player.apk">the Android app</a> (Android asks you to allow installing it).</p>
   </div>
 </section>` : '';
   const host = P.host ? `
@@ -255,7 +272,7 @@ ${sections}
     <div class="grid" style="margin-top:28px">${P.cards.map(c => card(c)).join('')}</div>
   </div>
 </section>
-${how}${host}${family}${download}
+${how}${host}${family}${download}${iphone}
 </main>
 <footer>
   <div class="wrap">

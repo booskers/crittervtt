@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- the Critter mark on Critter's dark tone; the launcher cuts it to its own shape (circle, squircle, square) -->
+<!-- the Critter mark (a vector, made by app/logo-src/app-icon.py) on Critter's dark tone; the launcher cuts it to its own shape (circle, squircle, square) -->
 <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
     <background android:drawable="@color/critter_tone" />
-    <foreground android:drawable="@mipmap/ic_launcher_foreground" />
-    <monochrome android:drawable="@mipmap/ic_launcher_foreground" />
+    <foreground android:drawable="@drawable/ic_launcher_foreground" />
+    <monochrome android:drawable="@drawable/ic_launcher_foreground" />
 </adaptive-icon>

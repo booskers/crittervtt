@@ -37,6 +37,9 @@ const wrap = body => `<!doctype html>
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#0b0c0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Critter VTT">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)}; window.CRITTER_VERSION = ${JSON.stringify(version)};</script>
 <script src="homebase.js"></script>
 </head>
@@ -52,10 +55,13 @@ await writeFile(join(out, 'music.html'), wrap(await readFile(join(here, 'music-l
 await cp(join(src, 'srd'), join(out, 'srd'), { recursive: true });
 // the Critter icon for browser tabs and home screens
 for (const f of ['favicon.ico', 'favicon.png', 'apple-touch-icon.png', 'icon-192.png', 'icon-512.png']) await cp(join(here, 'assets', f), join(out, f));
-// installable from the browser (Chrome's "Install app"): its own window and home-screen icon
-await writeFile(join(out, 'manifest.webmanifest'), JSON.stringify({
-  name: 'Critter VTT', short_name: 'Critter VTT', description: 'A free virtual tabletop: battle map, dice, sheets and rulebooks, live with your group.',
-  start_url: '/', scope: '/', display: 'standalone', background_color: '#0b0c0f', theme_color: '#0b0c0f',
+// installable from the browser (Chrome's "Install app", Safari's "Add to Home Screen"): its own window and home-screen icon.
+// The players' version (?app=player, which the page switches to) opens on "Join a table", like the Android app: it's how iPhones get the app.
+const manifest = (start, name) => JSON.stringify({
+  name, short_name: 'Critter VTT', description: 'A free virtual tabletop: battle map, dice, sheets and rulebooks, live with your group.',
+  id: start, start_url: start, scope: '/', display: 'standalone', background_color: '#0b0c0f', theme_color: '#0b0c0f',
   icons: [{ src: 'icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' }, { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' }]
-}, null, 1));
+}, null, 1);
+await writeFile(join(out, 'manifest.webmanifest'), manifest('/', 'Critter VTT'));
+await writeFile(join(out, 'manifest-player.webmanifest'), manifest('/?app=player', 'Critter VTT for players'));
 console.log(`www ready: page ${(html.length / 1024).toFixed(0)} KB, Homebase ${cfg.server ? 'at ' + cfg.server : 'not configured (the app will ask)'}`);
