@@ -99,12 +99,12 @@ const PAGES = {
     host: true, iphone: true
   },
   sounds: {
-    title: 'Critter Sounds', desc: 'Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter VTT, or in a Discord or Fluxer voice channel.',
-    nav: [['#features', 'Features'], ['#scapes', 'Soundscapes'], ['#library', 'Library'], ['#download', 'Download']],
+    title: 'Critter Sounds', desc: 'Critter Sounds plays music, sound pads and soundscapes live to your tabletop group: in Critter VTT, or in a Discord or Fluxer voice channel. On Windows, or in your browser.',
+    nav: [['#features', 'Features'], ['#scapes', 'Soundscapes'], ['#library', 'Library'], ['#phone', 'Phone'], ['#nearby', 'Nearby'], ['#download', 'Download']],
     h1: 'The soundtrack to your game, <em>played live.</em>',
     lede: 'Music, sound effects and ambience for your tabletop game, played from your computer to everyone at the table: in Critter VTT, or in a Discord or Fluxer voice channel.',
-    ctas: [['primary', 'down', 'Download for Windows', dl('sounds')], ['', 'play', 'How it connects', '#how']],
-    note: 'Free and open source. Windows 10 and 11.',
+    ctas: [['primary', 'down', 'Download for Windows', dl('sounds')], ['', 'play', 'Open in your browser', 'https://sounds.crittervtt.com']],
+    note: 'Free and open source. Windows 10 and 11, or any modern browser.',
     hero: ['sounds-main.jpg', 'Critter Sounds connected to a table, playing The Drowned Tower with the Cave effect, with playlists, sound pads, soundscapes, scenes and the queue', 2560, 1404, 'Connected to the table and heard by all four seats: a dungeon playlist with the Cave effect, rain looping on a pad, and the next tracks queued.'],
     sections: [
       { id: 'features', eyebrow: 'Running the music', h2: 'Everything the music needs.', sub: 'It plays from your computer and streams to every player over WebRTC, so there’s nothing to upload and no limit on tracks.',
@@ -114,7 +114,13 @@ const PAGES = {
         body: ticks([['A node editor', 'with sound, control and trigger cables, colour-coded.'], ['Macro sliders', 'like Danger or Intensity show on the soundscape’s tile, to change it while it plays.'], ['Render a loop', 'up to ten minutes long, crossfaded so it loops without a seam.'], ['Your own nodes', 'in a few lines of JavaScript.']]) },
       { id: 'library', eyebrow: 'Online library', h2: 'Free music, credited.', sub: 'Search free music and sound effects inside the app. Preview it, queue it, make it a pad, or save it to play offline. Every track keeps its credit, and players see it.',
         media: shot('sounds-library.jpg', 'The online library searching Tabletop Audio for tavern ambiences, beside the playlist and sound pads', 2560, 1404, 'Tavern ambiences from <a href="https://tabletopaudio.com">Tabletop Audio</a> (CC BY-NC-ND 4.0), shown with their credit.'),
-        body: ticks([['Tabletop Audio', 'with about 520 ten-minute ambiences and pieces of music.'], ['Incompetech', 'with about 1,440 pieces by Kevin MacLeod.'], ['Openverse and Freesound', 'for sound effects, each with its license.'], ['YouTube', 'search, keeping only the sound, for what you may use.']]) }
+        body: ticks([['Tabletop Audio', 'with about 520 ten-minute ambiences and pieces of music.'], ['Incompetech', 'with about 1,440 pieces by Kevin MacLeod.'], ['Openverse and Freesound', 'for sound effects, each with its license.'], ['YouTube', 'search, keeping only the sound, for what you may use.']]) },
+      { id: 'phone', eyebrow: 'In your browser', h2: 'Run the music from a phone or tablet.', sub: 'Critter Sounds also runs in a browser at <a href="https://sounds.crittervtt.com">sounds.crittervtt.com</a>. On a phone it works like an app: sections at the bottom, a player that slides up, and the swipes you know from your iPhone.', phone: true,
+        media: shot('sounds-phone.jpg', 'Critter Sounds on a phone: Now playing shows The Drowned Tower from the Dungeon crawl playlist, with its cover art, the position, the play controls and the volumes', 1170, 2532),
+        body: ticks([['Like an app', 'on iPhone and iPad: add it to your Home Screen from Safari’s Share menu, and it opens full screen.'], ['Swipes', 'down to close the player, from the edge to go back, and on a track to play it next or add it to the queue. Every swipe has a button too.'], ['Your sounds stay yours', 'in your browser, on your device. Nothing is uploaded.'], ['On a tablet', 'playlists sit beside their tracks, with the player along the bottom.'], ['What needs Windows', 'saving sounds, YouTube, the voice-chat bots and rendering loops say so, and come back while you control the desktop app.']]) },
+      { id: 'nearby', eyebrow: 'Nearby', h2: 'Control the desktop from your phone.', sub: 'Critter Sounds finds the others on your network. Ask from a phone, a tablet or another computer to control the desktop app: it shows who’s asking and a code to compare, and nothing happens until someone there presses <b>Allow</b>.', phone: true,
+        media: shot('sounds-nearby.jpg', 'A phone controlling Critter Sounds on the Game room PC: the sound pads, with Heavy rain on roof playing and The Drowned Tower in the mini player', 1170, 2532),
+        body: ticks([['Your library, over there', 'the phone shows the computer’s playlists, pads and soundscapes, and plays them on the computer.'], ['Downloads stay on the computer', 'save from the online library or YouTube, and the files land on the desktop, never on the phone.'], ['Only on your network', 'after the handshake the two talk directly, never through the internet.'], ['A pairing code', 'for when a device doesn’t show up by itself.']]) }
     ],
     cards: [['layout', 'Your layout, your way', 'A canvas of windows you split, dock and resize, with ready layouts for playing and preparing.'], ['log', 'Session log', 'Every track, pad and scene is logged with its time, and shows as small notes in Critter VTT’s chat.'], ['wave', 'Never louder', 'Effects are loudness-matched, so they never make the music louder. Any player can turn them off.'], ['mic', 'Voice channels', 'A bot of your own joins Discord or Fluxer and plays the table’s mix, effects included.'], ['update', 'Updates itself', 'New versions install from inside the app, with what changed.'], ['eye', 'Guided from the start', 'A short setup, a quick and a full tour, and a guided first soundscape.']],
     how: true
@@ -221,6 +227,7 @@ function page(k) {
       </div>
       <div class="dlcard">
         ${k === 'vtt' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones.</p><div class="row"><a class="btn" href="https://live.crittervtt.com">${ic('play')} Open live.crittervtt.com</a></div>`
+          : k === 'sounds' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones, and controls the desktop app on your network.</p><div class="row"><a class="btn" href="https://sounds.crittervtt.com">${ic('play')} Open sounds.crittervtt.com</a></div>`
           : `<h3>Plays with Critter VTT</h3><p>${k === 'sounds' ? 'The virtual tabletop it plays to: free, in a browser or on Windows.' : 'The virtual tabletop your notes go to: free, in a browser or on Windows.'}</p><div class="row"><a class="btn" href="${site('vtt')}">${ic('dice')} Get Critter VTT</a></div>`}
       </div>
     </div>
