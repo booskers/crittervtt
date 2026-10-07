@@ -23,13 +23,16 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
 /**
- * Critter VTT for players: the table at critter.poly-chrome.cc, full screen. The page knows it runs here from
+ * Critter VTT for players: the table at live.crittervtt.com, full screen. The page knows it runs here from
  * "?app=player" and "CritterPlayer" in the user agent, and then opens on "Join a table" instead of a GM's campaigns.
  * Everything else is the live site, so Critter VTT's updates arrive without a new app.
  */
 public class MainActivity extends Activity {
-    static final String HOST = "critter.poly-chrome.cc";
+    static final String HOST = "live.crittervtt.com";
     static final String HOME = "https://" + HOST + "/?app=player";
+    // the address before the move: links to it still open here, and the first start moves what the app kept there
+    static final String OLD_HOST = "critter.poly-chrome.cc";
+    static boolean ours(Uri u) { return u != null && (HOST.equals(u.getHost()) || OLD_HOST.equals(u.getHost())); }
     static final int PICK = 41;
 
     WebView web;
@@ -86,14 +89,14 @@ public class MainActivity extends Activity {
 
         web.setWebViewClient(new WebViewClient() {
             @Override
+            public void onPageFinished(WebView view, String url) { sendInsets(); moveStep(url); }
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest req) {
                 Uri u = req.getUrl();
-                if (HOST.equals(u.getHost())) return false;   // the table stays here
+                if (ours(u)) return false;                     // the table stays here
                 open(u);                                       // everything else (GitHub, credits, help) in the browser
                 return true;
             }
-            @Override
-            public void onPageFinished(WebView view, String url) { sendInsets(); }
             @Override
             public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError err) {
                 if (req.isForMainFrame()) offline();
@@ -113,6 +116,7 @@ public class MainActivity extends Activity {
         web.setDownloadListener((url, ua, cd, mime, len) -> { if (url.startsWith("http")) open(Uri.parse(url)); });
 
         if (saved != null) web.restoreState(saved);
+        else if (!getSharedPreferences("move", MODE_PRIVATE).getBoolean("done", false)) moveStart();
         else web.loadUrl(startUrl(getIntent()));
         updater = new Updater(this);
     }
@@ -132,6 +136,13 @@ public class MainActivity extends Activity {
             try { c = Color.parseColor(color); } catch (IllegalArgumentException e) { return; }
             runOnUiThread(() -> barsLike(c, light));
         }
+        // moving from the old address (see moveStart)
+        @JavascriptInterface
+        public void moveOut(String json) { runOnUiThread(() -> MainActivity.this.moveOut(json == null ? "-" : json)); }
+        @JavascriptInterface
+        public String moveTake() { String d = moveData; return d == null ? "{}" : d; }
+        @JavascriptInterface
+        public void moveIn(boolean ok) { runOnUiThread(() -> moveEnd(ok)); }
         // the page's "Check for updates" (the Critter VTT menu and Help)
         @JavascriptInterface
         public void checkUpdate() { runOnUiThread(() -> { if (updater != null) updater.check(true); }); }
@@ -172,17 +183,51 @@ public class MainActivity extends Activity {
         }
     }
 
-    // an invite link (critter.poly-chrome.cc/#K7QX2M) opens its table; anything else opens the start
+    /* Critter VTT moved from critter.poly-chrome.cc to live.crittervtt.com. The app's name, seat, settings and Homebase
+       identity were kept for the old address; on the first start after the update they move: the old address is opened
+       without starting Critter VTT (?critter-export=1), hands everything over through the bridge, and the new address
+       (opened the same way) takes it in. Only a finished move is remembered: anything else tries again next start. */
+    int moveStage;   // 0 none, 1 reading the old address, 2 writing at the new one
+    String moveData;
+    void moveStart() {
+        moveStage = 1;
+        web.loadUrl("https://" + OLD_HOST + "/?app=player&critter-export=1");
+        root.postDelayed(() -> { if (moveStage != 0) moveEnd(false); }, 15000);   // (never stuck on it)
+    }
+    void moveStep(String url) {
+        Uri u = Uri.parse(url);
+        if (moveStage == 1 && OLD_HOST.equals(u.getHost()))
+            web.evaluateJavascript("window.critterExport ? critterExport().then(d => CritterAndroid.moveOut(JSON.stringify(d)), () => CritterAndroid.moveOut('-')) : CritterAndroid.moveOut('-')", null);
+        else if (moveStage == 2 && HOST.equals(u.getHost()))
+            web.evaluateJavascript("window.critterImport ? critterImport(JSON.parse(CritterAndroid.moveTake())).then(() => CritterAndroid.moveIn(true), () => CritterAndroid.moveIn(false)) : CritterAndroid.moveIn(false)", null);
+    }
+    void moveOut(String json) {
+        if (moveStage != 1) return;
+        if ("-".equals(json)) { moveEnd(false); return; }                      // the old address can't hand anything over yet
+        // nothing kept there (a new install): nothing to move
+        boolean any = json.contains("\"hb.uid\"") || json.contains("\"tt.");
+        if (!any) { moveEnd(true); return; }
+        moveData = json; moveStage = 2;
+        web.loadUrl(HOME + "&critter-export=1");
+    }
+    void moveEnd(boolean done) {
+        if (moveStage == 0) return;
+        moveStage = 0; moveData = null;
+        if (done) getSharedPreferences("move", MODE_PRIVATE).edit().putBoolean("done", true).apply();
+        web.loadUrl(startUrl(getIntent()));
+    }
+
+    // an invite link (live.crittervtt.com/#K7QX2M, or the old address) opens its table; anything else opens the start
     String startUrl(Intent in) {
         Uri u = in == null ? null : in.getData();
-        if (u != null && HOST.equals(u.getHost())) { String f = u.getFragment(); return HOME + (f != null && !f.isEmpty() ? "#" + f : ""); }
+        if (ours(u)) { String f = u.getFragment(); return HOME + (f != null && !f.isEmpty() ? "#" + f : ""); }
         return HOME;
     }
 
     @Override
     protected void onNewIntent(Intent in) {
         super.onNewIntent(in);
-        if (in != null && in.getData() != null) web.loadUrl(startUrl(in));
+        if (in != null && in.getData() != null && moveStage == 0) web.loadUrl(startUrl(in));
     }
 
     void open(Uri u) {

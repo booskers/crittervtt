@@ -79,7 +79,7 @@ const PAGES = {
     nav: [['#play', 'Features'], ['#sheets', 'Sheets'], ['#host', 'Host it'], ['#download', 'Download'], ['#iphone', 'iPhone']],
     h1: 'Your table, <em>ready to play.</em>',
     lede: 'Critter VTT is a free virtual tabletop. Share a lobby code and your group sits down at the same battle map, with the same dice, sheets and rulebooks, and every roll as it happens.',
-    ctas: [['primary', 'play', 'Play in your browser', 'https://critter.poly-chrome.cc'], ['', 'down', 'Download for Windows', dl('vtt')]],
+    ctas: [['primary', 'play', 'Play in your browser', 'https://live.crittervtt.com'], ['', 'down', 'Download for Windows', dl('vtt')]],
     note: 'Free and open source. Nothing to install to play in a browser.',
     hero: ['vtt-hero.jpg', 'A battle in Critter VTT: the dungeon map with character and monster tokens, a fireball measured over three goblins, 3D dice rolling, the turn order and a busy chat', 3200, 1920, 'Round one in the crypt: Seraphine’s Fireball rolls 8d6 in her colour while the GM rolls the goblins’ saves. The turn order, live cursors and the 20 ft radius are all shared.'],
     sections: [
@@ -173,17 +173,17 @@ function page(k) {
   </div>
 </section>` : '';
   // iPhones get no app file: players add the players' version of the site to the home screen, where it opens full screen like an app
-  const PLAY = 'https://critter.poly-chrome.cc/?app=player';
+  const PLAY = 'https://live.crittervtt.com/?app=player';
   const iphone = P.iphone ? `
 <section id="iphone">
   <div class="wrap">
     <span class="eyebrow">iPhone and iPad</span>
     <h2>Put Critter VTT on your home screen.</h2>
     <p class="sub">There’s nothing to download from the App Store. Safari adds Critter VTT to your home screen, and it opens full screen with its own icon, like an app. It updates by itself whenever Critter VTT does.</p>
-    <div class="grid">${card(['globe', '1. Open it in Safari', 'On your iPhone, open <a href="' + PLAY + '"><b>critter.poly-chrome.cc/?app=player</b></a>: the players’ version, which opens on <b>Join a table</b>.'])}${card(['share', '2. Tap Share', 'The square with the arrow, at the bottom of Safari (on an iPad, at the top). Then scroll down a little.'])}${card(['plus', '3. Add to Home Screen', 'Leave <b>Open as Web App</b> on, then tap <b>Add</b>. Critter VTT is now on your home screen.'])}</div>
+    <div class="grid">${card(['globe', '1. Open it in Safari', 'On your iPhone, open <a href="' + PLAY + '"><b>live.crittervtt.com/?app=player</b></a>: the players’ version, which opens on <b>Join a table</b>.'])}${card(['share', '2. Tap Share', 'The square with the arrow, at the bottom of Safari (on an iPad, at the top). Then scroll down a little.'])}${card(['plus', '3. Add to Home Screen', 'Leave <b>Open as Web App</b> on, then tap <b>Add</b>. Critter VTT is now on your home screen.'])}</div>
     <div class="ctas" style="margin-top:24px"><a class="btn primary" href="${PLAY}">${ic('play')} Open the players’ version</a></div>
     <p class="small" style="margin-top:20px"><b>Dice you can feel:</b> on iOS 18 or later, your phone taps when your dice hit the table. To steer the dice by tilting the phone, and make them jump when you toss it up, open <b>Settings</b> (the gear) › <b>Dice feel</b> and allow motion. The results are never affected.</p>
-    <p class="small" style="margin-top:12px"><b>Running the game from an iPad?</b> Add <a href="https://critter.poly-chrome.cc">critter.poly-chrome.cc</a> the same way to get everything the game master needs.</p>
+    <p class="small" style="margin-top:12px"><b>Running the game from an iPad?</b> Add <a href="https://live.crittervtt.com">live.crittervtt.com</a> the same way to get everything the game master needs.</p>
     <p class="small" style="margin-top:12px"><b>On Android?</b> Get <a href="${GH}/crittervtt/releases/latest/download/Critter-VTT-Player.apk">the Android app</a> (Android asks you to allow installing it).</p>
   </div>
 </section>` : '';
@@ -220,7 +220,7 @@ function page(k) {
         <div class="row"><a class="btn primary" href="${dl(k)}">${ic('down')} ${A.name} for Windows</a></div>
       </div>
       <div class="dlcard">
-        ${k === 'vtt' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones.</p><div class="row"><a class="btn" href="https://critter.poly-chrome.cc">${ic('play')} Open critter.poly-chrome.cc</a></div>`
+        ${k === 'vtt' ? `<h3>In your browser</h3><p>Nothing to install. Works on computers, tablets and phones.</p><div class="row"><a class="btn" href="https://live.crittervtt.com">${ic('play')} Open live.crittervtt.com</a></div>`
           : `<h3>Plays with Critter VTT</h3><p>${k === 'sounds' ? 'The virtual tabletop it plays to: free, in a browser or on Windows.' : 'The virtual tabletop your notes go to: free, in a browser or on Windows.'}</p><div class="row"><a class="btn" href="${site('vtt')}">${ic('dice')} Get Critter VTT</a></div>`}
       </div>
     </div>

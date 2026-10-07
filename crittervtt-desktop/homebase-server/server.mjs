@@ -7,7 +7,7 @@ import { readFile, writeFile, mkdir, rename, rm, readdir } from 'node:fs/promise
 import { existsSync, statSync } from 'node:fs';
 import { join, normalize, extname, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createHash, timingSafeEqual } from 'node:crypto';
+import { createHash, timingSafeEqual, randomBytes } from 'node:crypto';
 import { WebSocketServer } from 'ws';
 import { ddbRequest } from './ddb.mjs';
 
@@ -182,14 +182,35 @@ const rooms = new Map();     // room -> Map(peer -> { ws, by, presence })
 const send = (ws, m) => { if (ws.readyState === 1) ws.send(JSON.stringify(m)); };
 const peersOf = room => [...(rooms.get(room) || new Map())].map(([peer, x]) => ({ peer, by: x.by, presence: x.presence }));
 const peerT = new Map();
-function announcePeers(room) {
-  if (peerT.has(room)) return;
-  peerT.set(room, setTimeout(() => { peerT.delete(room); const list = peersOf(room); for (const [, x] of rooms.get(room) || []) send(x.ws, { t: 'peers', room, peers: list }); }, 40));
+// who is in a room: the whole list goes out when someone joins or leaves, and to apps from before presence updates
+// (onlyOld: a presence changed, and the newer apps already got just that one player's)
+function announcePeers(room, onlyOld) {
+  const key = room + (onlyOld ? '\u0001old' : '');
+  if (peerT.has(room) || peerT.has(key)) return;
+  peerT.set(key, setTimeout(() => { peerT.delete(key); const list = peersOf(room); for (const [, x] of rooms.get(room) || []) if (!onlyOld || !x.ws.caps?.includes('pres')) send(x.ws, { t: 'peers', room: outName(room), peers: list }); }, 40));
 }
+/* "lan": Critter Sounds finds the other Critter Sounds on the same network here. Everyone whose connection comes from the
+   same network shares one room: the same public IPv4 address, the same IPv6 /64, and on a server in the home itself,
+   every private address. The room's real name is a salted hash that never leaves the server and can't be joined by
+   name, so nobody can look into another network's room. Only names and kinds pass through it, and the handshake for a
+   direct connection that Critter Sounds keeps to the local network. */
+const LAN_SALT = randomBytes(18).toString('hex');
+function netOf(ip) {
+  ip = String(ip || '').replace(/^::ffff:/i, '').replace(/%.*$/, '');
+  const v4 = /^(\d+)\.(\d+)\.\d+\.\d+$/.exec(ip);
+  if (v4) { const a = +v4[1], b = +v4[2]; return a === 10 || a === 127 || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31) || (a === 169 && b === 254) ? 'private' : ip; }
+  if (!ip.includes(':')) return 'private';
+  if (ip === '::1' || /^f[cd]/i.test(ip) || /^fe[89ab]/i.test(ip)) return 'private';
+  const [l, r = ''] = ip.split('::'), L = l ? l.split(':') : [], R = r ? r.split(':') : [], all = [...L, ...Array(Math.max(0, 8 - L.length - R.length)).fill('0'), ...R];
+  return all.slice(0, 4).map(x => parseInt(x || '0', 16).toString(16)).join(':') + '::/64';
+}
+const lanRoom = ip => 'lan_' + createHash('sha256').update(LAN_SALT + netOf(ip)).digest('hex').slice(0, 32);
+const outName = room => (room.startsWith('lan_') ? 'lan' : room);
 async function handle(ws, m) {
-  if (m.t === 'hello') { ws.uid = (await checkAuth(m.uid, m.key)) ? m.uid : null; send(ws, { t: 'hello', ok: !!ws.uid }); if (!ws.uid) ws.close(4001, 'wrong key'); return; }
+  if (m.t === 'hello') { ws.uid = (await checkAuth(m.uid, m.key)) ? m.uid : null; ws.caps = Array.isArray(m.caps) ? m.caps.filter(c => typeof c === 'string').slice(0, 10) : []; send(ws, { t: 'hello', ok: !!ws.uid }); if (!ws.uid) ws.close(4001, 'wrong key'); return; }
   if (!ws.uid) return;
   const ack = (extra) => m.rid && send(ws, { t: 'ack', rid: m.rid, ...extra });
+  if (typeof m.room === 'string') { if (m.room === 'lan') m.room = lanRoom(ws.ip); else if (m.room.startsWith('lan_')) return ack({ error: 'not allowed' }); }
   switch (m.t) {
     case 'sub': {
       if (typeof m.scope !== 'string' || !(m.scope === 'g' || validId(m.scope.slice(1))) || !mayRead(ws.uid, m.scope)) return ack({ error: 'not allowed' });
@@ -208,34 +229,12 @@ async function handle(ws, m) {
     }
     case 'write': {
       const ops = Array.isArray(m.ops) ? m.ops.slice(0, 100) : [];
-      for (const op of ops) if (!op || !(isAudio(op.path) || (validPath(op.path) && mayWrite(ws.uid, op.path) && scopeOf(op.path)))) return ack({ error: 'not allowed: ' + (op && op.path) });
       if (ipOf(ws.ip).writes > IP_WRITES_PER_DAY) return ack({ error: 'quota: this address has made too many changes today; try again tomorrow' });
-      for (const op of ops) {
-        if (isAudio(op.path)) {
-          if (op.op === 'delete') { await rm(audioFile(op.path), { force: true }); continue; }
-          const d = op.data && typeof op.data === 'object' ? op.data : {};
-          if (JSON.stringify(d).length > 300 * 1024) return ack({ error: 'too large' });
-          await writeFile(audioFile(op.path), JSON.stringify(d)); continue;
-        }
-        const scope = scopeOf(op.path), data = await scopeData(scope);
-        const old = data.get(op.path), oldLen = old === undefined ? 0 : op.path.length + JSON.stringify(old).length;
-        let d = null;
-        if (op.op !== 'delete') {
-          d = op.data && typeof op.data === 'object' ? op.data : {};
-          if (op.op === 'update') d = { ...(old || {}), ...d };
-          if (isLobbyRoot(op.path)) d = guardLobbyRoot(data, op.path, ws.uid, op.op, d);
-          const len = JSON.stringify(d).length;
-          if (len > MAX_DOC) return ack({ error: 'too large' });
-          const size = (await scopeSize(scope)) - oldLen + op.path.length + len;
-          if (scope[0] === 'L' && size > oldLen && (size > MAX_LOBBY_BYTES || (old === undefined && data.size >= MAX_LOBBY_DOCS))) return ack({ error: 'quota: this table is full (64 MB). Remove pictures or Library entries to make room.' });
-          data.set(op.path, d); sizes.set(scope, size);
-        } else {
-          if (isLobbyRoot(op.path) && guardLobbyRoot(data, op.path, ws.uid, 'delete', true) === undefined) return ack({ error: 'not allowed: only the owner can close this table' });
-          data.delete(op.path); if (sizes.has(scope)) sizes.set(scope, sizes.get(scope) - oldLen);
-        }
-        saveSoon(scope); if (scope[0] === 'L') dirty.add(scope);
-        for (const s of subs.get(scope) || []) send(s, { t: 'chg', scope, p: op.path, d });
-      }
+      // "each": several changes gathered into one message, each going through (or not) on its own
+      if (m.each) { const errs = {}; for (let i = 0; i < ops.length; i++) { const e = await writeOne(ws, ops[i]); if (e) errs[i] = e; } return ack(Object.keys(errs).length ? { ok: true, errs } : { ok: true }); }
+      // all or nothing, as apps from before "each" expect
+      for (const op of ops) if (!op || !(isAudio(op.path) || (validPath(op.path) && mayWrite(ws.uid, op.path) && scopeOf(op.path)))) return ack({ error: 'not allowed: ' + (op && op.path) });
+      for (const op of ops) { const e = await writeOne(ws, op); if (e) return ack({ error: e }); }
       return ack({ ok: true });
     }
     // autosaves, for the lobby owner and co-owners: list them, save now (named), and rewind to one
@@ -269,19 +268,54 @@ async function handle(ws, m) {
       return announcePeers(m.room);
     }
     case 'presence': {
-      const p = rooms.get(m.room)?.get(m.peer); if (!p || p.ws !== ws) return;
+      const r = rooms.get(m.room), p = r?.get(m.peer); if (!p || p.ws !== ws) return;
       if (JSON.stringify(m.presence || {}).length > 20000) return;
-      p.presence = m.presence || {}; return announcePeers(m.room);
+      p.presence = m.presence || {};
+      // the newer apps get just this player's presence; older ones the whole list, as before
+      let old = false;
+      for (const [peer, x] of r) { if (peer === m.peer) continue; if (x.ws.caps?.includes('pres')) send(x.ws, { t: 'pres', room: outName(m.room), peer: m.peer, by: ws.uid, presence: p.presence }); else old = true; }
+      if (old) announcePeers(m.room, true);
+      return;
     }
     case 'emit': {
       const r = rooms.get(m.room); if (!r || r.get(m.peer)?.ws !== ws || typeof m.topic !== 'string') return;
-      const msg = { t: 'evt', room: m.room, topic: m.topic, data: m.data ?? null, by: ws.uid, peer: m.peer };
+      const msg = { t: 'evt', room: outName(m.room), topic: m.topic, data: m.data ?? null, by: ws.uid, peer: m.peer };
       if (JSON.stringify(msg).length > 60000) return;
+      // "to": for one peer only (a handshake), else for everyone in the room
+      if (m.to !== undefined) { const x = validId(m.to) && r.get(m.to); if (x) send(x.ws, msg); return ack({ ok: !!x }); }
       for (const [, x] of r) send(x.ws, msg);
       return ack({ ok: true });
     }
     case 'leave': { leaveRoom(ws, m.room); return; }
   }
+}
+// one write, checked and stored; returns an error message, or nothing when it went through
+async function writeOne(ws, op) {
+  if (!op || !(isAudio(op.path) || (validPath(op.path) && mayWrite(ws.uid, op.path) && scopeOf(op.path)))) return 'not allowed: ' + (op && op.path);
+  if (isAudio(op.path)) {
+    if (op.op === 'delete') { await rm(audioFile(op.path), { force: true }); return; }
+    const d = op.data && typeof op.data === 'object' ? op.data : {};
+    if (JSON.stringify(d).length > 300 * 1024) return 'too large';
+    await writeFile(audioFile(op.path), JSON.stringify(d)); return;
+  }
+  const scope = scopeOf(op.path), data = await scopeData(scope);
+  const old = data.get(op.path), oldLen = old === undefined ? 0 : op.path.length + JSON.stringify(old).length;
+  let d = null;
+  if (op.op !== 'delete') {
+    d = op.data && typeof op.data === 'object' ? op.data : {};
+    if (op.op === 'update') d = { ...(old || {}), ...d };
+    if (isLobbyRoot(op.path)) d = guardLobbyRoot(data, op.path, ws.uid, op.op, d);
+    const len = JSON.stringify(d).length;
+    if (len > MAX_DOC) return 'too large';
+    const size = (await scopeSize(scope)) - oldLen + op.path.length + len;
+    if (scope[0] === 'L' && size > oldLen && (size > MAX_LOBBY_BYTES || (old === undefined && data.size >= MAX_LOBBY_DOCS))) return 'quota: this table is full (64 MB). Remove pictures or Library entries to make room.';
+    data.set(op.path, d); sizes.set(scope, size);
+  } else {
+    if (isLobbyRoot(op.path) && guardLobbyRoot(data, op.path, ws.uid, 'delete', true) === undefined) return 'not allowed: only the owner can close this table';
+    data.delete(op.path); if (sizes.has(scope)) sizes.set(scope, sizes.get(scope) - oldLen);
+  }
+  saveSoon(scope); if (scope[0] === 'L') dirty.add(scope);
+  for (const s of subs.get(scope) || []) send(s, { t: 'chg', scope, p: op.path, d });
 }
 // a scope nobody listens to any more is dropped from memory once it's on disk, so only open tables use memory
 function unsubscribe(ws, scope) {
@@ -329,13 +363,15 @@ wss.on('connection', (ws, req) => {
   const ip = ipOf(ws.ip);
   if (ip.sockets >= IP_SOCKETS) { ws.close(4029, 'too many connections from this address'); return; }
   ip.sockets++;
-  ws.scopes = new Set(); ws.rooms = new Map(); ws.alive = true;
+  ws.scopes = new Set(); ws.rooms = new Map(); ws.alive = true; ws.caps = [];
   ws.rl = { msg: bucket(LIMITS.msg), write: bucket(LIMITS.write), sub: bucket(LIMITS.sub) };
   ws.on('pong', () => { ws.alive = true; });
   // one message at a time per connection, so nothing sent right after "hello" arrives before the player is known
   let chain = Promise.resolve(), queued = 0;
   ws.on('message', raw => {
     let m; try { m = JSON.parse(raw); } catch { return; }
+    // the keep-alive gets its answer straight away, as on Cloudflare
+    if (m && m.t === 'ping') { if (ws.readyState === 1) ws.send('{"t":"pong"}'); return; }
     if (++queued > MAX_QUEUE) { ws.close(4008, 'too many messages'); return; }
     chain = chain.then(() => (m.t === 'hello' || m.t === 'ping' ? null : throttle(ws, m))).then(() => handle(ws, m)).catch(e => console.error(e)).finally(() => { queued--; });
   });

@@ -3,8 +3,10 @@ name = "critboard-homebase"
 main = "src/worker.js"
 compatibility_date = "2025-11-01"
 
-# the public address; Cloudflare makes the DNS record and certificate (poly-chrome.cc's DNS is on Cloudflare)
+# the public address, live.crittervtt.com; Cloudflare makes the DNS records and certificates (both domains' DNS is on
+# Cloudflare). critter.poly-chrome.cc was the address before: it stays, for apps and links from before the move
 routes = [
+  { pattern = "live.crittervtt.com", custom_domain = true },
   { pattern = "critter.poly-chrome.cc", custom_domain = true }
 ]
 # keep the old workers.dev address working for copies installed before the custom domain

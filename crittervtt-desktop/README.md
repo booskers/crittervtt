@@ -30,6 +30,11 @@ After that:
 
 After changing the page (`crittervtt/crittervtt.html`) or the Homebase client, run `npm run deploy` in `homebase-cloudflare`. It rebuilds `app/www` and puts it and the Worker online. It doesn't build the desktop installer.
 
+### The public address, and what it costs
+- **live.crittervtt.com** is the public Critter VTT (the built-in Homebase in `app/homebase.config.json`). **critter.poly-chrome.cc**, the address before, stays on the same Worker for older apps and links; opened there, `app/move.js` offers to move the browser's data (localStorage and IndexedDB, handed over with postMessage to the new address only) and then sends that browser to the new address. The Android app moves its data itself on its first start (see `MainActivity.moveStart`).
+- **Made for the free plan:** one Durable Object for every table (its running time fits the free allowance however many play), hibernating WebSockets with Cloudflare answering the `{"t":"ping"}` keep-alive (free), cursors only when someone else is there (about 8 a second, others glide in between), presence sent as just the one player who changed (`pres`, for clients that say `caps: ['pres']` in their hello; older ones still get the whole `peers` list), several writes in one message (`write` with `each: true`, each op checked on its own: the ack has `errs` by index), and autosaves stored as a few "pack" rows instead of one row per document.
+- **`/stats`** shows what the hub did, hour by hour (messages by kind, rows written, connections), and an estimate of today's share of the free plan. Counts only: no lobby codes, players or addresses.
+
 ## Run your own Homebase server instead
 
 Double-click `homebase-server/start-homebase.cmd`, or run `npm install`, then `node server.mjs --port 8787`. Then:
@@ -130,12 +135,12 @@ npm run dist
 
 ## Critter VTT for Android (players)
 
-**`android/`** is a small Android app for players: Critter VTT from critter.poly-chrome.cc in a full-screen window, opening on **Join a table** (the page sees `?app=player` and `CritterPlayer` in the user agent; campaigns, saves and setting up a table stay on the desktop app and the website). Updates to Critter VTT reach it without a new app.
+**`android/`** is a small Android app for players: Critter VTT from live.crittervtt.com in a full-screen window, opening on **Join a table** (the page sees `?app=player` and `CritterPlayer` in the user agent; campaigns, saves and setting up a table stay on the desktop app and the website). Updates to Critter VTT reach it without a new app.
 - **Building:** `python build.py` in `android/` makes `dist/Critter-VTT-Player.apk`. No Gradle: it runs the Android SDK's tools (aapt2, javac, d8, zipalign, apksigner) directly. It needs Java 17 (`winget install Microsoft.OpenJDK.17`) and the Android SDK command-line tools with `platforms;android-35` and `build-tools;35.0.0`, found through JAVA_HOME and ANDROID_HOME or their usual places.
 - **Signing:** the first build makes the signing key in `%USERPROFILE%\.critter\` (`critter-player.jks` and its password in `critter-player.pass`), outside the repository. Keep it safe: Android only installs an update signed with the same key.
 - **Releases:** attach `Critter-VTT-Player.apk` **and `critter-player.json`** (both made by `build.py` in `dist/`) to every Critter VTT release: the website links to `releases/latest/download/Critter-VTT-Player.apk`, and the app's updater reads `releases/latest/download/critter-player.json`. Raise `versionCode` and `versionName` in `AndroidManifest.xml` when the app itself changes.
 - **Updates:** on opening (every 6 hours at most) the app compares its `versionCode` with `critter-player.json`; when the release is newer it offers Update, Later or Skip this one, downloads the APK into Android's installer and Android asks to confirm. The first time, Android asks to allow installing from Critter VTT. Updates must be signed with the same key.
-- **What it does:** back closes what's open on the table (a sheet, a menu, a dialog), then sends the app to the background; picture uploads use the phone's picker; other links open in the browser; invite links (`critter.poly-chrome.cc/#CODE`) open in the app; the screen stays on while it's open.
+- **What it does:** back closes what's open on the table (a sheet, a menu, a dialog), then sends the app to the background; picture uploads use the phone's picker; other links open in the browser; invite links (`live.crittervtt.com/#CODE`) open in the app; the screen stays on while it's open.
 
 ## Critter Sounds (the desktop music player)
 

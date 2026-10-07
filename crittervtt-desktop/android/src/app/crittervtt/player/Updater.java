@@ -157,7 +157,7 @@ class Updater {
                     Intent confirm = in.getParcelableExtra(Intent.EXTRA_INTENT);
                     if (confirm != null) { confirm.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK); a.startActivity(confirm); }
                 } else if (st != PackageInstaller.STATUS_SUCCESS && st != PackageInstaller.STATUS_FAILURE_ABORTED) {
-                    Toast.makeText(a, "The update couldn't be installed. You can download it from critter.poly-chrome.cc.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(a, "The update couldn't be installed. You can download it from the Critter VTT website.", Toast.LENGTH_LONG).show();
                 }
             }
         };

@@ -58,7 +58,7 @@ a{color:var(--accent-text)}
 
 /* other people's cursors */
 #cursors{position:fixed;inset:0;pointer-events:none;overflow:hidden}
-.cur{position:absolute;left:0;top:0;transition:transform 90ms linear;will-change:transform}
+.cur{position:absolute;left:0;top:0;transition:transform 130ms linear;will-change:transform}
 /* "cur" also marks the current turn and your own seat in a list: those stay where they are */
 .turn.cur,.plopt.cur{position:static;transform:none;transition:none;will-change:auto}
 .cur .dot{position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;background:var(--c);border:2px solid var(--bg);box-shadow:0 0 0 1px var(--c)}
@@ -1536,6 +1536,9 @@ body.mob #onboardForm > .prow.end{position:sticky;bottom:-20px;z-index:2;margin:
 body.mob .overlay:not(#onboard):not(#splash) > .card::before{content:'';display:block;justify-self:center;align-self:start;width:40px;height:5px;border-radius:99px;background:var(--line);margin:-10px auto 0;flex:none}
 body.mob .overlay:not(#onboard) .card > :last-child:is(.prow,.ractions,.pactions,[class*=foot]),body.mob .overlay .helpcard > .prow.end{position:sticky;bottom:calc(-20px - var(--sab,env(safe-area-inset-bottom,0px)));z-index:3;margin:0 -16px calc(-20px - var(--sab,env(safe-area-inset-bottom,0px)));padding:12px 16px calc(14px + var(--sab,env(safe-area-inset-bottom,0px)));background:var(--panel-3);border-top:1px solid var(--line);box-shadow:0 -8px 18px -12px rgb(0 0 0/.55)}
 body.mob .overlay .helpcard > .prow.end{order:5;margin-bottom:0}
+/* the "moved" notice at the old address */
+.movebar{position:fixed;left:50%;top:calc(12px + var(--sat,env(safe-area-inset-top,0px)));transform:translateX(-50%);z-index:65;display:flex;align-items:center;gap:10px;flex-wrap:wrap;max-width:min(720px,calc(100vw - 24px));box-sizing:border-box;padding:10px 12px 10px 16px;border:1px solid var(--accent-line);border-radius:14px;background:var(--panel-3);box-shadow:var(--shadow)}
+.movebar .mbtx{flex:1 1 260px;font-size:13.5px;line-height:1.4}
 body.mob .menu{z-index:46}
 /* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
 body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
@@ -2283,6 +2286,8 @@ body.mob.chatoff #panel{transform:none;pointer-events:auto}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 <script>
+// a page that is only moving data to Critter VTT's new address doesn't start (see move.js in the desktop app's folder)
+if (window.__MOVING) throw new Error('Critter VTT is moving to live.crittervtt.com, so it does not start here.');
 (() => {
 'use strict';
 // windows can be popped out into their own browser windows; looking things up searches those too
@@ -5460,6 +5465,8 @@ window.addEventListener('pointermove', e => {
   setPresence({ x: Math.round(w.x), y: Math.round(w.y) });
 }, { passive: true });
 document.documentElement.addEventListener('mouseleave', () => setPresence({ x: null, y: null }));
+document.addEventListener('visibilitychange', () => { if (document.hidden) { setPresence({ x: null, y: null }); flushEnts(); } });
+addEventListener('pagehide', () => flushEnts());
 
 /* text tool */
 const ta = $('#textEdit');
@@ -5896,8 +5903,10 @@ function tick(now) {
 const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
 const coarse = matchMedia('(pointer: coarse)');
 const motionAsks = !!(window.DeviceMotionEvent && typeof DeviceMotionEvent.requestPermission === 'function');
-// motion starts on, except on iPhones and iPads, where the person turns it on in Settings and iOS asks them first
-let FEEL = { buzz: true, motion: !IOS, ...(lsGet('tt.feel', {}) || {}) };
+// motion starts on everywhere; iPhones and iPads ask once, the first time the dice panel is touched
+let FEEL = { buzz: true, motion: true, ...(lsGet('tt.feel', {}) || {}) };
+// (it was off on iOS until it could be asked for at the right moment: an old "off" that nobody chose goes)
+if (IOS && !lsGet('tt.feelAsked', 0)) { FEEL.motion = true; lsSet('tt.feelAsked', 1); }
 let buzzSwitch = null, lastBuzz = 0;
 function buzz(strength) {
   if (!FEEL.buzz || !coarse.matches || document.hidden) return;
@@ -5946,11 +5955,21 @@ function motionListen() {
   const go = () => { if (!motionOn) { motionOn = true; addEventListener('devicemotion', onMotion); } };
   // only iOS has to be asked (Android sends motion without asking, even where Chrome also has the question)
   if (!(motionAsks && IOS)) return go();
-  // iOS answers only from a tap: if this isn't one, the next tap anywhere asks
+  // iOS answers only during a tap (a touch that ends on a button or the dice panel; a drag on the board doesn't count).
+  // Outside one, the question waits for the first touch of the dice panel, where it makes sense
+  const inTap = !navigator.userActivation || navigator.userActivation.isActive;
+  if (!inTap) return askMotionOnTap();
   DeviceMotionEvent.requestPermission().then(r => {
     if (r === 'granted') go();
-    else { FEEL = { ...FEEL, motion: false }; lsSet('tt.feel', FEEL); toast('Motion isn’t allowed for this page, so the dice won’t follow the phone. You can allow it in the browser’s settings for this site.'); }
-  }).catch(() => addEventListener('click', motionListen, { once: true, capture: true }));
+    else { FEEL = { ...FEEL, motion: false }; lsSet('tt.feel', FEEL); toast('Motion isn’t allowed for this page, so the dice won’t follow the phone. You can allow it in Settings › Apps › Safari › Advanced › Website Data, or turn it on again under the gear.'); }
+  }).catch(() => askMotionOnTap());
+}
+let motionAsk = false;
+function askMotionOnTap() {
+  if (motionAsk) return; motionAsk = true;
+  const ask = () => { motionAsk = false; for (const t of ['touchend', 'click']) document.removeEventListener(t, onTap, true); motionListen(); };
+  const onTap = e => { if (e.target.closest && e.target.closest('#panel, #rollForm, #quick, .rollbtn, .rollable, #soundPop')) ask(); };
+  for (const t of ['touchend', 'click']) document.addEventListener(t, onTap, true);
 }
 function setFeel(patch) {
   FEEL = { ...FEEL, ...patch }; lsSet('tt.feel', FEEL);
@@ -7320,11 +7339,18 @@ function sanitizeEnt(id, d) {
 }
 
 /* store: lobby database when shared, this browser when playing solo */
-const entSaveT = new Map();
+const entSaveT = new Map(), entSaveFn = new Map();
+// what's waiting to be saved goes now (the tab is closing or going to the background)
+function flushEnts() { for (const [id, fn] of [...entSaveFn]) { clearTimeout(entSaveT.get(id)); fn(); } }
 function persistEnt(e) {
   asDirty();
   clearTimeout(entSaveT.get(e.id));
-  entSaveT.set(e.id, setTimeout(() => {
+  const save = () => { entSaveT.delete(e.id); entSaveFn.delete(e.id); saveEntNow(e); };
+  entSaveFn.set(e.id, save);
+  entSaveT.set(e.id, setTimeout(save, 1200));
+}
+function saveEntNow(e) {
+  {
     e.name = clampStr((e.data && e.data.name) || e.name || KIND_NAME[e.kind], 60);
     // remember when it was saved, so the database's echo of this write isn't taken for someone else's change
     e.ts = Date.now();
@@ -7332,7 +7358,7 @@ function persistEnt(e) {
     if (shared()) db.doc(`${lobbyPath()}/ents/${e.id}`).set(doc).catch(writeErr);
     else saveSoloEnts();
     renderLibrary();
-  }, 450));
+  }
 }
 function saveSoloEnts() { const o = {}; ENTS.forEach((e, id) => { o[id] = e; }); lsSet('tt.ents', o); }
 function createEnt(kind, sys, data, owner, extra) {
@@ -7359,6 +7385,7 @@ function subscribeEnts() {
       const raw = d.data() || {}, local = ENTS.get(d.id);
       if (local && raw.by === CLIENT && (raw.ts || 0) <= (local.ts || Infinity) + 5000) continue; // our own write: the window already shows it
       if (local && raw.ts && raw.ts === local.ts) continue;   // unchanged since the last update: nothing to redo
+      if (local && entSaveT.has(d.id)) continue;   // our own change is about to be saved over it: keep what's typed
       const e = sanitizeEnt(d.id, raw); if (!e) continue;
       ENTS.set(d.id, e);
       refreshEntWin(d.id);
@@ -13740,6 +13767,21 @@ async function offerContinue() {
   ov.append(card); document.body.append(ov); go.focus();
 }
 
+/* Critter VTT moved from critter.poly-chrome.cc to live.crittervtt.com: at the old address, a notice offers to move,
+   bringing this browser's settings, Homebase identity, rulebooks and saves along (the Android app moves by itself) */
+function offerMove() {
+  const M = window.CRITTER_MOVE;
+  if (!M || M.here !== 'old' || PLAYER_APP || typeof window.critterMove !== 'function' || document.getElementById('moveBar')) return;
+  try { if (sessionStorage.getItem('tt.moveLater')) return; } catch {}
+  const bar = el('div', 'movebar'); bar.id = 'moveBar'; bar.setAttribute('role', 'region'); bar.setAttribute('aria-label', 'Critter VTT has moved');
+  const go = el('button', 'btn small primary', 'Move there'), later = el('button', 'btn small ghost', 'Later');
+  go.type = later.type = 'button';
+  go.onclick = async () => { go.disabled = true; go.textContent = 'Moving…'; try { await window.critterMove(); } catch (e) { go.disabled = false; go.textContent = 'Move there'; toast(String((e && e.message) || e)); } };
+  later.onclick = () => { try { sessionStorage.setItem('tt.moveLater', '1'); } catch {} bar.remove(); };
+  bar.append(HB.el('span', 'mbtx', el('b', '', 'Critter VTT has moved to live.crittervtt.com.'), el('span', 'hint', ' Your name, settings, rulebooks and saves come along; this address will take you there from then on.')), go, later);
+  document.body.append(bar);
+}
+setTimeout(offerMove, 2500);
 /* the walkthrough: one card at a time, pointing at the thing it talks about */
 function offerTour(fromMenu) {
   const gm = isHost() || lsGet('tt.myRole', 'player') === 'gm';

@@ -4,6 +4,20 @@ Critter VTT (the page, `crittervtt/crittervtt.html`, and the desktop app in `cri
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
 ## Unreleased
+**Critter VTT has moved to live.crittervtt.com**
+- The public table is now at **live.crittervtt.com**. critter.poly-chrome.cc keeps working for older apps and links. Opened there, Critter VTT offers to move: your name, settings, Homebase identity, rulebooks and saves in the browser come along, and from then on the old address takes you to the new one. (A saves folder you chose is picked again at the new address; the files on disk stay where they are.)
+- The Android app (1.3.0) opens the new address and moves what it kept by itself on its first start. Invite links to either address open it.
+- The desktop apps connect to the new address (their own data stays where it is).
+
+**More play on the same Homebase** (the free Cloudflare plan goes about 5–10 times as far)
+- Cursors: nothing is sent while you're alone at the table; another player's cursor arrives about 8 times a second (was 20) and glides smoothly in between; a stroke being drawn about 12 times a second. A tab in the background sends nothing.
+- The Homebase sends just the player whose cursor moved, not everyone's every time.
+- Changes made together (moving several tokens, a chat line) travel in one message.
+- Autosaves on the Homebase take a few rows however much changed, and sheet edits are saved once typing pauses (and at once when the tab goes away).
+- Keep-alive pings are answered by Cloudflare without waking the Homebase, and a quiet Homebase sleeps.
+- The Homebase's /stats shows what it did, hour by hour, and how much of the free plan today used.
+- Tilting the phone steers the dice on iPhones too: it's on by default, and iOS asks the first time you touch the dice panel.
+
 
 ## 1.3.1 (2026-10-07)
 **Highlights**

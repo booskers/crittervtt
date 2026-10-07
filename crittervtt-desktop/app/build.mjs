@@ -1,6 +1,6 @@
 // Puts the Critter page, its SRD data and Homebase into ./www for the desktop app (and for the Homebase server).
 // The page is the same file that is published as the claude.ai artifact.
-//   homebase.config.json  { "server": "https://critter.poly-chrome.cc" } (or a workers.dev address), written by homebase-cloudflare/setup-homebase.cmd;
+//   homebase.config.json  { "server": "https://live.crittervtt.com" } (or a workers.dev address), written by homebase-cloudflare/setup-homebase.cmd;
 //                         without it the app asks where to connect
 //   HOMEBASE_SERVER=<url> use another built-in Homebase for this build (for testing, e.g. http://localhost:8787 from "wrangler dev")
 import { readFile, writeFile, mkdir, cp, rm, readdir } from 'node:fs/promises';
@@ -27,6 +27,8 @@ delete cfg.firebase;
 
 await build({ entryPoints: [join(here, 'shim', 'homebase-client.js')], bundle: true, format: 'iife', minify: true, target: 'chrome120', outfile: join(out, 'homebase.js'), logLevel: 'warning' });
 
+// the move from critter.poly-chrome.cc to live.crittervtt.com (see move.js): first, so a page that is only moving data never starts
+const moveJs = await readFile(join(here, 'move.js'), 'utf8');
 const wrap = body => `<!doctype html>
 <html lang="en">
 <head>
@@ -40,6 +42,7 @@ const wrap = body => `<!doctype html>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Critter VTT">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>${moveJs}</script>
 <script>window.HOMEBASE_CONFIG = ${JSON.stringify(cfg)}; window.CRITTER_VERSION = ${JSON.stringify(version)};</script>
 <script src="homebase.js"></script>
 </head>

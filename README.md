@@ -5,7 +5,7 @@
 <p align="center"><b>A free virtual tabletop for your group, in the browser or on Windows.</b></p>
 
 <p align="center">
-  <a href="https://critter.poly-chrome.cc">Play in your browser</a> ·
+  <a href="https://live.crittervtt.com">Play in your browser</a> ·
   <a href="https://booskers.github.io/crittervtt/">Website</a> ·
   <a href="https://github.com/booskers/crittervtt/releases/latest">Download for Windows</a>
 </p>
