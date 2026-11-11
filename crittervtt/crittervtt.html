@@ -1592,6 +1592,16 @@ body.tab .dot::after{content:'';position:absolute;inset:-6px}
 @keyframes pageIn{from{translate:30% 0;opacity:.2}to{translate:0 0;opacity:1}}
 @keyframes drawerIn{from{translate:-22% 0;opacity:.2}to{translate:0 0;opacity:1}}
 @keyframes sheetUp{from{translate:0 36%;opacity:.3}to{translate:0 0;opacity:1}}
+/* placing a picture in its circle */
+.cropcard{width:min(420px,100%)}
+.cropstage{position:relative;width:min(320px,100%);aspect-ratio:1;margin:0 auto;overflow:hidden;border-radius:12px;background:#0b0c0f;touch-action:none;cursor:grab;outline-offset:3px}
+.cropstage:active{cursor:grabbing}
+.cropimg{position:absolute;left:0;top:0;transform-origin:0 0;max-width:none;user-select:none;-webkit-user-drag:none;pointer-events:none}
+/* outside the circle darkens, and a ring marks it: what shows on the seat or token */
+.cropring{position:absolute;inset:0;border-radius:50%;box-shadow:0 0 0 2px var(--accent-line),0 0 0 999px rgb(0 0 0/.58);pointer-events:none}
+.cropzrow{display:flex;align-items:center;gap:10px;width:min(320px,100%);margin:0 auto}
+.cropzoom{flex:1}
+.cropzbtn{font-size:20px;font-weight:700;min-width:36px;min-height:36px}
 body.mob .menu{z-index:46}
 /* menus on a phone: inside the screen with a gutter, each item's explanation on its own line under it, rows tall enough to tap */
 body.mob .menu{max-width:calc(100vw - 16px);box-sizing:border-box}
@@ -2950,6 +2960,79 @@ function sanitizeProfile(d) {
 }
 // an uploaded portrait: cropped square from the middle, small enough to travel with the profile
 const AV_MAX = 60000, AV_SIZE = 160;
+/* placing a picture in its circle (your seat's picture, a sheet's portrait): drag it behind the circle, zoom with the
+   slider, the − and + buttons, a pinch or the wheel; arrow keys move it and + and − zoom. It always fills the circle.
+   Resolves to the square that was chosen, as a new picture file (what the circle shows, and the corners around it),
+   or null when cancelled. */
+function placeInCircle(file, title) {
+  return new Promise(resolve => {
+    if (!/^image\//.test(file.type || '')) { resolve(file); return; }
+    const url = URL.createObjectURL(file), im = new Image();
+    im.onerror = () => { URL.revokeObjectURL(url); resolve(file); };
+    im.onload = () => {
+      const W = im.naturalWidth, H = im.naturalHeight;
+      const ov = el('div', 'overlay'); ov.id = 'cropDlg';
+      const card = el('div', 'card cropcard'); card.setAttribute('role', 'dialog'); card.setAttribute('aria-labelledby', 'cropT');
+      const h = el('h2', '', title || 'Place the picture'); h.id = 'cropT';
+      const stage = el('div', 'cropstage'); stage.tabIndex = 0;
+      stage.setAttribute('role', 'application'); stage.setAttribute('aria-label', 'The picture in its circle. Drag it, or use the arrow keys to move it and + and − to zoom.');
+      const pic = el('img', 'cropimg'); pic.src = url; pic.alt = ''; pic.draggable = false; pic.width = W; pic.height = H;
+      const ring = el('div', 'cropring'); ring.setAttribute('aria-hidden', 'true');
+      stage.append(pic, ring);
+      const zoom = el('input', 'cropzoom'); zoom.type = 'range'; zoom.min = 0; zoom.max = 1000; zoom.step = 1; zoom.setAttribute('aria-label', 'Zoom');
+      const out = el('button', 'icon-btn cropzbtn', '−'), inn = el('button', 'icon-btn cropzbtn', '+');
+      out.type = inn.type = 'button'; out.setAttribute('aria-label', 'Zoom out'); inn.setAttribute('aria-label', 'Zoom in');
+      const zrow = el('div', 'cropzrow'); zrow.append(out, zoom, inn);
+      const cancel = el('button', 'btn ghost', 'Cancel'), reset = el('button', 'btn ghost', 'Fit'), ok = el('button', 'btn primary', 'Use this');
+      cancel.type = reset.type = ok.type = 'button';
+      card.append(h, el('p', 'hint', 'Drag the picture to move it behind the circle, and zoom to choose how much of it shows.'), stage, zrow, HB.el('div', 'prow end', reset, el('span', 'grow'), cancel, ok));
+      ov.append(card); document.body.append(ov);
+
+      // the picture's place: s screen pixels per picture pixel, (x, y) its top left in the stage
+      let S = stage.getBoundingClientRect().width || 300, cover = Math.max(S / W, S / H), MAX = cover * 6, s = cover, x = (S - W * s) / 2, y = (S - H * s) / 2;
+      const clamp = () => { s = Math.min(MAX, Math.max(cover, s)); x = Math.min(0, Math.max(S - W * s, x)); y = Math.min(0, Math.max(S - H * s, y)); };
+      const paint = () => { clamp(); pic.style.transform = `translate(${x}px,${y}px) scale(${s})`; zoom.value = String(Math.round(Math.log(s / cover) / Math.log(MAX / cover) * 1000)); };
+      const zoomAt = (f, cx = S / 2, cy = S / 2) => { const ns = Math.min(MAX, Math.max(cover, s * f)); x = cx - (cx - x) * ns / s; y = cy - (cy - y) * ns / s; s = ns; paint(); };
+      const fit = () => { s = cover; x = (S - W * s) / 2; y = (S - H * s) / 2; paint(); };
+      fit();
+      zoom.oninput = () => zoomAt(cover * Math.pow(MAX / cover, zoom.value / 1000) / s);
+      out.onclick = () => zoomAt(1 / 1.25); inn.onclick = () => zoomAt(1.25); reset.onclick = fit;
+      // dragging with a mouse or a finger, pinching with two
+      const pts = new Map(); let last = null;
+      const mid = () => { const [a, b] = [...pts.values()]; return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2, d: Math.hypot(a.x - b.x, a.y - b.y) || 1 }; };
+      stage.addEventListener('pointerdown', e => { try { stage.setPointerCapture(e.pointerId); } catch {} const r = stage.getBoundingClientRect(); pts.set(e.pointerId, { x: e.clientX - r.left, y: e.clientY - r.top }); last = pts.size === 2 ? mid() : null; });
+      stage.addEventListener('pointermove', e => {
+        if (!pts.has(e.pointerId)) return; const r = stage.getBoundingClientRect(), p0 = pts.get(e.pointerId), p = { x: e.clientX - r.left, y: e.clientY - r.top };
+        pts.set(e.pointerId, p);
+        if (pts.size === 1) { x += p.x - p0.x; y += p.y - p0.y; paint(); }
+        else if (pts.size === 2 && last) { const m = mid(); x += m.x - last.x; y += m.y - last.y; zoomAt(m.d / last.d, m.x, m.y); last = m; }
+      });
+      const up = e => { pts.delete(e.pointerId); last = pts.size === 2 ? mid() : null; };
+      stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+      stage.addEventListener('wheel', e => { e.preventDefault(); const r = stage.getBoundingClientRect(); zoomAt(Math.exp(-e.deltaY * 0.0015), e.clientX - r.left, e.clientY - r.top); }, { passive: false });
+      stage.addEventListener('keydown', e => {
+        const k = e.key, step = e.shiftKey ? 40 : 10;
+        if (k === 'ArrowLeft') x += step; else if (k === 'ArrowRight') x -= step; else if (k === 'ArrowUp') y += step; else if (k === 'ArrowDown') y -= step;
+        else if (k === '+' || k === '=') { zoomAt(1.1); return e.preventDefault(); } else if (k === '-' || k === '_') { zoomAt(1 / 1.1); return e.preventDefault(); } else return;
+        e.preventDefault(); paint();
+      });
+      // the dialog's size can change (a phone turned): keep the same part of the picture in view
+      const ro = window.ResizeObserver ? new ResizeObserver(() => { const n = stage.getBoundingClientRect().width; if (!n || n === S) return; const f = n / S; S = n; cover = Math.max(S / W, S / H); MAX = cover * 6; s *= f; x *= f; y *= f; paint(); }) : null;
+      if (ro) ro.observe(stage);
+      const done = res => { if (ro) ro.disconnect(); ov.remove(); URL.revokeObjectURL(url); resolve(res); };
+      cancel.onclick = () => done(null);
+      ov.onkeydown = e => { if (e.key === 'Escape') { e.stopPropagation(); done(null); } };
+      ok.onclick = () => {
+        // the chosen square, at up to 768 pixels (what the avatar and portrait are made from)
+        const side = S / s, n = Math.max(1, Math.round(Math.min(768, side))), c = document.createElement('canvas'); c.width = c.height = n;
+        const g = c.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(im, -x / s, -y / s, side, side, 0, 0, n, n);
+        c.toBlob(b => done(b ? new File([b], 'picture.png', { type: 'image/png' }) : file), 'image/png');
+      };
+      ok.focus();
+    };
+    im.src = url;
+  });
+}
 function avatarFromFile(file) {
   return new Promise((resolve, reject) => {
     if (!/^image\//.test(file.type || '') || file.size > 20e6) { reject(new Error('type')); return; }
@@ -4578,7 +4661,7 @@ function buildOnboard() {
   const fi = el('input'); fi.type = 'file'; fi.accept = 'image/*'; fi.id = 'obImgFile'; fi.hidden = true; $('#onboardForm').append(fi);
   fi.onchange = async () => {
     const f = fi.files && fi.files[0]; fi.value = ''; if (!f) return;
-    try { obPick.img = await avatarFromFile(f); obTouched = true; $('#obErr').hidden = true; paintOnboard(); }
+    try { const placed = await placeInCircle(f, 'Place your picture'); if (!placed) return; obPick.img = await avatarFromFile(placed); obTouched = true; $('#obErr').hidden = true; paintOnboard(); }
     catch (er) { const e = $('#obErr'); e.textContent = er && er.message === 'type' ? 'Pick a picture file, like a .jpg or .png.' : 'That picture couldn\'t be used. Try another one.'; e.hidden = false; }
   };
   $('#obColorCustom').addEventListener('change', e => { if (isHex(e.target.value)) { obTouched = true; obPick.color = e.target.value.toLowerCase(); paintOnboard(); } });
@@ -12530,7 +12613,7 @@ function portraitBox() {
   pic.onclick = () => fi.click();
   fi.onchange = async () => {
     const f = fi.files[0]; fi.value = ''; if (!f) return;
-    try { const [img, imgT] = await sheetPics(f), e = ENTS.get(ent.id) || ent; e.img = img; e.imgT = imgT; persistEnt(e); refreshEntWin(e.id, true); requestDraw(); }
+    try { const placed = await placeInCircle(f, 'Place the portrait'); if (!placed) return; const [img, imgT] = await sheetPics(placed), e = ENTS.get(ent.id) || ent; e.img = img; e.imgT = imgT; persistEnt(e); refreshEntWin(e.id, true); requestDraw(); }
     catch { toast('That picture could not be read.'); }
   };
   const tx = el('div', 'pftx');

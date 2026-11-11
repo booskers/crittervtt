@@ -4,6 +4,9 @@ Critter VTT (the page, `crittervtt/crittervtt.html`, and the desktop app in `cri
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
 ## Unreleased
+**Place your picture**
+- Uploading a picture for your seat or a sheet's portrait now lets you place it in its circle first: drag it to choose what shows, and zoom with the slider, the − and + buttons, a pinch or the mouse wheel (arrow keys and + and − on a keyboard). The picture always fills the circle; Fit starts over, Cancel keeps the old picture.
+
 **Critter VTT has moved to live.crittervtt.com**
 - The public table is now at **live.crittervtt.com**. critter.poly-chrome.cc keeps working for older apps and links. Opened there, Critter VTT offers to move: your name, settings, Homebase identity, rulebooks and saves in the browser come along, and from then on the old address takes you to the new one. (A saves folder you chose is picked again at the new address; the files on disk stay where they are.)
 - The Android app (1.3.0) opens the new address and moves what it kept by itself on its first start. Invite links to either address open it.
