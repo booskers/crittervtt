@@ -3,7 +3,7 @@
 Critter VTT (the page, `crittervtt/crittervtt.html`, and the desktop app in `crittervtt-desktop/app`).
 Critter Sounds keeps its own changelog in the critter-sounds repository.
 
-## Unreleased
+## 1.4.0 (2026-11-11)
 **Place your picture**
 - Uploading a picture for your seat or a sheet's portrait now lets you place it in its circle first: drag it to choose what shows, and zoom with the slider, the − and + buttons, a pinch or the mouse wheel (arrow keys and + and − on a keyboard). The picture always fills the circle; Fit starts over, Cancel keeps the old picture.
 
